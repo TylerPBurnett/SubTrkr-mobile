@@ -3,6 +3,7 @@ import Supabase
 
 final class ItemService {
     private let client: SupabaseClient
+    private let notificationService = NotificationService()
 
     init(client: SupabaseClient = SupabaseManager.shared.client) {
         self.client = client
@@ -58,24 +59,49 @@ final class ItemService {
     // MARK: - Create
 
     func createItem(_ data: ItemInsert) async throws -> Item {
-        return try await client.from("items")
+        let item: Item = try await client.from("items")
             .insert(data)
             .select("*, categories(*)")
             .single()
             .execute()
             .value
+
+        // Schedule notification for new item
+        if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
+            let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
+            if item.status == .active {
+                await notificationService.scheduleRenewalReminder(for: item, daysBefore: days > 0 ? days : 3)
+            } else if item.status == .trial {
+                await notificationService.scheduleTrialExpirationReminder(for: item)
+            }
+        }
+
+        return item
     }
 
     // MARK: - Update
 
     func updateItem(id: String, data: ItemUpdate) async throws -> Item {
-        return try await client.from("items")
+        let item: Item = try await client.from("items")
             .update(data)
             .eq("id", value: id)
             .select("*, categories(*)")
             .single()
             .execute()
             .value
+
+        // Reschedule notifications for updated item
+        if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
+            notificationService.cancelNotifications(for: id)
+            let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
+            if item.status == .active {
+                await notificationService.scheduleRenewalReminder(for: item, daysBefore: days > 0 ? days : 3)
+            } else if item.status == .trial {
+                await notificationService.scheduleTrialExpirationReminder(for: item)
+            }
+        }
+
+        return item
     }
 
     // MARK: - Delete
@@ -85,6 +111,8 @@ final class ItemService {
             .delete()
             .eq("id", value: id)
             .execute()
+
+        notificationService.cancelNotifications(for: id)
     }
 
     // MARK: - Status Change
