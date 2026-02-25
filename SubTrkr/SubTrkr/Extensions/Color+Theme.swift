@@ -71,3 +71,22 @@ extension Color {
         }
     }
 }
+
+// MARK: - ShapeStyle Extensions
+// Allows short-form syntax: .foregroundStyle(.brand), .foregroundStyle(.textTertiary), etc.
+
+extension ShapeStyle where Self == Color {
+    static var brand: Color { .init(hex: "#22c55e") }
+    static var brandDark: Color { .init(hex: "#16a34a") }
+    static var bgBase: Color { Color(.systemBackground) }
+    static var bgSurface: Color { Color(.secondarySystemBackground) }
+    static var bgCard: Color { Color(.tertiarySystemBackground) }
+    static var textPrimary: Color { Color(.label) }
+    static var textSecondary: Color { Color(.secondaryLabel) }
+    static var textTertiary: Color { Color(.tertiaryLabel) }
+    static var statusActive: Color { .init(hex: "#22c55e") }
+    static var statusPaused: Color { .init(hex: "#f59e0b") }
+    static var statusCancelled: Color { .init(hex: "#ef4444") }
+    static var statusArchived: Color { .init(hex: "#64748b") }
+    static var statusTrial: Color { .init(hex: "#8b5cf6") }
+}

@@ -11,28 +11,39 @@ final class ItemService {
     // MARK: - Read
 
     func getItems(type: ItemType? = nil) async throws -> [Item] {
-        var query = client.from("items")
-            .select("*, categories(*)")
-            .order("next_billing_date", ascending: true)
-
         if let type {
-            query = query.eq("item_type", value: type.rawValue)
+            return try await client.from("items")
+                .select("*, categories(*)")
+                .eq("item_type", value: type.rawValue)
+                .order("next_billing_date", ascending: true)
+                .execute()
+                .value
         }
 
-        return try await query.execute().value
+        return try await client.from("items")
+            .select("*, categories(*)")
+            .order("next_billing_date", ascending: true)
+            .execute()
+            .value
     }
 
     func getActiveItems(type: ItemType? = nil) async throws -> [Item] {
-        var query = client.from("items")
+        if let type {
+            return try await client.from("items")
+                .select("*, categories(*)")
+                .eq("status", value: ItemStatus.active.rawValue)
+                .eq("item_type", value: type.rawValue)
+                .order("next_billing_date", ascending: true)
+                .execute()
+                .value
+        }
+
+        return try await client.from("items")
             .select("*, categories(*)")
             .eq("status", value: ItemStatus.active.rawValue)
             .order("next_billing_date", ascending: true)
-
-        if let type {
-            query = query.eq("item_type", value: type.rawValue)
-        }
-
-        return try await query.execute().value
+            .execute()
+            .value
     }
 
     func getItemById(_ id: String) async throws -> Item {

@@ -11,15 +11,20 @@ final class PaymentService {
     // MARK: - Read
 
     func getPayments(itemId: String? = nil) async throws -> [Payment] {
-        var query = client.from("payments")
-            .select()
-            .order("paid_date", ascending: false)
-
         if let itemId {
-            query = query.eq("item_id", value: itemId)
+            return try await client.from("payments")
+                .select()
+                .eq("item_id", value: itemId)
+                .order("paid_date", ascending: false)
+                .execute()
+                .value
         }
 
-        return try await query.execute().value
+        return try await client.from("payments")
+            .select()
+            .order("paid_date", ascending: false)
+            .execute()
+            .value
     }
 
     // MARK: - Create

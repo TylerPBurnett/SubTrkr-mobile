@@ -1,13 +1,9 @@
-# Xcode
-*.xcodeproj/
-*.xcworkspace/
-*.pbxproj
+# Xcode - ignore generated/user-specific files, but NOT the project itself
 xcuserdata/
 *.xccheckout
 *.moved-aside
 *.xcuserstate
 *.xcscmblueprint
-*.xcscheme
 DerivedData/
 build/
 *.hmap
@@ -15,11 +11,12 @@ build/
 *.dSYM.zip
 *.dSYM
 
+# Ignore the SPM-generated Xcode workspace (not our real project)
+**/.swiftpm/xcode/
+
 # Swift Package Manager
 .build/
 Packages/
-Package.resolved
-*.xcodeproj
 
 # CocoaPods (if ever used)
 Pods/

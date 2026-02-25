@@ -70,13 +70,13 @@ final class AuthService {
     }
 
     func verifyOTP(email: String, token: String) async throws {
-        let session = try await client.auth.verifyOTP(
+        let response = try await client.auth.verifyOTP(
             email: email,
             token: token,
             type: .email
         )
-        self.currentSession = session
-        self.currentUser = session.user
+        self.currentSession = response.session
+        self.currentUser = response.user
     }
 
     // MARK: - OAuth

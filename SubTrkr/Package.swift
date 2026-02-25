@@ -1,13 +1,10 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
     name: "SubTrkr",
     platforms: [
-        .iOS(.v17)
-    ],
-    products: [
-        .library(name: "SubTrkr", targets: ["SubTrkr"])
+        .iOS(.v18)
     ],
     dependencies: [
         .package(url: "https://github.com/supabase/supabase-swift.git", from: "2.0.0")
@@ -20,5 +17,6 @@ let package = Package(
             ],
             path: "SubTrkr"
         )
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )

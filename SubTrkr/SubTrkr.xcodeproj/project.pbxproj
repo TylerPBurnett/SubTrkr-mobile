@@ -1,0 +1,583 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CC000000000000000000CC01 /* SubTrkrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB01 /* SubTrkrApp.swift */; };
+		CC000000000000000000CC02 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB02 /* Color+Theme.swift */; };
+		CC000000000000000000CC03 /* Date+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB03 /* Date+Helpers.swift */; };
+		CC000000000000000000CC04 /* Double+Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB04 /* Double+Currency.swift */; };
+		CC000000000000000000CC05 /* AnalyticsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB05 /* AnalyticsModels.swift */; };
+		CC000000000000000000CC06 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB06 /* Category.swift */; };
+		CC000000000000000000CC07 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB07 /* Enums.swift */; };
+		CC000000000000000000CC08 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB08 /* Item.swift */; };
+		CC000000000000000000CC09 /* NotificationChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB09 /* NotificationChannel.swift */; };
+		CC000000000000000000CC0A /* Payment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0A /* Payment.swift */; };
+		CC000000000000000000CC0B /* StatusHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0B /* StatusHistory.swift */; };
+		CC000000000000000000CC0C /* KnownServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0C /* KnownServices.swift */; };
+		CC000000000000000000CC0D /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0D /* AnalyticsService.swift */; };
+		CC000000000000000000CC0E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0E /* AuthService.swift */; };
+		CC000000000000000000CC0F /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0F /* CategoryService.swift */; };
+		CC000000000000000000CC10 /* ItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB10 /* ItemService.swift */; };
+		CC000000000000000000CC11 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB11 /* NotificationService.swift */; };
+		CC000000000000000000CC12 /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB12 /* PaymentService.swift */; };
+		CC000000000000000000CC13 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB13 /* SupabaseManager.swift */; };
+		CC000000000000000000CC14 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB14 /* ContentView.swift */; };
+		CC000000000000000000CC15 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB15 /* AnalyticsView.swift */; };
+		CC000000000000000000CC16 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB16 /* AuthScreen.swift */; };
+		CC000000000000000000CC17 /* CurrencyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB17 /* CurrencyText.swift */; };
+		CC000000000000000000CC18 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB18 /* EmptyState.swift */; };
+		CC000000000000000000CC19 /* ServiceLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB19 /* ServiceLogo.swift */; };
+		CC000000000000000000CC1A /* StatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1A /* StatusBadge.swift */; };
+		CC000000000000000000CC1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1B /* DashboardView.swift */; };
+		CC000000000000000000CC1C /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1C /* ItemDetailView.swift */; };
+		CC000000000000000000CC1D /* ItemFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1D /* ItemFormView.swift */; };
+		CC000000000000000000CC1E /* ItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1E /* ItemListView.swift */; };
+		CC000000000000000000CC1F /* StatusChangeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB1F /* StatusChangeSheet.swift */; };
+		CC000000000000000000CC20 /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB20 /* NotificationSettingsView.swift */; };
+		CC000000000000000000CC21 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB21 /* SettingsView.swift */; };
+		CC000000000000000000CC22 /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB22 /* AnalyticsViewModel.swift */; };
+		CC000000000000000000CC23 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB23 /* AuthViewModel.swift */; };
+		CC000000000000000000CC24 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB24 /* DashboardViewModel.swift */; };
+		CC000000000000000000CC25 /* ItemFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB25 /* ItemFormViewModel.swift */; };
+		CC000000000000000000CC26 /* ItemListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB26 /* ItemListViewModel.swift */; };
+		CC000000000000000000CC27 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB27 /* SettingsViewModel.swift */; };
+		CC000000000000000000CC28 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AA000000000000000000AA1E /* Supabase */; };
+		CC000000000000000000CC29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB28 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA000000000000000000AA08 /* SubTrkr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTrkr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000000000000000000AA15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BB000000000000000000BB01 /* SubTrkrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrkrApp.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB02 /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
+		BB000000000000000000BB03 /* Date+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Helpers.swift"; sourceTree = "<group>"; };
+		BB000000000000000000BB04 /* Double+Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Currency.swift"; sourceTree = "<group>"; };
+		BB000000000000000000BB05 /* AnalyticsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsModels.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB06 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB07 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB08 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB09 /* NotificationChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationChannel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0A /* Payment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Payment.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0B /* StatusHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusHistory.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0C /* KnownServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownServices.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0D /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0E /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB0F /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB10 /* ItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB11 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB12 /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB13 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB14 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB15 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB16 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB17 /* CurrencyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyText.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB18 /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB19 /* ServiceLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLogo.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1A /* StatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBadge.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1C /* ItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1D /* ItemFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemFormView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1E /* ItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB1F /* StatusChangeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusChangeSheet.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB20 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB21 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB22 /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB23 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB24 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB25 /* ItemFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemFormViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB26 /* ItemListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB27 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB28 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA000000000000000000AA04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC000000000000000000CC28 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA000000000000000000AA06 /* / */ = {
+			isa = PBXGroup;
+			children = (
+				AA000000000000000000AA09 /* SubTrkr */,
+				AA000000000000000000AA07 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA07 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA000000000000000000AA08 /* SubTrkr.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA09 /* SubTrkr */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB01 /* SubTrkrApp.swift */,
+				AA000000000000000000AA15 /* Info.plist */,
+				BB000000000000000000BB28 /* Assets.xcassets */,
+				AA000000000000000000AA0A /* Extensions */,
+				AA000000000000000000AA0B /* Models */,
+				AA000000000000000000AA0C /* Resources */,
+				AA000000000000000000AA0D /* Services */,
+				AA000000000000000000AA0E /* Views */,
+				AA000000000000000000AA16 /* ViewModels */,
+			);
+			path = SubTrkr;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB02 /* Color+Theme.swift */,
+				BB000000000000000000BB03 /* Date+Helpers.swift */,
+				BB000000000000000000BB04 /* Double+Currency.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB05 /* AnalyticsModels.swift */,
+				BB000000000000000000BB06 /* Category.swift */,
+				BB000000000000000000BB07 /* Enums.swift */,
+				BB000000000000000000BB08 /* Item.swift */,
+				BB000000000000000000BB09 /* NotificationChannel.swift */,
+				BB000000000000000000BB0A /* Payment.swift */,
+				BB000000000000000000BB0B /* StatusHistory.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB0C /* KnownServices.swift */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB0D /* AnalyticsService.swift */,
+				BB000000000000000000BB0E /* AuthService.swift */,
+				BB000000000000000000BB0F /* CategoryService.swift */,
+				BB000000000000000000BB10 /* ItemService.swift */,
+				BB000000000000000000BB11 /* NotificationService.swift */,
+				BB000000000000000000BB12 /* PaymentService.swift */,
+				BB000000000000000000BB13 /* SupabaseManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB14 /* ContentView.swift */,
+				AA000000000000000000AA0F /* Analytics */,
+				AA000000000000000000AA10 /* Auth */,
+				AA000000000000000000AA11 /* Components */,
+				AA000000000000000000AA12 /* Dashboard */,
+				AA000000000000000000AA13 /* Items */,
+				AA000000000000000000AA14 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA0F /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB15 /* AnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA10 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB16 /* AuthScreen.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA11 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB17 /* CurrencyText.swift */,
+				BB000000000000000000BB18 /* EmptyState.swift */,
+				BB000000000000000000BB19 /* ServiceLogo.swift */,
+				BB000000000000000000BB1A /* StatusBadge.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA12 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB1B /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA13 /* Items */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB1C /* ItemDetailView.swift */,
+				BB000000000000000000BB1D /* ItemFormView.swift */,
+				BB000000000000000000BB1E /* ItemListView.swift */,
+				BB000000000000000000BB1F /* StatusChangeSheet.swift */,
+			);
+			path = Items;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA14 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB20 /* NotificationSettingsView.swift */,
+				BB000000000000000000BB21 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000AA16 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000BB22 /* AnalyticsViewModel.swift */,
+				BB000000000000000000BB23 /* AuthViewModel.swift */,
+				BB000000000000000000BB24 /* DashboardViewModel.swift */,
+				BB000000000000000000BB25 /* ItemFormViewModel.swift */,
+				BB000000000000000000BB26 /* ItemListViewModel.swift */,
+				BB000000000000000000BB27 /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA000000000000000000AA02 /* SubTrkr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000000000000000000AA1C /* Build configuration list for PBXNativeTarget "SubTrkr" */;
+			buildPhases = (
+				AA000000000000000000AA03 /* Sources */,
+				AA000000000000000000AA04 /* Frameworks */,
+				AA000000000000000000AA05 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SubTrkr;
+			packageProductDependencies = (
+				AA000000000000000000AA1E /* Supabase */,
+			);
+			productName = SubTrkr;
+			productReference = AA000000000000000000AA08 /* SubTrkr.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA000000000000000000AA01 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					AA000000000000000000AA02 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = AA000000000000000000AA1B /* Build configuration list for PBXProject "SubTrkr" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AA000000000000000000AA06;
+			packageReferences = (
+				AA000000000000000000AA1D /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			productRefGroup = AA000000000000000000AA07 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA000000000000000000AA02 /* SubTrkr */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA000000000000000000AA05 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC000000000000000000CC29 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA000000000000000000AA03 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC000000000000000000CC01 /* SubTrkrApp.swift in Sources */,
+				CC000000000000000000CC02 /* Color+Theme.swift in Sources */,
+				CC000000000000000000CC03 /* Date+Helpers.swift in Sources */,
+				CC000000000000000000CC04 /* Double+Currency.swift in Sources */,
+				CC000000000000000000CC05 /* AnalyticsModels.swift in Sources */,
+				CC000000000000000000CC06 /* Category.swift in Sources */,
+				CC000000000000000000CC07 /* Enums.swift in Sources */,
+				CC000000000000000000CC08 /* Item.swift in Sources */,
+				CC000000000000000000CC09 /* NotificationChannel.swift in Sources */,
+				CC000000000000000000CC0A /* Payment.swift in Sources */,
+				CC000000000000000000CC0B /* StatusHistory.swift in Sources */,
+				CC000000000000000000CC0C /* KnownServices.swift in Sources */,
+				CC000000000000000000CC0D /* AnalyticsService.swift in Sources */,
+				CC000000000000000000CC0E /* AuthService.swift in Sources */,
+				CC000000000000000000CC0F /* CategoryService.swift in Sources */,
+				CC000000000000000000CC10 /* ItemService.swift in Sources */,
+				CC000000000000000000CC11 /* NotificationService.swift in Sources */,
+				CC000000000000000000CC12 /* PaymentService.swift in Sources */,
+				CC000000000000000000CC13 /* SupabaseManager.swift in Sources */,
+				CC000000000000000000CC14 /* ContentView.swift in Sources */,
+				CC000000000000000000CC15 /* AnalyticsView.swift in Sources */,
+				CC000000000000000000CC16 /* AuthScreen.swift in Sources */,
+				CC000000000000000000CC17 /* CurrencyText.swift in Sources */,
+				CC000000000000000000CC18 /* EmptyState.swift in Sources */,
+				CC000000000000000000CC19 /* ServiceLogo.swift in Sources */,
+				CC000000000000000000CC1A /* StatusBadge.swift in Sources */,
+				CC000000000000000000CC1B /* DashboardView.swift in Sources */,
+				CC000000000000000000CC1C /* ItemDetailView.swift in Sources */,
+				CC000000000000000000CC1D /* ItemFormView.swift in Sources */,
+				CC000000000000000000CC1E /* ItemListView.swift in Sources */,
+				CC000000000000000000CC1F /* StatusChangeSheet.swift in Sources */,
+				CC000000000000000000CC20 /* NotificationSettingsView.swift in Sources */,
+				CC000000000000000000CC21 /* SettingsView.swift in Sources */,
+				CC000000000000000000CC22 /* AnalyticsViewModel.swift in Sources */,
+				CC000000000000000000CC23 /* AuthViewModel.swift in Sources */,
+				CC000000000000000000CC24 /* DashboardViewModel.swift in Sources */,
+				CC000000000000000000CC25 /* ItemFormViewModel.swift in Sources */,
+				CC000000000000000000CC26 /* ItemListViewModel.swift in Sources */,
+				CC000000000000000000CC27 /* SettingsViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA000000000000000000AA17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)");
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA000000000000000000AA18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA000000000000000000AA19 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = SubTrkr/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.subtrkr.app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA000000000000000000AA1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = SubTrkr/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.subtrkr.app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA000000000000000000AA1B /* Build configuration list for PBXProject "SubTrkr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000000000000000000AA17 /* Debug */,
+				AA000000000000000000AA18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000000000000000000AA1C /* Build configuration list for PBXNativeTarget "SubTrkr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000000000000000000AA19 /* Debug */,
+				AA000000000000000000AA1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA000000000000000000AA1D /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "2.0.0";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA000000000000000000AA1E /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000000000000000000AA1D /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+	};
+	rootObject = AA000000000000000000AA01 /* Project object */;
+}

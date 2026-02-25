@@ -11,15 +11,20 @@ final class CategoryService {
     // MARK: - Read
 
     func getCategories(type: ItemType? = nil) async throws -> [Category] {
-        var query = client.from("categories")
-            .select()
-            .order("name", ascending: true)
-
         if let type {
-            query = query.eq("type", value: type.rawValue)
+            return try await client.from("categories")
+                .select()
+                .eq("type", value: type.rawValue)
+                .order("name", ascending: true)
+                .execute()
+                .value
         }
 
-        return try await query.execute().value
+        return try await client.from("categories")
+            .select()
+            .order("name", ascending: true)
+            .execute()
+            .value
     }
 
     // MARK: - Create
