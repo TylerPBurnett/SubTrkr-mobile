@@ -12,6 +12,10 @@ struct ItemDetailView: View {
     @State private var currentItem: Item
     @State private var payments: [Payment] = []
     @State private var statusHistory: [StatusHistory] = []
+    @State private var showPaymentSheet = false
+    @State private var paymentAmount: Double = 0
+    @State private var paymentDate = Date.now
+    @State private var isRecordingPayment = false
 
     init(item: Item, onUpdate: (() async -> Void)? = nil) {
         self.item = item
@@ -71,6 +75,47 @@ struct ItemDetailView: View {
                         await onUpdate?()
                     }
                 )
+            }
+            .sheet(isPresented: $showPaymentSheet) {
+                NavigationStack {
+                    Form {
+                        Section("Payment Details") {
+                            HStack {
+                                Image(systemName: "dollarsign.circle.fill")
+                                    .foregroundStyle(.brand)
+                                    .frame(width: 24)
+                                TextField("Amount", value: $paymentAmount, format: .number.precision(.fractionLength(2)))
+                                    .keyboardType(.decimalPad)
+                            }
+
+                            DatePicker(selection: $paymentDate, displayedComponents: .date) {
+                                HStack {
+                                    Image(systemName: "calendar")
+                                        .foregroundStyle(.brand)
+                                        .frame(width: 24)
+                                    Text("Date")
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle("Record Payment")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Cancel") { showPaymentSheet = false }
+                                .foregroundStyle(.brand)
+                        }
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Save") {
+                                Task { await recordPayment() }
+                            }
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.brand)
+                            .disabled(paymentAmount <= 0 || isRecordingPayment)
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
             }
         }
         .task {
@@ -218,9 +263,25 @@ struct ItemDetailView: View {
 
     private var paymentHistorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Payment History")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.textSecondary)
+            HStack {
+                Text("Payment History")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.textSecondary)
+
+                Spacer()
+
+                if currentItem.status == .active || currentItem.status == .trial {
+                    Button {
+                        paymentAmount = currentItem.amount
+                        paymentDate = Date.now
+                        showPaymentSheet = true
+                    } label: {
+                        Label("Record Payment", systemImage: "plus.circle.fill")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.brand)
+                    }
+                }
+            }
 
             if payments.isEmpty {
                 Text("No payments recorded yet")
@@ -232,7 +293,6 @@ struct ItemDetailView: View {
                 ForEach(payments.prefix(10)) { payment in
                     HStack {
                         if let date = payment.paidDateFormatted {
-                            let f = DateFormatter()
                             Text({
                                 let f = DateFormatter()
                                 f.dateStyle = .medium
@@ -303,6 +363,38 @@ struct ItemDetailView: View {
         } catch {
             // Non-critical
         }
+    }
+
+    private func recordPayment() async {
+        guard let userId = authService.currentUser?.id.uuidString else { return }
+        isRecordingPayment = true
+
+        do {
+            // Record the payment
+            _ = try await PaymentService().recordPayment(
+                userId: userId,
+                itemId: currentItem.id,
+                amount: paymentAmount,
+                paidDate: paymentDate
+            )
+
+            // Auto-advance next billing date by one cycle
+            if let currentDate = currentItem.nextBillingDateFormatted {
+                let nextDate = DateHelper.advanceDate(currentDate, by: currentItem.billingCycle)
+                let update = ItemUpdate(nextBillingDate: DateHelper.formatDate(nextDate))
+                _ = try await ItemService().updateItem(id: currentItem.id, data: update)
+            }
+
+            // Refresh data
+            await refreshItem()
+            await loadPayments()
+            await onUpdate?()
+            showPaymentSheet = false
+        } catch {
+            // Payment failed — sheet stays open so user can retry
+        }
+
+        isRecordingPayment = false
     }
 }
 
