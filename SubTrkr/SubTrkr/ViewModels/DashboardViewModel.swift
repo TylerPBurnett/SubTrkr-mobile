@@ -5,6 +5,7 @@ final class DashboardViewModel {
     private let itemService = ItemService()
     private let analyticsService = AnalyticsService()
     private let categoryService = CategoryService()
+    private let notificationService = NotificationService()
 
     var items: [Item] = []
     var categories: [Category] = []
@@ -71,8 +72,17 @@ final class DashboardViewModel {
             try await itemService.archivePastCancellations()
             try await itemService.resumePausedItems()
             try await itemService.handleExpiredTrials(userId: userId)
+
+            // Reschedule all notifications after maintenance changes
+            if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
+                let allItems = try await itemService.getItems()
+                let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
+                await notificationService.rescheduleAllNotifications(
+                    items: allItems,
+                    daysBefore: days > 0 ? days : 3
+                )
+            }
         } catch {
-            // Maintenance errors are non-critical
             print("Maintenance error: \(error)")
         }
     }
