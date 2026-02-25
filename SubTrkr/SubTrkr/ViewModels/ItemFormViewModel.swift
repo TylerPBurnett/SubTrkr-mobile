@@ -27,6 +27,7 @@ final class ItemFormViewModel {
     var error: String?
     var isSaved = false
     var editingItem: Item?
+    var userEditedNextBillingDate = false
 
     // Service autocomplete
     var serviceSearchText = ""
@@ -60,6 +61,17 @@ final class ItemFormViewModel {
 
     var isValid: Bool {
         !name.isEmpty && (amount > 0 || status == .trial)
+    }
+
+    func autoCalcNextBillingDate() {
+        guard !isEditing, !userEditedNextBillingDate else { return }
+        var date = startDate
+        let now = Date.now
+        // Roll forward until the date is in the future
+        while date <= now {
+            date = DateHelper.advanceDate(date, by: billingCycle)
+        }
+        nextBillingDate = date
     }
 
     var relevantCategories: [Category] {

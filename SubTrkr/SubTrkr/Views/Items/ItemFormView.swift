@@ -179,6 +179,9 @@ struct ItemFormView: View {
                     Text("Billing Cycle")
                 }
             }
+            .onChange(of: viewModel.billingCycle) { _, _ in
+                viewModel.autoCalcNextBillingDate()
+            }
 
             DatePicker(selection: Binding(
                 get: { viewModel.startDate },
@@ -191,10 +194,16 @@ struct ItemFormView: View {
                     Text("Start Date")
                 }
             }
+            .onChange(of: viewModel.startDate) { _, _ in
+                viewModel.autoCalcNextBillingDate()
+            }
 
             DatePicker(selection: Binding(
                 get: { viewModel.nextBillingDate },
-                set: { viewModel.nextBillingDate = $0 }
+                set: {
+                    viewModel.nextBillingDate = $0
+                    viewModel.userEditedNextBillingDate = true
+                }
             ), displayedComponents: .date) {
                 HStack {
                     Image(systemName: "calendar.badge.clock")
