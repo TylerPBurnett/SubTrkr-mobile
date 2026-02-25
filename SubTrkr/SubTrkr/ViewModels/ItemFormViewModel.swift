@@ -42,7 +42,7 @@ final class ItemFormViewModel {
         if let item = editingItem {
             name = item.name
             amount = item.amount
-            currency = item.currency
+            currency = "USD"
             billingCycle = item.billingCycle
             categoryId = item.categoryId
             startDate = item.startDate.flatMap { DateHelper.parseDate($0) } ?? Date.now
@@ -79,7 +79,7 @@ final class ItemFormViewModel {
     func selectService(_ service: KnownService) {
         name = service.name
         amount = service.defaultPrice
-        currency = service.currency
+        currency = "USD"
         billingCycle = service.billingCycle
         logoUrl = service.logoUrl
         url = service.url
