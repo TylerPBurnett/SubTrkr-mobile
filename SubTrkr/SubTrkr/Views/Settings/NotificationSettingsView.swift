@@ -48,7 +48,7 @@ struct NotificationSettingsView: View {
                     Spacer()
                     Text("Desktop only")
                         .font(.caption)
-                        .foregroundStyle(.textTertiary)
+                        .foregroundStyle(.textMuted)
                 }
                 HStack {
                     Label("Discord", systemImage: "bubble.left.fill")
@@ -56,7 +56,7 @@ struct NotificationSettingsView: View {
                     Spacer()
                     Text("Desktop only")
                         .font(.caption)
-                        .foregroundStyle(.textTertiary)
+                        .foregroundStyle(.textMuted)
                 }
                 HStack {
                     Label("Slack", systemImage: "number")
@@ -64,7 +64,7 @@ struct NotificationSettingsView: View {
                     Spacer()
                     Text("Desktop only")
                         .font(.caption)
-                        .foregroundStyle(.textTertiary)
+                        .foregroundStyle(.textMuted)
                 }
             } header: {
                 Text("Notification Channels")

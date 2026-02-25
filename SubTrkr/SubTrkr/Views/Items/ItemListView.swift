@@ -185,7 +185,7 @@ struct ItemRow: View {
                     if let date = item.nextBillingDateFormatted {
                         Text(DateHelper.relativeDateString(date))
                             .font(.caption2)
-                            .foregroundStyle(.textTertiary)
+                            .foregroundStyle(.textMuted)
                     }
                 }
             }
@@ -200,7 +200,7 @@ struct ItemRow: View {
 
                 Text(item.billingCycle.displayName)
                     .font(.caption2)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
         }
         .padding(.vertical, 8)

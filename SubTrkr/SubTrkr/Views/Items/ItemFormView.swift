@@ -78,7 +78,7 @@ struct ItemFormView: View {
         Section("Search Services") {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
                 TextField("Search for a service...", text: Binding(
                     get: { viewModel.serviceSearchText },
                     set: {

@@ -127,7 +127,7 @@ struct AnalyticsView: View {
                                         .foregroundStyle(.textPrimary)
                                     Text("\(category.count) item\(category.count == 1 ? "" : "s")")
                                         .font(.caption)
-                                        .foregroundStyle(.textTertiary)
+                                        .foregroundStyle(.textMuted)
                                 }
 
                                 Spacer()
@@ -139,7 +139,7 @@ struct AnalyticsView: View {
                                         .foregroundStyle(.textPrimary)
                                     Text("/month")
                                         .font(.caption2)
-                                        .foregroundStyle(.textTertiary)
+                                        .foregroundStyle(.textMuted)
                                 }
                             }
                             .padding(.horizontal)
@@ -204,12 +204,12 @@ struct AnalyticsView: View {
                     .chartYAxis {
                         AxisMarks(position: .leading) { value in
                             AxisGridLine()
-                                .foregroundStyle(Color.textTertiary.opacity(0.2))
+                                .foregroundStyle(Color.textMuted.opacity(0.2))
                             AxisValueLabel {
                                 if let intValue = value.as(Double.self) {
                                     Text(intValue.formattedCompact(currency: "USD"))
                                         .font(.caption2)
-                                        .foregroundStyle(.textTertiary)
+                                        .foregroundStyle(.textMuted)
                                 }
                             }
                         }
@@ -254,7 +254,7 @@ struct AnalyticsView: View {
                                     .foregroundStyle(.textSecondary)
                                 Text("saved/mo")
                                     .font(.caption2)
-                                    .foregroundStyle(.textTertiary)
+                                    .foregroundStyle(.textMuted)
                             }
                         }
                         .padding(.vertical, 4)
@@ -380,7 +380,7 @@ struct AnalyticsCard: View {
             if let subtitle {
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -11,7 +11,7 @@ struct EmptyStateView: View {
         VStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 48))
-                .foregroundStyle(.textTertiary)
+                .foregroundStyle(.textMuted)
 
             VStack(spacing: 6) {
                 Text(title)

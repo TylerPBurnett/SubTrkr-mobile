@@ -228,7 +228,7 @@ struct ItemDetailView: View {
             if payments.isEmpty {
                 Text("No payments recorded yet")
                     .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else {

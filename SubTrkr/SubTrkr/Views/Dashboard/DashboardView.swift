@@ -111,7 +111,7 @@ struct DashboardView: View {
                         Spacer()
                         Text("\(category.count) items")
                             .font(.caption)
-                            .foregroundStyle(.textTertiary)
+                            .foregroundStyle(.textMuted)
                         Text(category.total.formatted(currency: "USD"))
                             .font(.system(.subheadline, design: .monospaced))
                             .fontWeight(.medium)
@@ -136,7 +136,7 @@ struct DashboardView: View {
                 Spacer()
                 Text("Next 30 days")
                     .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
 
             ForEach(viewModel.upcomingPayments.prefix(8)) { item in
@@ -178,7 +178,7 @@ struct StatsCard: View {
             if let subtitle {
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -212,7 +212,7 @@ struct UpcomingPaymentRow: View {
                     Text(DateHelper.relativeDateString(date))
                         .font(.caption)
                         .foregroundStyle(
-                            (item.daysUntilDue ?? 0) <= 3 ? .statusCancelled : .textTertiary
+                            (item.daysUntilDue ?? 0) <= 3 ? .statusCancelled : .textMuted
                         )
                 }
             }
@@ -225,7 +225,7 @@ struct UpcomingPaymentRow: View {
 
                 Text(item.billingCycle.displayName)
                     .font(.caption2)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
         }
         .padding(.vertical, 4)

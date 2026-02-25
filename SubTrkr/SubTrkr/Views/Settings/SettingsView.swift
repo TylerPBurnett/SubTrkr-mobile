@@ -70,7 +70,7 @@ struct SettingsView: View {
                         Spacer()
                         Text("1.0.0")
                             .font(.subheadline)
-                            .foregroundStyle(.textTertiary)
+                            .foregroundStyle(.textMuted)
                     }
 
                     HStack {
@@ -79,7 +79,7 @@ struct SettingsView: View {
                         Spacer()
                         Text("iOS")
                             .font(.subheadline)
-                            .foregroundStyle(.textTertiary)
+                            .foregroundStyle(.textMuted)
                     }
                 } header: {
                     Text("About")
@@ -197,7 +197,7 @@ struct CategoryRow: View {
             if let type = category.itemType {
                 Text(type.displayName)
                     .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(.textMuted)
             }
         }
     }
