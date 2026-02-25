@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct NotificationSettingsView: View {
-    @State private var notificationsEnabled = false
-    @State private var defaultReminderDays = 3
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("defaultReminderDays") private var defaultReminderDays = 3
     @State private var hasPermission = false
 
     var body: some View {
@@ -37,6 +37,15 @@ struct NotificationSettingsView: View {
                         Text("7 days before").tag(7)
                         Text("14 days before").tag(14)
                         Text("30 days before").tag(30)
+                    }
+                    .onChange(of: defaultReminderDays) { _, newValue in
+                        Task {
+                            let items = try? await ItemService().getItems()
+                            await NotificationService().rescheduleAllNotifications(
+                                items: items ?? [],
+                                daysBefore: newValue
+                            )
+                        }
                     }
                 }
             }
@@ -76,7 +85,10 @@ struct NotificationSettingsView: View {
         .task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()
             hasPermission = settings.authorizationStatus == .authorized
-            notificationsEnabled = hasPermission
+            // If the user previously enabled notifications but OS permission was revoked, sync the toggle
+            if notificationsEnabled && !hasPermission {
+                notificationsEnabled = false
+            }
         }
     }
 }
