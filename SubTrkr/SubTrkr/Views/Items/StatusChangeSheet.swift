@@ -84,7 +84,7 @@ struct StatusChangeSheet: View {
                 if let error {
                     Section {
                         Text(error)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.accentRed)
                             .font(.caption)
                     }
                 }

@@ -91,7 +91,7 @@ struct ItemDetailView: View {
 
             VStack(spacing: 4) {
                 Text(currentItem.amount.formatted(currency: currentItem.currency))
-                    .font(.system(size: 32, weight: .bold, design: .monospaced))
+                    .font(.system(size: 32, weight: .heavy, design: .monospaced))
                     .foregroundStyle(.textPrimary)
 
                 Text(currentItem.billingCycle.displayName)
@@ -161,8 +161,7 @@ struct ItemDetailView: View {
                 DetailRow(label: "Website", value: url, isLink: true)
             }
         }
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .cardStyle(cornerRadius: 14)
     }
 
     // MARK: - Status Actions
@@ -187,9 +186,8 @@ struct ItemDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color.bgCard)
                         .foregroundStyle(colorForAction(action))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .cardStyle(cornerRadius: 12)
                     }
                 }
             }
@@ -212,8 +210,7 @@ struct ItemDetailView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(Color.bgCard)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .cardStyle(cornerRadius: 14)
         }
     }
 
@@ -256,8 +253,7 @@ struct ItemDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .cardStyle(cornerRadius: 14)
     }
 
     // MARK: - Helpers

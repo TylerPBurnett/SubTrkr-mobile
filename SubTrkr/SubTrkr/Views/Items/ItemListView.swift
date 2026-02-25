@@ -87,7 +87,7 @@ struct ItemListView: View {
         List {
             ForEach(viewModel.filteredItems) { item in
                 ItemRow(item: item)
-                    .listRowBackground(Color.bgCard)
+                    .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                     .contentShape(Rectangle())
@@ -205,8 +205,7 @@ struct ItemRow: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .cardStyle(cornerRadius: 14)
     }
 }
 
@@ -322,7 +321,7 @@ struct ShimmerModifier: ViewModifier {
         content
             .overlay(
                 LinearGradient(
-                    colors: [.clear, .white.opacity(0.1), .clear],
+                    colors: [.clear, .white.opacity(0.05), .clear],
                     startPoint: .leading,
                     endPoint: .trailing
                 )

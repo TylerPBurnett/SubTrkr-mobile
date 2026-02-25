@@ -102,7 +102,7 @@ struct AuthScreen: View {
                     Text(error)
                 }
                 .font(.caption)
-                .foregroundStyle(.red)
+                .foregroundStyle(.accentRed)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 4)
             }
@@ -160,17 +160,17 @@ struct AuthScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.textMuted.opacity(0.3), lineWidth: 1)
+                        .stroke(Color.borderDefault, lineWidth: 1)
                 )
             }
 
             // Divider
             HStack {
-                Rectangle().fill(Color.textMuted.opacity(0.3)).frame(height: 1)
+                Rectangle().fill(Color.borderDefault).frame(height: 1)
                 Text("or continue with")
                     .font(.caption)
                     .foregroundStyle(.textMuted)
-                Rectangle().fill(Color.textMuted.opacity(0.3)).frame(height: 1)
+                Rectangle().fill(Color.borderDefault).frame(height: 1)
             }
 
             // OAuth Buttons
@@ -218,7 +218,7 @@ struct AuthScreen: View {
             if let error = vm.errorMessage {
                 Text(error)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.accentRed)
             }
 
             Button {
@@ -265,7 +265,7 @@ struct AuthScreen: View {
             )
 
             if let error = vm.errorMessage {
-                Text(error).font(.caption).foregroundStyle(.red)
+                Text(error).font(.caption).foregroundStyle(.accentRed)
             }
             if let success = vm.successMessage {
                 Text(success).font(.caption).foregroundStyle(.brand)
@@ -327,11 +327,11 @@ struct AuthTextField: View {
             }
         }
         .padding()
-        .background(Color.bgSurface)
+        .background(Color.bgInput)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.textMuted.opacity(0.2), lineWidth: 1)
+                .stroke(Color.borderStrong, lineWidth: 1.5)
         )
     }
 }
@@ -348,7 +348,7 @@ struct PasswordStrengthBar: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.textMuted.opacity(0.2))
+                        .fill(Color.borderMuted)
                         .frame(height: 6)
 
                     RoundedRectangle(cornerRadius: 3)
@@ -388,7 +388,7 @@ struct OAuthButton: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color.textMuted.opacity(0.3), lineWidth: 1)
+                    .stroke(Color.borderDefault, lineWidth: 1)
             )
         }
     }

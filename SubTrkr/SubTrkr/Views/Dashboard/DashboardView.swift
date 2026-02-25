@@ -56,7 +56,7 @@ struct DashboardView: View {
                     title: "Yearly",
                     value: viewModel.yearlySpending.formattedCompact(currency: "USD"),
                     icon: "calendar.badge.clock",
-                    color: .blue
+                    color: .accentPurple
                 )
             }
 
@@ -121,8 +121,7 @@ struct DashboardView: View {
             }
         }
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .cardStyle()
     }
 
     // MARK: - Upcoming Payments
@@ -144,8 +143,7 @@ struct DashboardView: View {
             }
         }
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .cardStyle()
     }
 }
 
@@ -170,7 +168,7 @@ struct StatsCard: View {
             }
 
             Text(value)
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .font(.system(size: 20, weight: .heavy, design: .monospaced))
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -183,8 +181,7 @@ struct StatsCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .cardStyle(cornerRadius: 14)
     }
 }
 

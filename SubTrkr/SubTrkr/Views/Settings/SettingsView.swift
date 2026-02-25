@@ -4,10 +4,25 @@ struct SettingsView: View {
     @Environment(AuthService.self) private var authService
     @State private var viewModel = SettingsViewModel()
     @State private var showSignOutAlert = false
+    @AppStorage("appearanceMode") private var appearanceMode: String = "system"
 
     var body: some View {
         NavigationStack {
             List {
+                // Appearance
+                Section {
+                    Picker(selection: $appearanceMode) {
+                        Text("System").tag("system")
+                        Text("Light").tag("light")
+                        Text("Dark").tag("dark")
+                    } label: {
+                        Label("Appearance", systemImage: "circle.lefthalf.filled")
+                            .foregroundStyle(.textPrimary)
+                    }
+                } header: {
+                    Text("Appearance")
+                }
+
                 // Account
                 Section {
                     if let email = authService.currentUser?.email {
@@ -100,7 +115,7 @@ struct SettingsView: View {
                         showSignOutAlert = true
                     } label: {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.accentRed)
                     }
                 }
             }

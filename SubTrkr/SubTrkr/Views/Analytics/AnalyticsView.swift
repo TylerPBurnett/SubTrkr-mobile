@@ -54,7 +54,7 @@ struct AnalyticsView: View {
                     title: "Yearly",
                     value: viewModel.yearlySpending.formattedCompact(currency: "USD"),
                     icon: "calendar.badge.clock",
-                    color: .blue
+                    color: .accentPurple
                 )
             }
             .padding(.horizontal)
@@ -150,8 +150,7 @@ struct AnalyticsView: View {
                             }
                         }
                     }
-                    .background(Color.bgCard)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .cardStyle(cornerRadius: 14)
                     .padding(.horizontal)
                 }
             } else {
@@ -181,7 +180,7 @@ struct AnalyticsView: View {
                         )
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [.brand.opacity(0.3), .brand.opacity(0.05)],
+                                colors: [.brand.opacity(0.3), .brand.opacity(0.02)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -217,8 +216,7 @@ struct AnalyticsView: View {
                     .frame(height: 220)
                 }
                 .padding()
-                .background(Color.bgCard)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .cardStyle()
                 .padding(.horizontal)
             }
 
@@ -261,8 +259,7 @@ struct AnalyticsView: View {
                     }
                 }
                 .padding()
-                .background(Color.bgCard)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .cardStyle()
                 .padding(.horizontal)
             }
         }
@@ -300,8 +297,7 @@ struct AnalyticsView: View {
             }
         }
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .cardStyle()
         .padding(.horizontal)
     }
 
@@ -345,8 +341,7 @@ struct AnalyticsView: View {
             }
         }
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .cardStyle()
         .padding(.horizontal)
     }
 }
@@ -372,7 +367,7 @@ struct AnalyticsCard: View {
             }
 
             Text(value)
-                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                .font(.system(size: 18, weight: .heavy, design: .monospaced))
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -385,7 +380,6 @@ struct AnalyticsCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color.bgCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .cardStyle(cornerRadius: 14)
     }
 }

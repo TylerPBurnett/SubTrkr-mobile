@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthService.self) private var authService
+    @AppStorage("appearanceMode") private var appearanceMode: String = "system"
 
     var body: some View {
         Group {
@@ -15,6 +16,15 @@ struct ContentView: View {
         }
         .animation(.smooth(duration: 0.3), value: authService.isAuthenticated)
         .animation(.smooth(duration: 0.3), value: authService.isLoading)
+        .preferredColorScheme(colorScheme)
+    }
+
+    private var colorScheme: ColorScheme? {
+        switch appearanceMode {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil // system
+        }
     }
 }
 
