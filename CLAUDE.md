@@ -57,7 +57,7 @@ View → ViewModel (@Observable) → Service → Supabase SDK → PostgreSQL
 
 - `SubTrkr/SubTrkr/SubTrkrApp.swift` — `@main` entry, auth init, OAuth URL handler
 - `SubTrkr/SubTrkr/Services/SupabaseManager.swift` — singleton client. Credentials read from env vars → Info.plist → hardcoded fallback
-- `SubTrkr/SubTrkr/Extensions/Color+Theme.swift` — all brand colors as `Color` statics AND `ShapeStyle where Self == Color` extensions (required for `.foregroundStyle(.brand)` short-form syntax)
+- `SubTrkr/SubTrkr/Extensions/Color+Theme.swift` — adaptive light/dark color tokens using `Color.adaptive(light:dark:)`, `ShapeStyle` extensions for short-form syntax, and `cardStyle()` view modifier. All colors are explicit hex values from `docs/IOS_DESIGN_HANDOFF.md` — do NOT use Apple system colors (`.systemBackground`, `.label`, etc.)
 - `SubTrkr/SubTrkr/Models/Enums.swift` — `ItemType`, `ItemStatus`, `BillingCycle` with raw values matching DB
 - `SubTrkr/SubTrkr/Views/ContentView.swift` — auth gate and `MainTabView` with iOS 18 `Tab` API
 
@@ -67,9 +67,20 @@ The runnable project is `SubTrkr/SubTrkr.xcodeproj`. `SubTrkr/Package.swift` als
 
 When adding new Swift files outside Xcode, they must be manually added to the `SubTrkr` target in `SubTrkr.xcodeproj/project.pbxproj` (PBXFileReference + PBXBuildFile + PBXSourcesBuildPhase entry + PBXGroup entry).
 
+## Color system conventions
+
+- All colors defined in `Color+Theme.swift` using `Color.adaptive(light:dark:)` — never use Apple system colors
+- `docs/IOS_DESIGN_HANDOFF.md` is the canonical source for all color values
+- Card-like containers must use `.cardStyle(cornerRadius:)` modifier (default 16pt, 14pt for smaller cards, 12pt for buttons)
+- Use semantic tokens: `.textPrimary`, `.textSecondary`, `.textMuted` — not `.primary`, `.secondary`
+- Status colors map to accent tokens: `.statusActive` = `.accentEmerald`, etc.
+- Appearance preference stored in `@AppStorage("appearanceMode")` with values `"system"`, `"light"`, `"dark"`
+
 ## What's not implemented
 
-- `NotificationService.swift` — structure exists, no scheduling logic
+- `NotificationService.swift` — scheduling logic exists but is never called
 - Offline/caching — every screen fetches fresh from Supabase on load
 - Unit tests — services are not constructor-injectable yet
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
+- Payment recording UI — service works but no button in `ItemDetailView`
+- Account management — no password change or deletion (App Store requirement)
