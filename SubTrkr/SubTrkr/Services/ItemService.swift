@@ -209,10 +209,19 @@ final class ItemService {
         for item in items where item.status == .trial {
             guard let trialEndDate = item.trialEndDate, trialEndDate < today else { continue }
 
+            // Auto-cancel the expired trial
+            let update = ItemUpdate(
+                status: .cancelled,
+                cancelledAt: DateHelper.formatISO8601(Date.now),
+                cancellationDate: today
+            )
+            _ = try await updateItem(id: item.id, data: update)
+
+            // Record the automatic transition
             let history = StatusHistoryInsert(
                 itemId: item.id,
                 userId: userId,
-                status: .trial,
+                status: .cancelled,
                 reason: "Trial expired",
                 notes: "Trial ended on \(trialEndDate)"
             )
