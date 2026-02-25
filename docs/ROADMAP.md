@@ -16,28 +16,32 @@
 - Adaptive status badge backgrounds
 - Heavy font weight on stat numbers
 
+### Bugfixes & Notifications ✓
+*Completed 2026-02-25. See `docs/plans/2026-02-25-bugfixes-notifications-design.md` for details.*
+
+- Enforced single-currency (USD) — form always writes USD, resolves multi-currency math bug
+- Expired trials auto-cancel — `handleExpiredTrials` now transitions to `.cancelled` status, flows through archive pipeline
+- Notification toggle persists — `@AppStorage` for `notificationsEnabled` and `defaultReminderDays`
+- Local notifications wired — schedule on create, reschedule on update, cancel on delete, bulk reschedule after maintenance
+
 ---
 
 ## Up Next — Prioritized
 
 ### Phase 1: Data Correctness (Bugs)
 
-These affect accuracy for anyone using the app today. Fix before adding features.
-
 | # | Issue | Effort | Impact |
 |---|-------|--------|--------|
-| 1 | **Multi-currency math is wrong** — all analytics sum raw numbers and format as USD regardless of item currency. Decide: single-currency (remove field) or add conversion. | Medium | High |
-| 2 | **Expired trials never transition** — `handleExpiredTrials` writes history but doesn't change status. Auto-cancel or surface alert. | Small | Medium |
-| 3 | **Notification toggle doesn't persist** — no `@AppStorage`. Resets on relaunch. | Trivial | Low |
+| ~~1~~ | ~~Multi-currency math~~ | | ✓ Fixed — enforced single-currency (USD) |
+| ~~2~~ | ~~Expired trials never transition~~ | | ✓ Fixed — auto-cancel |
+| ~~3~~ | ~~Notification toggle doesn't persist~~ | | ✓ Fixed — @AppStorage |
 | 4 | **Spending trend chart is flat** — applies current items to all past months. Needs historical reconstruction. | Large | Medium |
 
 ### Phase 2: Wire Half-Built Features
 
-Code exists for all of these. They need wiring, not design.
-
 | # | Feature | Effort | Notes |
 |---|---------|--------|-------|
-| 5 | **Local notifications** — `NotificationService` has complete scheduling logic. Call `rescheduleAllNotifications` after item CRUD. | Small | Highest user-perceived value |
+| ~~5~~ | ~~Local notifications~~ | | ✓ Wired to item CRUD + maintenance |
 | 6 | **Record Payment UI** — `PaymentService.recordPayment` works. Add button + sheet in `ItemDetailView`. Auto-advance `nextBillingDate`. | Medium | Core feature gap |
 | 7 | **Status history display** — Model + writes exist. Fetch + render timeline in `ItemDetailView`. | Small | |
 | 8 | **Category editing** — `SettingsViewModel.editingCategory` exists. Add tap-to-edit on category rows. | Small | |
@@ -49,7 +53,7 @@ Things users expect from a billing tracker.
 
 | # | Feature | Effort | Notes |
 |---|---------|--------|-------|
-| 10 | **Currency picker in item form** — model supports per-item currency but form has no picker. At minimum: USD, EUR, GBP, CAD, AUD. | Small | Blocked by decision in #1 |
+| ~~10~~ | ~~Currency picker~~ | | N/A — single-currency (USD) decision made |
 | 11 | **Auto-calculate next billing date** — from start date + billing cycle. Currently stays at `Date.now`. | Small | Quick UX win |
 | 12 | **Account management** — password change + account deletion. App Store review requirement. | Medium | Required before submission |
 | 13 | **Haptic feedback** — `.sensoryFeedback` on item save, status change, swipe delete, pull-to-refresh, payment recorded. | Small | Polish pass |
@@ -82,14 +86,12 @@ Things users expect from a billing tracker.
 
 ## Suggested Next Session
 
-The highest-impact next session would tackle **items 1-3 + 5** together:
+The highest-impact next batch is **items 6 + 11** together:
 
-1. **Decide single vs multi-currency** (1) — 10 min decision, affects everything downstream
-2. **Fix notification persistence** (3) — trivial, 5 min
-3. **Wire local notifications** (5) — biggest user-facing win, code already exists
-4. **Fix expired trials** (2) — small fix, prevents data rot
+1. **Record Payment UI** (#6) — core feature gap, service already works
+2. **Auto-calculate next billing date** (#11) — quick UX win, pairs with payment recording
 
-This clears all the "broken" items and delivers the most-requested feature (notifications) in a single session.
+Then: Account management (#12) for App Store readiness.
 
 ---
 

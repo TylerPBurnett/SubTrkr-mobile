@@ -76,9 +76,16 @@ When adding new Swift files outside Xcode, they must be manually added to the `S
 - Status colors map to accent tokens: `.statusActive` = `.accentEmerald`, etc.
 - Appearance preference stored in `@AppStorage("appearanceMode")` with values `"system"`, `"light"`, `"dark"`
 
+## Currency
+
+Single-currency (USD) enforced. The `currency` field exists in the model/DB for Codable compatibility but `ItemFormViewModel` always writes `"USD"`. Do not add a currency picker.
+
+## Notifications
+
+Local notifications are wired to item CRUD via `NotificationService` calls in `ItemService` (create/update/delete) and `DashboardViewModel` (post-maintenance reschedule). Settings persisted with `@AppStorage("notificationsEnabled")` and `@AppStorage("defaultReminderDays")` — these are read from `UserDefaults` in services.
+
 ## What's not implemented
 
-- `NotificationService.swift` — scheduling logic exists but is never called
 - Offline/caching — every screen fetches fresh from Supabase on load
 - Unit tests — services are not constructor-injectable yet
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
