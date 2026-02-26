@@ -89,5 +89,6 @@ Local notifications are wired to item CRUD via `NotificationService` calls in `I
 - Offline/caching — every screen fetches fresh from Supabase on load
 - Unit tests — services are not constructor-injectable yet
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
-- Payment recording UI — service works but no button in `ItemDetailView`
 - Account management — no password change or deletion (App Store requirement)
+- Status history display — model + writes exist but ItemDetailView doesn't render timeline
+- Category editing — SettingsViewModel has state but no edit UI

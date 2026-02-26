@@ -24,6 +24,12 @@
 - Notification toggle persists — `@AppStorage` for `notificationsEnabled` and `defaultReminderDays`
 - Local notifications wired — schedule on create, reschedule on update, cancel on delete, bulk reschedule after maintenance
 
+### Record Payment & Auto-Calc Billing Date ✓
+*Completed 2026-02-25. See `docs/plans/2026-02-25-payment-billing-design.md` for details.*
+
+- Record Payment sheet in ItemDetailView — pre-filled amount, date picker, auto-advances nextBillingDate by one cycle
+- Auto-calculate next billing date in item form — rolls startDate forward by billingCycle until future, respects manual overrides
+
 ---
 
 ## Up Next — Prioritized
@@ -42,7 +48,7 @@
 | # | Feature | Effort | Notes |
 |---|---------|--------|-------|
 | ~~5~~ | ~~Local notifications~~ | | ✓ Wired to item CRUD + maintenance |
-| 6 | **Record Payment UI** — `PaymentService.recordPayment` works. Add button + sheet in `ItemDetailView`. Auto-advance `nextBillingDate`. | Medium | Core feature gap |
+| ~~6~~ | ~~Record Payment UI~~ | | ✓ Sheet with auto-advance billing date |
 | 7 | **Status history display** — Model + writes exist. Fetch + render timeline in `ItemDetailView`. | Small | |
 | 8 | **Category editing** — `SettingsViewModel.editingCategory` exists. Add tap-to-edit on category rows. | Small | |
 | 9 | **Notification channels** — `loadNotifications()` exists but is never called. Wire up real channel data. | Small | Desktop-only channels, low priority |
@@ -54,7 +60,7 @@ Things users expect from a billing tracker.
 | # | Feature | Effort | Notes |
 |---|---------|--------|-------|
 | ~~10~~ | ~~Currency picker~~ | | N/A — single-currency (USD) decision made |
-| 11 | **Auto-calculate next billing date** — from start date + billing cycle. Currently stays at `Date.now`. | Small | Quick UX win |
+| ~~11~~ | ~~Auto-calculate next billing date~~ | | ✓ Reactive calc from startDate + billingCycle |
 | 12 | **Account management** — password change + account deletion. App Store review requirement. | Medium | Required before submission |
 | 13 | **Haptic feedback** — `.sensoryFeedback` on item save, status change, swipe delete, pull-to-refresh, payment recorded. | Small | Polish pass |
 | 14 | **App icon** — `AppIcon.appiconset` slot is empty. Need 1024x1024 PNG. | Small | Required before submission |
@@ -86,10 +92,11 @@ Things users expect from a billing tracker.
 
 ## Suggested Next Session
 
-The highest-impact next batch is **items 6 + 11** together:
+The next batch is **items 7 + 8 + 13** (small wiring + polish):
 
-1. **Record Payment UI** (#6) — core feature gap, service already works
-2. **Auto-calculate next billing date** (#11) — quick UX win, pairs with payment recording
+1. **Status history display** (#7) — model + writes exist, wire fetch + render timeline
+2. **Category editing** (#8) — ViewModel state exists, add tap-to-edit
+3. **Haptic feedback** (#13) — polish pass across key interactions
 
 Then: Account management (#12) for App Store readiness.
 
