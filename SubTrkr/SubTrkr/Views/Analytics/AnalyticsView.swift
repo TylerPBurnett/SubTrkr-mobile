@@ -61,11 +61,11 @@ struct AnalyticsView: View {
 
             HStack(spacing: 12) {
                 AnalyticsCard(
-                    title: "Savings",
-                    value: viewModel.monthlySavings.formatted(currency: "USD"),
-                    subtitle: "from cancelled",
-                    icon: "arrow.down.circle",
-                    color: .statusPaused
+                    title: "Projected",
+                    value: viewModel.projectedAnnualSpend.formattedCompact(currency: "USD"),
+                    subtitle: "next 12 months",
+                    icon: "chart.line.uptrend.xyaxis",
+                    color: .accentAmber
                 )
                 AnalyticsCard(
                     title: "Active",
@@ -74,6 +74,18 @@ struct AnalyticsView: View {
                     icon: "checkmark.circle",
                     color: .brand
                 )
+            }
+            .padding(.horizontal)
+
+            HStack(spacing: 12) {
+                AnalyticsCard(
+                    title: "Savings",
+                    value: viewModel.monthlySavings.formatted(currency: "USD"),
+                    subtitle: "from cancelled",
+                    icon: "arrow.down.circle",
+                    color: .statusPaused
+                )
+                Spacer()
             }
             .padding(.horizontal)
 
@@ -167,102 +179,241 @@ struct AnalyticsView: View {
 
     private var trendsTab: some View {
         VStack(spacing: 20) {
+            // Month range picker
+            Picker("Time Range", selection: $viewModel.selectedMonthRange) {
+                Text("3 Mo").tag(3)
+                Text("6 Mo").tag(6)
+                Text("12 Mo").tag(12)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+
+            // Spending Trend
             if !viewModel.monthlyTrend.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("6-Month Spending Trend")
-                        .font(.headline)
-                        .foregroundStyle(.textPrimary)
+                spendingTrendChart
+            }
 
-                    Chart(viewModel.monthlyTrend) { month in
-                        AreaMark(
-                            x: .value("Month", month.shortMonth),
-                            y: .value("Amount", month.total)
-                        )
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.brand.opacity(0.3), .brand.opacity(0.02)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+            // Category Breakdown Over Time
+            if !viewModel.categoryTrend.isEmpty {
+                categoryTrendChart
+            }
 
-                        LineMark(
-                            x: .value("Month", month.shortMonth),
-                            y: .value("Amount", month.total)
-                        )
-                        .foregroundStyle(.brand)
-                        .lineStyle(StrokeStyle(lineWidth: 2.5))
-
-                        PointMark(
-                            x: .value("Month", month.shortMonth),
-                            y: .value("Amount", month.total)
-                        )
-                        .foregroundStyle(.brand)
-                        .symbolSize(30)
-                    }
-                    .chartYAxis {
-                        AxisMarks(position: .leading) { value in
-                            AxisGridLine()
-                                .foregroundStyle(Color.textMuted.opacity(0.2))
-                            AxisValueLabel {
-                                if let intValue = value.as(Double.self) {
-                                    Text(intValue.formattedCompact(currency: "USD"))
-                                        .font(.caption2)
-                                        .foregroundStyle(.textMuted)
-                                }
-                            }
-                        }
-                    }
-                    .frame(height: 220)
-                }
-                .padding()
-                .cardStyle()
-                .padding(.horizontal)
+            // Subscription Count
+            if !viewModel.itemCountTrend.isEmpty {
+                itemCountChart
             }
 
             // Cancellation history
             if !viewModel.cancelledItems.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Cancellation History")
-                        .font(.headline)
-                        .foregroundStyle(.textPrimary)
-
-                    ForEach(viewModel.cancelledItems.prefix(10)) { item in
-                        HStack(spacing: 12) {
-                            ServiceLogo(
-                                url: item.logoURL,
-                                name: item.name,
-                                categoryColor: item.categoryColor,
-                                size: 32
-                            )
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.name)
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundStyle(.textPrimary)
-                                StatusBadge(status: item.status)
-                            }
-
-                            Spacer()
-
-                            VStack(alignment: .trailing, spacing: 2) {
-                                Text(item.monthlyAmount.formatted(currency: item.currency))
-                                    .font(.system(.caption, design: .monospaced))
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(.textSecondary)
-                                Text("saved/mo")
-                                    .font(.caption2)
-                                    .foregroundStyle(.textMuted)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-                .padding()
-                .cardStyle()
-                .padding(.horizontal)
+                cancellationHistory
             }
         }
+    }
+
+    private var spendingTrendChart: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Spending Trend")
+                .font(.headline)
+                .foregroundStyle(.textPrimary)
+
+            Chart(viewModel.monthlyTrend) { month in
+                AreaMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Amount", month.total)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.brand.opacity(0.3), .brand.opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                LineMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Amount", month.total)
+                )
+                .foregroundStyle(.brand)
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                PointMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Amount", month.total)
+                )
+                .foregroundStyle(.brand)
+                .symbolSize(30)
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color.textMuted.opacity(0.2))
+                    AxisValueLabel {
+                        if let intValue = value.as(Double.self) {
+                            Text(intValue.formattedCompact(currency: "USD"))
+                                .font(.caption2)
+                                .foregroundStyle(.textMuted)
+                        }
+                    }
+                }
+            }
+            .frame(height: 220)
+        }
+        .padding()
+        .cardStyle()
+        .padding(.horizontal)
+    }
+
+    private var categoryTrendColors: [Color] {
+        let unique = Dictionary(grouping: viewModel.categoryTrend, by: \.category)
+        return unique.keys.sorted().compactMap { name in
+            unique[name]?.first.map { Color(hex: $0.color) }
+        }
+    }
+
+    private var categoryTrendChart: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Spending by Category")
+                .font(.headline)
+                .foregroundStyle(.textPrimary)
+
+            Chart(viewModel.categoryTrend) { entry in
+                AreaMark(
+                    x: .value("Month", entry.shortMonth),
+                    y: .value("Amount", entry.total)
+                )
+                .foregroundStyle(by: .value("Category", entry.category))
+            }
+            .chartForegroundStyleScale(range: categoryTrendColors)
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color.textMuted.opacity(0.2))
+                    AxisValueLabel {
+                        if let intValue = value.as(Double.self) {
+                            Text(intValue.formattedCompact(currency: "USD"))
+                                .font(.caption2)
+                                .foregroundStyle(.textMuted)
+                        }
+                    }
+                }
+            }
+            .frame(height: 220)
+
+            // Legend
+            let categories = Dictionary(grouping: viewModel.categoryTrend, by: \.category)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], alignment: .leading, spacing: 4) {
+                ForEach(Array(categories.keys.sorted()), id: \.self) { name in
+                    if let entry = categories[name]?.first {
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(Color(hex: entry.color))
+                                .frame(width: 8, height: 8)
+                            Text(name)
+                                .font(.caption2)
+                                .foregroundStyle(.textSecondary)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .cardStyle()
+        .padding(.horizontal)
+    }
+
+    private var itemCountChart: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Active Subscriptions")
+                .font(.headline)
+                .foregroundStyle(.textPrimary)
+
+            Chart(viewModel.itemCountTrend) { month in
+                LineMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Count", month.count)
+                )
+                .foregroundStyle(.brand)
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                PointMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Count", month.count)
+                )
+                .foregroundStyle(.brand)
+                .symbolSize(30)
+
+                AreaMark(
+                    x: .value("Month", month.shortMonth),
+                    y: .value("Count", month.count)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.brand.opacity(0.2), .brand.opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color.textMuted.opacity(0.2))
+                    AxisValueLabel {
+                        if let intValue = value.as(Int.self) {
+                            Text("\(intValue)")
+                                .font(.caption2)
+                                .foregroundStyle(.textMuted)
+                        }
+                    }
+                }
+            }
+            .frame(height: 180)
+        }
+        .padding()
+        .cardStyle()
+        .padding(.horizontal)
+    }
+
+    private var cancellationHistory: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Cancellation History")
+                .font(.headline)
+                .foregroundStyle(.textPrimary)
+
+            ForEach(viewModel.cancelledItems.prefix(10)) { item in
+                HStack(spacing: 12) {
+                    ServiceLogo(
+                        url: item.logoURL,
+                        name: item.name,
+                        categoryColor: item.categoryColor,
+                        size: 32
+                    )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.name)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.textPrimary)
+                        StatusBadge(status: item.status)
+                    }
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(item.monthlyAmount.formatted(currency: item.currency))
+                            .font(.system(.caption, design: .monospaced))
+                            .fontWeight(.medium)
+                            .foregroundStyle(.textSecondary)
+                        Text("saved/mo")
+                            .font(.caption2)
+                            .foregroundStyle(.textMuted)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .padding()
+        .cardStyle()
+        .padding(.horizontal)
     }
 
     // MARK: - Top Expenses
