@@ -47,6 +47,27 @@ enum DateHelper {
         mediumDateFormatter.string(from: date)
     }
 
+    private static let shortMonthFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM"
+        return f
+    }()
+
+    private static let yearMonthFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+
+    static func formatShortMonth(_ date: Date) -> String {
+        shortMonthFormatter.string(from: date)
+    }
+
+    static func formatYearMonth(_ date: Date) -> String {
+        yearMonthFormatter.string(from: date)
+    }
+
     static func relativeDateString(_ date: Date) -> String {
         let calendar = Calendar.current
         let now = Date.now

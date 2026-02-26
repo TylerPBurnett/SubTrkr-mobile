@@ -64,10 +64,6 @@ final class AnalyticsService {
         for i in (0..<months).reversed() {
             guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
 
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM"
-            let monthKey = formatter.string(from: monthDate)
-
             // For simplicity, use current active items' monthly cost
             // A more sophisticated approach would track historical changes
             let total = items
@@ -82,7 +78,7 @@ final class AnalyticsService {
                 }
                 .reduce(0) { $0 + $1.monthlyAmount }
 
-            result.append(MonthlySpending(month: monthKey, total: total))
+            result.append(MonthlySpending(month: monthDate, total: total))
         }
 
         return result

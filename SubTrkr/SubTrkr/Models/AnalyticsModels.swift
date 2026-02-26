@@ -10,20 +10,33 @@ struct SpendingByCategory: Identifiable {
 
 struct MonthlySpending: Identifiable {
     let id = UUID()
-    let month: String
+    let month: Date
     let total: Double
 
-    var monthDate: Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.date(from: month)
+    var shortMonth: String {
+        DateHelper.formatShortMonth(month)
     }
+}
+
+struct CategoryMonthlySpending: Identifiable {
+    let id = UUID()
+    let month: Date
+    let category: String
+    let color: String
+    let total: Double
 
     var shortMonth: String {
-        guard let date = monthDate else { return month }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
-        return formatter.string(from: date)
+        DateHelper.formatShortMonth(month)
+    }
+}
+
+struct MonthlyItemCount: Identifiable {
+    let id = UUID()
+    let month: Date
+    let count: Int
+
+    var shortMonth: String {
+        DateHelper.formatShortMonth(month)
     }
 }
 
