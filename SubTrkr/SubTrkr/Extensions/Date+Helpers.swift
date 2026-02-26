@@ -20,6 +20,13 @@ enum DateHelper {
         return f
     }()
 
+    private static let mediumDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
     static func parseDate(_ string: String) -> Date? {
         dateFormatter.date(from: string)
     }
@@ -34,6 +41,10 @@ enum DateHelper {
 
     static func formatISO8601(_ date: Date) -> String {
         iso8601Formatter.string(from: date)
+    }
+
+    static func formatMediumDate(_ date: Date) -> String {
+        mediumDateFormatter.string(from: date)
     }
 
     static func relativeDateString(_ date: Date) -> String {
@@ -56,10 +67,7 @@ enum DateHelper {
             let weeks = days / 7
             return "In \(weeks) week\(weeks == 1 ? "" : "s")"
         default:
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            formatter.timeStyle = .none
-            return formatter.string(from: date)
+            return formatMediumDate(date)
         }
     }
 

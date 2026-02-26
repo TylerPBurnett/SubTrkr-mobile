@@ -171,12 +171,7 @@ struct ItemDetailView: View {
             }
 
             if let startDate = currentItem.startDate, let date = DateHelper.parseDate(startDate) {
-                let formatter = DateFormatter()
-                DetailRow(label: "Start Date", value: {
-                    let f = DateFormatter()
-                    f.dateStyle = .medium
-                    return f.string(from: date)
-                }())
+                DetailRow(label: "Start Date", value: DateHelper.formatMediumDate(date))
             }
 
             if currentItem.status == .trial, let trialEnd = currentItem.trialEndDateFormatted {
@@ -197,12 +192,7 @@ struct ItemDetailView: View {
             if currentItem.status == .cancelled, let cancellationDate = currentItem.cancellationDate,
                let date = DateHelper.parseDate(cancellationDate) {
                 Divider().padding(.leading)
-                let f = DateFormatter()
-                DetailRow(label: "Cancellation Date", value: {
-                    let f = DateFormatter()
-                    f.dateStyle = .medium
-                    return f.string(from: date)
-                }())
+                DetailRow(label: "Cancellation Date", value: DateHelper.formatMediumDate(date))
             }
 
             if let url = currentItem.url, !url.isEmpty {
@@ -297,11 +287,7 @@ struct ItemDetailView: View {
                 ForEach(payments.prefix(10)) { payment in
                     HStack {
                         if let date = payment.paidDateFormatted {
-                            Text({
-                                let f = DateFormatter()
-                                f.dateStyle = .medium
-                                return f.string(from: date)
-                            }())
+                            Text(DateHelper.formatMediumDate(date))
                             .font(.subheadline)
                             .foregroundStyle(.textSecondary)
                         }
