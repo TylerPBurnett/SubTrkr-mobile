@@ -3,10 +3,12 @@ import Supabase
 
 final class ItemService {
     private let client: SupabaseClient
-    private let notificationService = NotificationService()
+    private let notificationService: NotificationService
 
-    init(client: SupabaseClient = SupabaseManager.shared.client) {
+    init(client: SupabaseClient = SupabaseManager.shared.client,
+         notificationService: NotificationService = NotificationService()) {
         self.client = client
+        self.notificationService = notificationService
     }
 
     // MARK: - Read
@@ -171,6 +173,11 @@ final class ItemService {
             break
         }
 
+        // Guard against unknown actions — don't write a no-op update or fabricated history
+        guard let newStatus = update.status else {
+            return try await getItemById(id)
+        }
+
         // Update the item
         let item = try await updateItem(id: id, data: update)
 
@@ -178,7 +185,7 @@ final class ItemService {
         let history = StatusHistoryInsert(
             itemId: id,
             userId: userId,
-            status: update.status ?? .active,
+            status: newStatus,
             reason: statusData.reason,
             notes: statusData.notes
         )

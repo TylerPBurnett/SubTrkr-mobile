@@ -4,6 +4,7 @@ struct NotificationSettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("defaultReminderDays") private var defaultReminderDays = 3
     @State private var hasPermission = false
+    @State private var notificationService = NotificationService()
     @State private var itemService = ItemService()
 
     var body: some View {
@@ -16,7 +17,7 @@ struct NotificationSettingsView: View {
                 .onChange(of: notificationsEnabled) { _, enabled in
                     if enabled {
                         Task {
-                            let granted = await NotificationService().requestPermission()
+                            let granted = await notificationService.requestPermission()
                             hasPermission = granted
                             if !granted {
                                 notificationsEnabled = false
@@ -42,7 +43,7 @@ struct NotificationSettingsView: View {
                     .onChange(of: defaultReminderDays) { _, newValue in
                         Task {
                             let items = try? await itemService.getItems()
-                            await NotificationService().rescheduleAllNotifications(
+                            await notificationService.rescheduleAllNotifications(
                                 items: items ?? [],
                                 daysBefore: newValue
                             )

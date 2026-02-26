@@ -283,6 +283,8 @@ struct CategoryRow: View {
     }
 }
 
+private let colorGridColumns = Array(repeating: GridItem(.flexible()), count: 6)
+
 struct AddCategorySheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthService.self) private var authService
@@ -292,17 +294,13 @@ struct AddCategorySheet: View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("Category name", text: Binding(
-                        get: { viewModel.newCategoryName },
-                        set: { viewModel.newCategoryName = $0 }
-                    ))
+                    @Bindable var vm = viewModel
+                    TextField("Category name", text: $vm.newCategoryName)
                 }
 
                 Section("Type") {
-                    Picker("Type", selection: Binding(
-                        get: { viewModel.newCategoryType },
-                        set: { viewModel.newCategoryType = $0 }
-                    )) {
+                    @Bindable var vm = viewModel
+                    Picker("Type", selection: $vm.newCategoryType) {
                         Text("Subscription").tag(ItemType.subscription)
                         Text("Bill").tag(ItemType.bill)
                     }
@@ -310,7 +308,7 @@ struct AddCategorySheet: View {
                 }
 
                 Section("Color") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                    LazyVGrid(columns: colorGridColumns, spacing: 12) {
                         ForEach(Color.categoryColors, id: \.self) { colorHex in
                             Circle()
                                 .fill(Color(hex: colorHex))
@@ -378,7 +376,7 @@ struct EditCategorySheet: View {
                 }
 
                 Section("Color") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                    LazyVGrid(columns: colorGridColumns, spacing: 12) {
                         ForEach(Color.categoryColors, id: \.self) { colorHex in
                             Circle()
                                 .fill(Color(hex: colorHex))

@@ -76,18 +76,16 @@ struct ItemFormView: View {
     // MARK: - Service Search
 
     private var serviceSearchSection: some View {
-        Section("Search Services") {
+        @Bindable var vm = viewModel
+        return Section("Search Services") {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.textMuted)
-                TextField("Search for a service...", text: Binding(
-                    get: { viewModel.serviceSearchText },
-                    set: {
-                        viewModel.serviceSearchText = $0
-                        viewModel.showServiceSuggestions = !$0.isEmpty
+                TextField("Search for a service...", text: $vm.serviceSearchText)
+                    .textInputAutocapitalization(.never)
+                    .onChange(of: viewModel.serviceSearchText) { _, newValue in
+                        viewModel.showServiceSuggestions = !newValue.isEmpty
                     }
-                ))
-                .textInputAutocapitalization(.never)
             }
 
             if viewModel.showServiceSuggestions && !viewModel.serviceSuggestions.isEmpty {
@@ -120,33 +118,25 @@ struct ItemFormView: View {
     // MARK: - Basic Info
 
     private var basicInfoSection: some View {
-        Section("Details") {
+        @Bindable var vm = viewModel
+        return Section("Details") {
             HStack {
                 Image(systemName: "tag.fill")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
-                TextField("Name", text: Binding(
-                    get: { viewModel.name },
-                    set: { viewModel.name = $0 }
-                ))
+                TextField("Name", text: $vm.name)
             }
 
             HStack {
                 Image(systemName: "dollarsign.circle.fill")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
-                TextField("Amount", value: Binding(
-                    get: { viewModel.amount },
-                    set: { viewModel.amount = $0 }
-                ), format: .number.precision(.fractionLength(2)))
-                .keyboardType(.decimalPad)
+                TextField("Amount", value: $vm.amount, format: .number.precision(.fractionLength(2)))
+                    .keyboardType(.decimalPad)
             }
 
             if !viewModel.isEditing {
-                Picker(selection: Binding(
-                    get: { viewModel.status },
-                    set: { viewModel.status = $0 }
-                )) {
+                Picker(selection: $vm.status) {
                     Text("Active").tag(ItemStatus.active)
                     Text("Trial").tag(ItemStatus.trial)
                 } label: {
@@ -164,11 +154,9 @@ struct ItemFormView: View {
     // MARK: - Billing
 
     private var billingSection: some View {
-        Section("Billing") {
-            Picker(selection: Binding(
-                get: { viewModel.billingCycle },
-                set: { viewModel.billingCycle = $0 }
-            )) {
+        @Bindable var vm = viewModel
+        return Section("Billing") {
+            Picker(selection: $vm.billingCycle) {
                 ForEach(BillingCycle.allCases) { cycle in
                     Text(cycle.displayName).tag(cycle)
                 }
@@ -184,10 +172,7 @@ struct ItemFormView: View {
                 viewModel.autoCalcNextBillingDate()
             }
 
-            DatePicker(selection: Binding(
-                get: { viewModel.startDate },
-                set: { viewModel.startDate = $0 }
-            ), displayedComponents: .date) {
+            DatePicker(selection: $vm.startDate, displayedComponents: .date) {
                 HStack {
                     Image(systemName: "calendar")
                         .foregroundStyle(.brand)
@@ -199,19 +184,16 @@ struct ItemFormView: View {
                 viewModel.autoCalcNextBillingDate()
             }
 
-            DatePicker(selection: Binding(
-                get: { viewModel.nextBillingDate },
-                set: {
-                    viewModel.nextBillingDate = $0
-                    viewModel.userEditedNextBillingDate = true
-                }
-            ), displayedComponents: .date) {
+            DatePicker(selection: $vm.nextBillingDate, displayedComponents: .date) {
                 HStack {
                     Image(systemName: "calendar.badge.clock")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
                     Text("Next Billing Date")
                 }
+            }
+            .onChange(of: viewModel.nextBillingDate) { _, _ in
+                viewModel.userEditedNextBillingDate = true
             }
         }
     }
@@ -244,6 +226,7 @@ struct ItemFormView: View {
             }
         }
     }
+    // Note: categorySection keeps Binding(get:set:) because it maps Optional<String> to non-optional String for the Picker tag type.
 
     // MARK: - Trial
 
@@ -262,21 +245,20 @@ struct ItemFormView: View {
             }
         }
     }
+    // Note: trialSection keeps Binding(get:set:) because it maps Optional<Date> to non-optional Date with a fallback default.
 
     // MARK: - Additional
 
     private var additionalSection: some View {
-        Section("Additional") {
+        @Bindable var vm = viewModel
+        return Section("Additional") {
             HStack {
                 Image(systemName: "link")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
-                TextField("Website URL", text: Binding(
-                    get: { viewModel.url },
-                    set: { viewModel.url = $0 }
-                ))
-                .keyboardType(.URL)
-                .textInputAutocapitalization(.never)
+                TextField("Website URL", text: $vm.url)
+                    .keyboardType(.URL)
+                    .textInputAutocapitalization(.never)
             }
 
             HStack(alignment: .top) {
@@ -284,11 +266,8 @@ struct ItemFormView: View {
                     .foregroundStyle(.brand)
                     .frame(width: 24)
                     .padding(.top, 4)
-                TextField("Notes", text: Binding(
-                    get: { viewModel.notes },
-                    set: { viewModel.notes = $0 }
-                ), axis: .vertical)
-                .lineLimit(3...6)
+                TextField("Notes", text: $vm.notes, axis: .vertical)
+                    .lineLimit(3...6)
             }
 
             Picker(selection: Binding(
@@ -311,4 +290,5 @@ struct ItemFormView: View {
             }
         }
     }
+    // Note: reminderDays Picker keeps Binding(get:set:) because it maps Optional<Int> to non-optional Int.
 }

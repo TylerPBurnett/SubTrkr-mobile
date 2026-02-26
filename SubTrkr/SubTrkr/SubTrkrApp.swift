@@ -16,7 +16,7 @@ struct SubTrkrApp: App {
                 }
                 .task {
                     await authService.initialize()
-                    Task { await authService.observeAuthChanges() }
+                    await authService.observeAuthChanges()
                 }
         }
     }

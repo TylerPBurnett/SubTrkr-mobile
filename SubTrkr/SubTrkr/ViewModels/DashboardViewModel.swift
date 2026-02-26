@@ -83,7 +83,7 @@ final class DashboardViewModel {
                 )
             }
         } catch {
-            print("Maintenance error: \(error)")
+            self.error = "Maintenance failed: \(error.localizedDescription)"
         }
     }
 }

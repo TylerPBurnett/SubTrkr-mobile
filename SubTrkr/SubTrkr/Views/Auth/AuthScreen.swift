@@ -9,10 +9,10 @@ struct AuthScreen: View {
             if let viewModel {
                 authContent(viewModel)
             } else {
-                Color.clear
+                ProgressView()
             }
         }
-        .onAppear {
+        .task {
             if viewModel == nil {
                 viewModel = AuthViewModel(authService: authService)
             }
@@ -41,16 +41,18 @@ struct AuthScreen: View {
                     .padding(.top, 40)
 
                     // Auth Mode Picker
-                    Picker("", selection: Binding(
-                        get: { vm.mode },
-                        set: { vm.mode = $0; vm.errorMessage = nil; vm.successMessage = nil }
-                    )) {
+                    @Bindable var bindableVM = vm
+                    Picker("", selection: $bindableVM.mode) {
                         ForEach(AuthViewModel.AuthMode.allCases, id: \.self) { mode in
                             Text(mode.rawValue).tag(mode)
                         }
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
+                    .onChange(of: vm.mode) { _, _ in
+                        vm.errorMessage = nil
+                        vm.successMessage = nil
+                    }
 
                     switch vm.step {
                     case .credentials:
@@ -70,13 +72,14 @@ struct AuthScreen: View {
 
     @ViewBuilder
     private func credentialsForm(_ vm: AuthViewModel) -> some View {
+        @Bindable var bindableVM = vm
         VStack(spacing: 20) {
             // Email & Password
             VStack(spacing: 14) {
                 AuthTextField(
                     icon: "envelope.fill",
                     placeholder: "Email",
-                    text: Binding(get: { vm.email }, set: { vm.email = $0 }),
+                    text: $bindableVM.email,
                     keyboardType: .emailAddress,
                     textContentType: .emailAddress
                 )
@@ -84,7 +87,7 @@ struct AuthScreen: View {
                 AuthTextField(
                     icon: "lock.fill",
                     placeholder: "Password",
-                    text: Binding(get: { vm.password }, set: { vm.password = $0 }),
+                    text: $bindableVM.password,
                     isSecure: true,
                     textContentType: vm.mode == .signUp ? .newPassword : .password
                 )
@@ -207,10 +210,11 @@ struct AuthScreen: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.textPrimary)
 
+            @Bindable var bindableVM = vm
             AuthTextField(
                 icon: "number",
                 placeholder: "6-digit code",
-                text: Binding(get: { vm.otpCode }, set: { vm.otpCode = $0 }),
+                text: $bindableVM.otpCode,
                 keyboardType: .numberPad,
                 textContentType: .oneTimeCode
             )
@@ -256,10 +260,11 @@ struct AuthScreen: View {
                 .foregroundStyle(.textSecondary)
                 .multilineTextAlignment(.center)
 
+            @Bindable var bindableVM = vm
             AuthTextField(
                 icon: "envelope.fill",
                 placeholder: "Email",
-                text: Binding(get: { vm.email }, set: { vm.email = $0 }),
+                text: $bindableVM.email,
                 keyboardType: .emailAddress,
                 textContentType: .emailAddress
             )

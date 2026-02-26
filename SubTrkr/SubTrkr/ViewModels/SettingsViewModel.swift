@@ -29,6 +29,7 @@ final class SettingsViewModel {
 
     func loadData() async {
         isLoading = true
+        error = nil
         do {
             categories = try await categoryService.getCategories()
         } catch {
@@ -38,6 +39,7 @@ final class SettingsViewModel {
     }
 
     func loadNotifications() async {
+        error = nil
         do {
             notificationChannels = try await notificationService.getNotificationChannels()
             notificationPreferences = try await notificationService.getNotificationPreferences()
