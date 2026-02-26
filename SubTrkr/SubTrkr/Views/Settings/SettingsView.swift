@@ -146,6 +146,7 @@ struct CategoryManagementView: View {
     @Environment(AuthService.self) private var authService
     let viewModel: SettingsViewModel
     @State private var showAddCategory = false
+    @State private var editingCategory: Category?
 
     var body: some View {
         List {
@@ -153,6 +154,8 @@ struct CategoryManagementView: View {
             Section("Subscription Categories") {
                 ForEach(viewModel.subscriptionCategories) { category in
                     CategoryRow(category: category)
+                        .contentShape(Rectangle())
+                        .onTapGesture { editingCategory = category }
                 }
                 .onDelete { indices in
                     Task {
@@ -168,6 +171,8 @@ struct CategoryManagementView: View {
             Section("Bill Categories") {
                 ForEach(viewModel.billCategories) { category in
                     CategoryRow(category: category)
+                        .contentShape(Rectangle())
+                        .onTapGesture { editingCategory = category }
                 }
                 .onDelete { indices in
                     Task {
@@ -190,6 +195,9 @@ struct CategoryManagementView: View {
         }
         .sheet(isPresented: $showAddCategory) {
             AddCategorySheet(viewModel: viewModel)
+        }
+        .sheet(item: $editingCategory) { category in
+            EditCategorySheet(category: category, viewModel: viewModel)
         }
     }
 }
@@ -283,6 +291,74 @@ struct AddCategorySheet: View {
                     .fontWeight(.semibold)
                     .foregroundStyle(.brand)
                     .disabled(viewModel.newCategoryName.isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
+struct EditCategorySheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let category: Category
+    let viewModel: SettingsViewModel
+
+    @State private var name: String
+    @State private var color: String
+
+    init(category: Category, viewModel: SettingsViewModel) {
+        self.category = category
+        self.viewModel = viewModel
+        _name = State(initialValue: category.name)
+        _color = State(initialValue: category.color)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Name") {
+                    TextField("Category name", text: $name)
+                }
+
+                Section("Color") {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                        ForEach(Color.categoryColors, id: \.self) { colorHex in
+                            Circle()
+                                .fill(Color(hex: colorHex))
+                                .frame(width: 36, height: 36)
+                                .overlay {
+                                    if color == colorHex {
+                                        Image(systemName: "checkmark")
+                                            .font(.caption.weight(.bold))
+                                            .foregroundStyle(.white)
+                                    }
+                                }
+                                .onTapGesture { color = colorHex }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            .navigationTitle("Edit Category")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(.brand)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        Task {
+                            var updated = category
+                            updated.name = name
+                            updated.color = color
+                            await viewModel.updateCategory(updated)
+                            dismiss()
+                        }
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.brand)
+                    .disabled(name.isEmpty)
                 }
             }
         }
