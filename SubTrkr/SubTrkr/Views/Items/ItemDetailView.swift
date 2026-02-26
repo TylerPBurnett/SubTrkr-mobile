@@ -213,19 +213,19 @@ struct ItemDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: 10) {
-                ForEach(availableActions, id: \.self) { action in
+                ForEach(currentItem.status.availableActions, id: \.self) { action in
                     Button {
                         showStatusSheet = true
                     } label: {
                         VStack(spacing: 6) {
-                            Image(systemName: iconForAction(action))
+                            Image(systemName: StatusActionHelper.icon(for: action))
                                 .font(.system(size: 18))
-                            Text(action.capitalized)
+                            Text(StatusActionHelper.label(for: action))
                                 .font(.caption2.weight(.medium))
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .foregroundStyle(colorForAction(action))
+                        .foregroundStyle(StatusActionHelper.color(for: action))
                         .cardStyle(cornerRadius: 12)
                     }
                 }
@@ -350,37 +350,6 @@ struct ItemDetailView: View {
     }
 
     // MARK: - Helpers
-
-    private var availableActions: [String] {
-        switch currentItem.status {
-        case .active: return ["pause", "cancel", "archive"]
-        case .paused: return ["resume", "cancel", "archive"]
-        case .cancelled: return ["reactivate", "archive"]
-        case .archived: return ["reactivate"]
-        case .trial: return ["convert", "cancel"]
-        }
-    }
-
-    private func iconForAction(_ action: String) -> String {
-        switch action {
-        case "pause": return "pause.circle"
-        case "resume", "reactivate": return "play.circle"
-        case "cancel": return "xmark.circle"
-        case "archive": return "archivebox"
-        case "convert": return "arrow.right.circle"
-        default: return "circle"
-        }
-    }
-
-    private func colorForAction(_ action: String) -> Color {
-        switch action {
-        case "pause": return .statusPaused
-        case "resume", "reactivate", "convert": return .brand
-        case "cancel": return .statusCancelled
-        case "archive": return .statusArchived
-        default: return .textSecondary
-        }
-    }
 
     private func refreshItem() async {
         do {

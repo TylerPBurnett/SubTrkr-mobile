@@ -36,15 +36,15 @@ struct StatusChangeSheet: View {
                 }
 
                 Section("Change To") {
-                    ForEach(availableActions, id: \.self) { action in
+                    ForEach(item.status.availableActions, id: \.self) { action in
                         Button {
                             selectedAction = action
                         } label: {
                             HStack {
-                                Image(systemName: iconForAction(action))
-                                    .foregroundStyle(colorForAction(action))
+                                Image(systemName: StatusActionHelper.icon(for: action))
+                                    .foregroundStyle(StatusActionHelper.color(for: action))
                                     .frame(width: 24)
-                                Text(labelForAction(action))
+                                Text(StatusActionHelper.label(for: action))
                                     .foregroundStyle(.textPrimary)
                                 Spacer()
                                 if selectedAction == action {
@@ -111,16 +111,6 @@ struct StatusChangeSheet: View {
         .presentationDetents([.medium, .large])
     }
 
-    private var availableActions: [String] {
-        switch item.status {
-        case .active: return ["pause", "cancel", "archive", "start_trial"]
-        case .paused: return ["resume", "cancel", "archive"]
-        case .cancelled: return ["reactivate", "archive"]
-        case .archived: return ["reactivate"]
-        case .trial: return ["convert_trial", "cancel", "archive"]
-        }
-    }
-
     private func executeChange() async {
         guard let userId = authService.currentUser?.id.uuidString else { return }
         isLoading = true
@@ -150,39 +140,4 @@ struct StatusChangeSheet: View {
         isLoading = false
     }
 
-    private func iconForAction(_ action: String) -> String {
-        switch action {
-        case "pause": return "pause.circle.fill"
-        case "resume", "reactivate": return "play.circle.fill"
-        case "cancel": return "xmark.circle.fill"
-        case "archive": return "archivebox.fill"
-        case "start_trial": return "clock.fill"
-        case "convert_trial": return "checkmark.circle.fill"
-        default: return "circle"
-        }
-    }
-
-    private func colorForAction(_ action: String) -> Color {
-        switch action {
-        case "pause": return .statusPaused
-        case "resume", "reactivate", "convert_trial": return .brand
-        case "cancel": return .statusCancelled
-        case "archive": return .statusArchived
-        case "start_trial": return .statusTrial
-        default: return .textSecondary
-        }
-    }
-
-    private func labelForAction(_ action: String) -> String {
-        switch action {
-        case "pause": return "Pause"
-        case "resume": return "Resume"
-        case "reactivate": return "Reactivate"
-        case "cancel": return "Cancel"
-        case "archive": return "Archive"
-        case "start_trial": return "Start Trial"
-        case "convert_trial": return "Convert to Active"
-        default: return action.capitalized
-        }
-    }
 }

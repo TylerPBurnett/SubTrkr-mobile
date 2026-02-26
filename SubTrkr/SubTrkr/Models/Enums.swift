@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 enum BillingCycle: String, Codable, CaseIterable, Identifiable {
     case weekly
@@ -85,6 +85,16 @@ enum ItemStatus: String, Codable, CaseIterable, Identifiable {
         case .trial: return "clock.fill"
         }
     }
+
+    var availableActions: [String] {
+        switch self {
+        case .active: return ["pause", "cancel", "archive", "start_trial"]
+        case .paused: return ["resume", "cancel", "archive"]
+        case .cancelled: return ["reactivate", "archive"]
+        case .archived: return ["reactivate"]
+        case .trial: return ["convert_trial", "cancel", "archive"]
+        }
+    }
 }
 
 enum NotificationChannelType: String, Codable, CaseIterable {
@@ -130,6 +140,44 @@ enum SortOption: String, CaseIterable, Identifiable {
         case .price: return "dollarsign"
         case .category: return "folder"
         case .status: return "circle.dotted"
+        }
+    }
+}
+
+enum StatusActionHelper {
+    static func icon(for action: String) -> String {
+        switch action {
+        case "pause": return "pause.circle.fill"
+        case "resume", "reactivate": return "play.circle.fill"
+        case "cancel": return "xmark.circle.fill"
+        case "archive": return "archivebox.fill"
+        case "start_trial": return "clock.fill"
+        case "convert_trial": return "checkmark.circle.fill"
+        default: return "circle"
+        }
+    }
+
+    static func color(for action: String) -> Color {
+        switch action {
+        case "pause": return .statusPaused
+        case "resume", "reactivate", "convert_trial": return .brand
+        case "cancel": return .statusCancelled
+        case "archive": return .statusArchived
+        case "start_trial": return .statusTrial
+        default: return .textSecondary
+        }
+    }
+
+    static func label(for action: String) -> String {
+        switch action {
+        case "pause": return "Pause"
+        case "resume": return "Resume"
+        case "reactivate": return "Reactivate"
+        case "cancel": return "Cancel"
+        case "archive": return "Archive"
+        case "start_trial": return "Start Trial"
+        case "convert_trial": return "Convert to Active"
+        default: return action.capitalized
         }
     }
 }
