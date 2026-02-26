@@ -89,4 +89,4 @@ Local notifications are wired to item CRUD via `NotificationService` calls in `I
 - Offline/caching — every screen fetches fresh from Supabase on load
 - Unit tests — services are not constructor-injectable yet
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
-- Account management — no password change or deletion (App Store requirement)
+- `delete_user` RPC needs to be deployed to Supabase (SQL in `docs/plans/2026-02-25-account-management-design.md`)

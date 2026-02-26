@@ -37,6 +37,13 @@
 - Category tap-to-edit — edit sheet for name and color on existing categories
 - Haptic feedback — `.sensoryFeedback(.success)` on save/status change/payment, `.warning` on delete
 
+### Account Management ✓
+*Completed 2026-02-25. See `docs/plans/2026-02-25-account-management-design.md` for details.*
+
+- Change password — sheet with new/confirm fields, calls `client.auth.update(user:)`
+- Delete account — two-step confirmation (alert + type "DELETE"), calls `client.rpc("delete_user")`, signs out
+- Requires `delete_user` RPC deployed to Supabase (SQL in design doc)
+
 ---
 
 ## Up Next — Prioritized
@@ -68,7 +75,7 @@ Things users expect from a billing tracker.
 |---|---------|--------|-------|
 | ~~10~~ | ~~Currency picker~~ | | N/A — single-currency (USD) decision made |
 | ~~11~~ | ~~Auto-calculate next billing date~~ | | ✓ Reactive calc from startDate + billingCycle |
-| 12 | **Account management** — password change + account deletion. App Store review requirement. | Medium | Required before submission |
+| ~~12~~ | ~~Account management~~ | | ✓ Password change + account deletion |
 | ~~13~~ | ~~Haptic feedback~~ | | ✓ Save, delete, status change, payment |
 | 14 | **App icon** — `AppIcon.appiconset` slot is empty. Need 1024x1024 PNG. | Small | Required before submission |
 
@@ -113,8 +120,8 @@ Things users expect from a billing tracker.
 Before submitting to App Store Review:
 
 - [ ] Dark mode support ✓ (done)
-- [ ] Account deletion option (#12)
-- [ ] Password change option (#12)
+- [x] Account deletion option (#12) ✓
+- [x] Password change option (#12) ✓
 - [ ] App icon (#14)
 - [ ] Remove hardcoded credentials (#15)
 - [ ] Privacy policy URL in App Store Connect
