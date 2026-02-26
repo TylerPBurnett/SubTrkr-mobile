@@ -125,6 +125,17 @@ final class AuthService {
         self.currentUser = nil
     }
 
+    // MARK: - Account Management
+
+    func updatePassword(newPassword: String) async throws {
+        try await client.auth.update(user: UserAttributes(password: newPassword))
+    }
+
+    func deleteAccount() async throws {
+        try await client.rpc("delete_user").execute()
+        try await signOut()
+    }
+
     // MARK: - Email Verification
 
     func resendVerificationEmail() async throws {

@@ -4,6 +4,12 @@ struct SettingsView: View {
     @Environment(AuthService.self) private var authService
     @State private var viewModel = SettingsViewModel()
     @State private var showSignOutAlert = false
+    @State private var showChangePassword = false
+    @State private var showDeleteAlert = false
+    @State private var deleteConfirmText = ""
+    @State private var showDeleteConfirm = false
+    @State private var accountError: String?
+    @State private var accountSuccess: String?
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
 
     var body: some View {
@@ -49,6 +55,15 @@ struct SettingsView: View {
                                 }
                                 .foregroundStyle(authService.isEmailVerified ? .brand : .statusPaused)
                             }
+                        }
+                    }
+
+                    if authService.currentUser?.email != nil {
+                        Button {
+                            showChangePassword = true
+                        } label: {
+                            Label("Change Password", systemImage: "key.fill")
+                                .foregroundStyle(.textPrimary)
                         }
                     }
                 } header: {
@@ -118,6 +133,18 @@ struct SettingsView: View {
                             .foregroundStyle(.accentRed)
                     }
                 }
+
+                // Danger Zone
+                Section {
+                    Button {
+                        showDeleteAlert = true
+                    } label: {
+                        Label("Delete Account", systemImage: "trash.fill")
+                            .foregroundStyle(.accentRed)
+                    }
+                } footer: {
+                    Text("Permanently delete your account and all associated data.")
+                }
             }
             .navigationTitle("Settings")
             .alert("Sign Out?", isPresented: $showSignOutAlert) {
@@ -129,6 +156,36 @@ struct SettingsView: View {
                 }
             } message: {
                 Text("You'll need to sign in again to access your data.")
+            }
+            .sheet(isPresented: $showChangePassword) {
+                ChangePasswordSheet(authService: authService)
+            }
+            .alert("Delete Account?", isPresented: $showDeleteAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Continue", role: .destructive) {
+                    showDeleteConfirm = true
+                }
+            } message: {
+                Text("This will permanently delete your account and all your data. This cannot be undone.")
+            }
+            .alert("Confirm Deletion", isPresented: $showDeleteConfirm) {
+                TextField("Type DELETE to confirm", text: $deleteConfirmText)
+                Button("Cancel", role: .cancel) {
+                    deleteConfirmText = ""
+                }
+                Button("Delete Forever", role: .destructive) {
+                    guard deleteConfirmText == "DELETE" else { return }
+                    Task {
+                        do {
+                            try await authService.deleteAccount()
+                        } catch {
+                            accountError = error.localizedDescription
+                        }
+                    }
+                    deleteConfirmText = ""
+                }
+            } message: {
+                Text("Type DELETE to permanently remove your account.")
             }
         }
         .task {
@@ -363,5 +420,84 @@ struct EditCategorySheet: View {
             }
         }
         .presentationDetents([.medium])
+    }
+}
+
+struct ChangePasswordSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let authService: AuthService
+
+    @State private var newPassword = ""
+    @State private var confirmPassword = ""
+    @State private var isLoading = false
+    @State private var error: String?
+    @State private var success = false
+
+    var isValid: Bool {
+        newPassword.count >= 6 && newPassword == confirmPassword
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    SecureField("New Password", text: $newPassword)
+                    SecureField("Confirm Password", text: $confirmPassword)
+                } footer: {
+                    if newPassword.count > 0 && newPassword.count < 6 {
+                        Text("Password must be at least 6 characters")
+                            .foregroundStyle(.accentRed)
+                    } else if confirmPassword.count > 0 && newPassword != confirmPassword {
+                        Text("Passwords don't match")
+                            .foregroundStyle(.accentRed)
+                    }
+                }
+
+                if let error {
+                    Section {
+                        Text(error)
+                            .foregroundStyle(.accentRed)
+                            .font(.caption)
+                    }
+                }
+
+                if success {
+                    Section {
+                        Label("Password updated successfully", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.brand)
+                    }
+                }
+            }
+            .navigationTitle("Change Password")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(success ? "Done" : "Cancel") { dismiss() }
+                        .foregroundStyle(.brand)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !success {
+                        Button("Save") {
+                            Task {
+                                isLoading = true
+                                error = nil
+                                do {
+                                    try await authService.updatePassword(newPassword: newPassword)
+                                    success = true
+                                } catch {
+                                    self.error = error.localizedDescription
+                                }
+                                isLoading = false
+                            }
+                        }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.brand)
+                        .disabled(!isValid || isLoading)
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .sensoryFeedback(.success, trigger: success)
     }
 }
