@@ -53,35 +53,165 @@ final class AnalyticsService {
         }.sorted { $0.total > $1.total }
     }
 
-    // MARK: - Monthly Trend
+    // MARK: - Historical Reconstruction
 
-    func getMonthlySpendingTrend(items: [Item], months: Int = 6) -> [MonthlySpending] {
+    /// Determines if an item was actively costing money during a given month.
+    private func wasItemActive(item: Item, monthStart: Date, monthEnd: Date) -> Bool {
+        guard let startDateStr = item.startDate,
+              let startDate = DateHelper.parseDate(startDateStr),
+              startDate <= monthEnd else {
+            return false
+        }
+
+        // Trial items don't cost money
+        if item.status == .trial {
+            return false
+        }
+
+        // Cancelled before this month started
+        if let cancelledAtStr = item.cancelledAt,
+           let cancelledAt = DateHelper.parseISO8601(cancelledAtStr),
+           cancelledAt < monthStart {
+            return false
+        }
+
+        // Archived before this month started
+        if let archivedAtStr = item.archivedAt,
+           let archivedAt = DateHelper.parseISO8601(archivedAtStr),
+           archivedAt < monthStart {
+            return false
+        }
+
+        // Paused for the entire month
+        if let pausedAtStr = item.pausedAt,
+           let pausedAt = DateHelper.parseISO8601(pausedAtStr),
+           pausedAt < monthStart {
+            if let pausedUntilStr = item.pausedUntil,
+               let pausedUntil = DateHelper.parseDate(pausedUntilStr) {
+                if pausedUntil > monthEnd {
+                    return false
+                }
+            } else if item.status == .paused {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private func monthRange(for date: Date) -> (start: Date, end: Date) {
+        let calendar = Calendar.current
+        let start = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
+        let end = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: start)!
+        return (start, end)
+    }
+
+    /// Reconstructed monthly spending using item metadata + real payments when available.
+    func reconstructMonthlySpending(items: [Item], payments: [Payment], months: Int) -> [MonthlySpending] {
         let calendar = Calendar.current
         let now = Date.now
+
+        var paymentIndex: [String: [String: Double]] = [:]
+        for payment in payments {
+            guard let date = payment.paidDateFormatted else { continue }
+            let key = DateHelper.formatYearMonth(date)
+            paymentIndex[payment.itemId, default: [:]][key, default: 0] += payment.amount
+        }
 
         var result: [MonthlySpending] = []
 
         for i in (0..<months).reversed() {
             guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
+            let (monthStart, monthEnd) = monthRange(for: monthDate)
+            let monthKey = DateHelper.formatYearMonth(monthStart)
 
-            // For simplicity, use current active items' monthly cost
-            // A more sophisticated approach would track historical changes
-            let total = items
-                .filter { item in
-                    guard item.status == .active || item.status == .trial else { return false }
-                    // Item must have started before this month
-                    if let startDate = item.startDate,
-                       let start = DateHelper.parseDate(startDate) {
-                        return start <= monthDate
-                    }
-                    return true
+            var total = 0.0
+            for item in items {
+                if let paidAmount = paymentIndex[item.id]?[monthKey] {
+                    total += paidAmount
+                } else if wasItemActive(item: item, monthStart: monthStart, monthEnd: monthEnd) {
+                    total += item.monthlyAmount
                 }
-                .reduce(0) { $0 + $1.monthlyAmount }
+            }
 
-            result.append(MonthlySpending(month: monthDate, total: total))
+            result.append(MonthlySpending(month: monthStart, total: total))
         }
 
         return result
+    }
+
+    /// Category spending over time (for stacked area chart).
+    func reconstructCategorySpending(items: [Item], payments: [Payment], months: Int) -> [CategoryMonthlySpending] {
+        let calendar = Calendar.current
+        let now = Date.now
+
+        var paymentIndex: [String: [String: Double]] = [:]
+        for payment in payments {
+            guard let date = payment.paidDateFormatted else { continue }
+            let key = DateHelper.formatYearMonth(date)
+            paymentIndex[payment.itemId, default: [:]][key, default: 0] += payment.amount
+        }
+
+        var result: [CategoryMonthlySpending] = []
+
+        for i in (0..<months).reversed() {
+            guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
+            let (monthStart, monthEnd) = monthRange(for: monthDate)
+            let monthKey = DateHelper.formatYearMonth(monthStart)
+
+            var categoryTotals: [String: (color: String, total: Double)] = [:]
+
+            for item in items {
+                var amount = 0.0
+                if let paidAmount = paymentIndex[item.id]?[monthKey] {
+                    amount = paidAmount
+                } else if wasItemActive(item: item, monthStart: monthStart, monthEnd: monthEnd) {
+                    amount = item.monthlyAmount
+                }
+
+                if amount > 0 {
+                    let name = item.categoryName
+                    let color = item.categoryColor
+                    categoryTotals[name, default: (color: color, total: 0)].total += amount
+                }
+            }
+
+            for (name, data) in categoryTotals {
+                result.append(CategoryMonthlySpending(
+                    month: monthStart,
+                    category: name,
+                    color: data.color,
+                    total: data.total
+                ))
+            }
+        }
+
+        return result
+    }
+
+    /// Active item count per month.
+    func reconstructMonthlyItemCount(items: [Item], months: Int) -> [MonthlyItemCount] {
+        let calendar = Calendar.current
+        let now = Date.now
+
+        var result: [MonthlyItemCount] = []
+
+        for i in (0..<months).reversed() {
+            guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
+            let (monthStart, monthEnd) = monthRange(for: monthDate)
+
+            let count = items.filter { wasItemActive(item: $0, monthStart: monthStart, monthEnd: monthEnd) }.count
+            result.append(MonthlyItemCount(month: monthStart, count: count))
+        }
+
+        return result
+    }
+
+    /// Forward-looking projected annual spend from currently active items.
+    func calculateProjectedAnnualSpend(items: [Item]) -> Double {
+        items
+            .filter { $0.status == .active }
+            .reduce(0) { $0 + $1.yearlyAmount }
     }
 
     // MARK: - Top Expenses
