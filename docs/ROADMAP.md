@@ -30,6 +30,13 @@
 - Record Payment sheet in ItemDetailView — pre-filled amount, date picker, auto-advances nextBillingDate by one cycle
 - Auto-calculate next billing date in item form — rolls startDate forward by billingCycle until future, respects manual overrides
 
+### Status History, Category Editing & Haptics ✓
+*Completed 2026-02-25.*
+
+- Status history timeline in ItemDetailView — fetches from `item_status_history`, shows status icon, reason, relative date
+- Category tap-to-edit — edit sheet for name and color on existing categories
+- Haptic feedback — `.sensoryFeedback(.success)` on save/status change/payment, `.warning` on delete
+
 ---
 
 ## Up Next — Prioritized
@@ -49,8 +56,8 @@
 |---|---------|--------|-------|
 | ~~5~~ | ~~Local notifications~~ | | ✓ Wired to item CRUD + maintenance |
 | ~~6~~ | ~~Record Payment UI~~ | | ✓ Sheet with auto-advance billing date |
-| 7 | **Status history display** — Model + writes exist. Fetch + render timeline in `ItemDetailView`. | Small | |
-| 8 | **Category editing** — `SettingsViewModel.editingCategory` exists. Add tap-to-edit on category rows. | Small | |
+| ~~7~~ | ~~Status history display~~ | | ✓ Timeline in ItemDetailView |
+| ~~8~~ | ~~Category editing~~ | | ✓ Tap-to-edit with name + color |
 | 9 | **Notification channels** — `loadNotifications()` exists but is never called. Wire up real channel data. | Small | Desktop-only channels, low priority |
 
 ### Phase 3: Missing Table-Stakes Features
@@ -62,7 +69,7 @@ Things users expect from a billing tracker.
 | ~~10~~ | ~~Currency picker~~ | | N/A — single-currency (USD) decision made |
 | ~~11~~ | ~~Auto-calculate next billing date~~ | | ✓ Reactive calc from startDate + billingCycle |
 | 12 | **Account management** — password change + account deletion. App Store review requirement. | Medium | Required before submission |
-| 13 | **Haptic feedback** — `.sensoryFeedback` on item save, status change, swipe delete, pull-to-refresh, payment recorded. | Small | Polish pass |
+| ~~13~~ | ~~Haptic feedback~~ | | ✓ Save, delete, status change, payment |
 | 14 | **App icon** — `AppIcon.appiconset` slot is empty. Need 1024x1024 PNG. | Small | Required before submission |
 
 ### Phase 4: Code Quality (Pre-Release)
@@ -92,13 +99,12 @@ Things users expect from a billing tracker.
 
 ## Suggested Next Session
 
-The next batch is **items 7 + 8 + 13** (small wiring + polish):
+**Account management (#12)** is the next critical item — App Store requires password change + account deletion. After that, the remaining items are:
 
-1. **Status history display** (#7) — model + writes exist, wire fetch + render timeline
-2. **Category editing** (#8) — ViewModel state exists, add tap-to-edit
-3. **Haptic feedback** (#13) — polish pass across key interactions
-
-Then: Account management (#12) for App Store readiness.
+1. **Account management** (#12) — password change + account deletion (App Store requirement)
+2. **App icon** (#14) — need 1024x1024 PNG
+3. **Remove hardcoded credentials** (#15) — fail loudly if missing
+4. **Code quality pass** (#15-19) — pre-release cleanup
 
 ---
 

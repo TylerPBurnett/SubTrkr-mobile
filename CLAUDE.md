@@ -90,5 +90,3 @@ Local notifications are wired to item CRUD via `NotificationService` calls in `I
 - Unit tests — services are not constructor-injectable yet
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
 - Account management — no password change or deletion (App Store requirement)
-- Status history display — model + writes exist but ItemDetailView doesn't render timeline
-- Category editing — SettingsViewModel has state but no edit UI
