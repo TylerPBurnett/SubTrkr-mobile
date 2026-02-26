@@ -32,6 +32,7 @@ struct ItemDetailView: View {
                     statusSection
                     notesSection
                     paymentHistorySection
+                    statusHistorySection
                 }
                 .padding()
             }
@@ -120,6 +121,7 @@ struct ItemDetailView: View {
         }
         .task {
             await loadPayments()
+            await loadStatusHistory()
         }
     }
 
@@ -316,6 +318,49 @@ struct ItemDetailView: View {
         .cardStyle(cornerRadius: 14)
     }
 
+    // MARK: - Status History
+
+    @ViewBuilder
+    private var statusHistorySection: some View {
+        if !statusHistory.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Status History")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.textSecondary)
+
+                ForEach(statusHistory.prefix(10)) { entry in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 6) {
+                                Image(systemName: entry.status.iconName)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.forStatus(entry.status))
+                                Text(entry.status.displayName)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.textPrimary)
+                            }
+                            if let reason = entry.reason, !reason.isEmpty {
+                                Text(reason)
+                                    .font(.caption)
+                                    .foregroundStyle(.textSecondary)
+                            }
+                        }
+                        Spacer()
+                        if let date = entry.changedAtFormatted {
+                            Text(DateHelper.relativeDateString(date))
+                                .font(.caption)
+                                .foregroundStyle(.textMuted)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .cardStyle(cornerRadius: 14)
+        }
+    }
+
     // MARK: - Helpers
 
     private var availableActions: [String] {
@@ -360,6 +405,14 @@ struct ItemDetailView: View {
     private func loadPayments() async {
         do {
             payments = try await PaymentService().getPayments(itemId: currentItem.id)
+        } catch {
+            // Non-critical
+        }
+    }
+
+    private func loadStatusHistory() async {
+        do {
+            statusHistory = try await ItemService().getStatusHistory(itemId: currentItem.id)
         } catch {
             // Non-critical
         }

@@ -56,6 +56,15 @@ final class ItemService {
             .value
     }
 
+    func getStatusHistory(itemId: String) async throws -> [StatusHistory] {
+        return try await client.from("item_status_history")
+            .select()
+            .eq("item_id", value: itemId)
+            .order("changed_at", ascending: false)
+            .execute()
+            .value
+    }
+
     // MARK: - Create
 
     func createItem(_ data: ItemInsert) async throws -> Item {
