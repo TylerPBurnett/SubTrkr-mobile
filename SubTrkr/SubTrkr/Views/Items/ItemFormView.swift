@@ -65,6 +65,7 @@ struct ItemFormView: View {
                     }
                 }
             }
+            .sensoryFeedback(.success, trigger: viewModel.isSaved)
         }
         .task {
             await viewModel.loadCategories()

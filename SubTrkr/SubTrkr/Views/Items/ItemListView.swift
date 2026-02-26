@@ -75,6 +75,7 @@ struct ItemListView: View {
             } message: {
                 Text("This action cannot be undone.")
             }
+            .sensoryFeedback(.warning, trigger: showDeleteAlert)
         }
         .task {
             await viewModel.loadData()

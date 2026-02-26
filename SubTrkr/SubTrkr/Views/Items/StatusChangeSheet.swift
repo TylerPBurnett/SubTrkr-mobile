@@ -13,6 +13,7 @@ struct StatusChangeSheet: View {
     @State private var reason = ""
     @State private var notes = ""
     @State private var isLoading = false
+    @State private var changeSucceeded = false
     @State private var error: String?
 
     var body: some View {
@@ -106,6 +107,7 @@ struct StatusChangeSheet: View {
                 }
             }
         }
+        .sensoryFeedback(.success, trigger: changeSucceeded)
         .presentationDetents([.medium, .large])
     }
 
@@ -139,6 +141,7 @@ struct StatusChangeSheet: View {
                 statusData: statusData
             )
             await onStatusChanged?()
+            changeSucceeded = true
             dismiss()
         } catch {
             self.error = error.localizedDescription

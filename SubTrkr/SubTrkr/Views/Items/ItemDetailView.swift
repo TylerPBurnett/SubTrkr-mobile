@@ -16,6 +16,7 @@ struct ItemDetailView: View {
     @State private var paymentAmount: Double = 0
     @State private var paymentDate = Date.now
     @State private var isRecordingPayment = false
+    @State private var paymentRecorded = false
 
     init(item: Item, onUpdate: (() async -> Void)? = nil) {
         self.item = item
@@ -119,6 +120,7 @@ struct ItemDetailView: View {
                 .presentationDetents([.medium])
             }
         }
+        .sensoryFeedback(.success, trigger: paymentRecorded)
         .task {
             await loadPayments()
             await loadStatusHistory()
@@ -442,6 +444,7 @@ struct ItemDetailView: View {
             await refreshItem()
             await loadPayments()
             await onUpdate?()
+            paymentRecorded = true
             showPaymentSheet = false
         } catch {
             // Payment failed — sheet stays open so user can retry
