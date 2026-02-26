@@ -4,6 +4,7 @@ struct NotificationSettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("defaultReminderDays") private var defaultReminderDays = 3
     @State private var hasPermission = false
+    @State private var itemService = ItemService()
 
     var body: some View {
         List {
@@ -40,7 +41,7 @@ struct NotificationSettingsView: View {
                     }
                     .onChange(of: defaultReminderDays) { _, newValue in
                         Task {
-                            let items = try? await ItemService().getItems()
+                            let items = try? await itemService.getItems()
                             await NotificationService().rescheduleAllNotifications(
                                 items: items ?? [],
                                 daysBefore: newValue

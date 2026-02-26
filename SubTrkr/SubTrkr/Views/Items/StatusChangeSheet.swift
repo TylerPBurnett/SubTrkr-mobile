@@ -15,6 +15,7 @@ struct StatusChangeSheet: View {
     @State private var isLoading = false
     @State private var changeSucceeded = false
     @State private var error: String?
+    @State private var itemService = ItemService()
 
     var body: some View {
         NavigationStack {
@@ -125,7 +126,7 @@ struct StatusChangeSheet: View {
         )
 
         do {
-            _ = try await ItemService().executeStatusChange(
+            _ = try await itemService.executeStatusChange(
                 id: item.id,
                 userId: userId,
                 statusData: statusData

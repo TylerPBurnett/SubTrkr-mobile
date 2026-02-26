@@ -17,6 +17,8 @@ struct ItemDetailView: View {
     @State private var paymentDate = Date.now
     @State private var isRecordingPayment = false
     @State private var paymentRecorded = false
+    @State private var itemService = ItemService()
+    @State private var paymentService = PaymentService()
 
     init(item: Item, onUpdate: (() async -> Void)? = nil) {
         self.item = item
@@ -353,7 +355,7 @@ struct ItemDetailView: View {
 
     private func refreshItem() async {
         do {
-            currentItem = try await ItemService().getItemById(currentItem.id)
+            currentItem = try await itemService.getItemById(currentItem.id)
         } catch {
             // Item may have been deleted
         }
@@ -361,7 +363,7 @@ struct ItemDetailView: View {
 
     private func loadPayments() async {
         do {
-            payments = try await PaymentService().getPayments(itemId: currentItem.id)
+            payments = try await paymentService.getPayments(itemId: currentItem.id)
         } catch {
             // Non-critical
         }
@@ -369,7 +371,7 @@ struct ItemDetailView: View {
 
     private func loadStatusHistory() async {
         do {
-            statusHistory = try await ItemService().getStatusHistory(itemId: currentItem.id)
+            statusHistory = try await itemService.getStatusHistory(itemId: currentItem.id)
         } catch {
             // Non-critical
         }
@@ -381,7 +383,7 @@ struct ItemDetailView: View {
 
         do {
             // Record the payment
-            _ = try await PaymentService().recordPayment(
+            _ = try await paymentService.recordPayment(
                 userId: userId,
                 itemId: currentItem.id,
                 amount: paymentAmount,
@@ -392,7 +394,7 @@ struct ItemDetailView: View {
             if let currentDate = currentItem.nextBillingDateFormatted {
                 let nextDate = DateHelper.advanceDate(currentDate, by: currentItem.billingCycle)
                 let update = ItemUpdate(nextBillingDate: DateHelper.formatDate(nextDate))
-                _ = try await ItemService().updateItem(id: currentItem.id, data: update)
+                _ = try await itemService.updateItem(id: currentItem.id, data: update)
             }
 
             // Refresh data
