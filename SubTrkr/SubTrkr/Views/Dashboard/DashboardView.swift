@@ -62,18 +62,18 @@ struct DashboardView: View {
 
             HStack(spacing: 12) {
                 StatsCard(
+                    title: "Projected",
+                    value: viewModel.projectedAnnualSpend.formattedCompact(currency: "USD"),
+                    subtitle: "next 12 months",
+                    icon: "chart.line.uptrend.xyaxis",
+                    color: .accentAmber
+                )
+                StatsCard(
                     title: "Active",
                     value: "\(viewModel.activeCount)",
                     subtitle: "\(viewModel.subscriptionCount) subs, \(viewModel.billCount) bills",
                     icon: "checkmark.circle",
                     color: .brand
-                )
-                StatsCard(
-                    title: "Savings",
-                    value: viewModel.monthlySavings.formatted(currency: "USD"),
-                    subtitle: "per month",
-                    icon: "arrow.down.circle",
-                    color: .statusPaused
                 )
             }
         }

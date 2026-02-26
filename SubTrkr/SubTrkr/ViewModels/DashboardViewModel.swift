@@ -25,6 +25,10 @@ final class DashboardViewModel {
         analyticsService.calculateMonthlySavings(items: items)
     }
 
+    var projectedAnnualSpend: Double {
+        analyticsService.calculateProjectedAnnualSpend(items: items)
+    }
+
     var spendingByCategory: [SpendingByCategory] {
         analyticsService.getSpendingByCategory(items: items)
     }
