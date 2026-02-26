@@ -56,9 +56,9 @@ View → ViewModel (@Observable) → Service → Supabase SDK → PostgreSQL
 ## Key files
 
 - `SubTrkr/SubTrkr/SubTrkrApp.swift` — `@main` entry, auth init, OAuth URL handler
-- `SubTrkr/SubTrkr/Services/SupabaseManager.swift` — singleton client. Credentials read from env vars → Info.plist → hardcoded fallback
+- `SubTrkr/SubTrkr/Services/SupabaseManager.swift` — singleton client. Credentials read from env vars → Info.plist; `fatalError` if missing
 - `SubTrkr/SubTrkr/Extensions/Color+Theme.swift` — adaptive light/dark color tokens using `Color.adaptive(light:dark:)`, `ShapeStyle` extensions for short-form syntax, and `cardStyle()` view modifier. All colors are explicit hex values from `docs/IOS_DESIGN_HANDOFF.md` — do NOT use Apple system colors (`.systemBackground`, `.label`, etc.)
-- `SubTrkr/SubTrkr/Models/Enums.swift` — `ItemType`, `ItemStatus`, `BillingCycle` with raw values matching DB
+- `SubTrkr/SubTrkr/Models/Enums.swift` — `ItemType`, `ItemStatus`, `BillingCycle` with raw values matching DB. `ItemStatus.availableActions` is the single source of truth for status transitions. `StatusActionHelper` provides shared icon/color/label for status actions.
 - `SubTrkr/SubTrkr/Views/ContentView.swift` — auth gate and `MainTabView` with iOS 18 `Tab` API
 
 ## Project files

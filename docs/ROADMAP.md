@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-02-25
+> Last updated: 2026-02-26
 
 ---
 
@@ -44,6 +44,15 @@
 - Delete account — two-step confirmation (alert + type "DELETE"), calls `client.rpc("delete_user")`, signs out
 - Requires `delete_user` RPC deployed to Supabase (SQL in design doc)
 
+### Code Quality Pass ✓
+*Completed 2026-02-26. See `docs/plans/2026-02-26-code-quality-design.md` for details.*
+
+- Removed hardcoded Supabase credentials — `fatalError` if env/plist missing
+- Removed `@Observable` from `SupabaseManager` — singleton, not observed by views
+- Cached `DateFormatter` instances — static `mediumDateFormatter` in `DateHelper`, eliminated per-render allocations
+- Deduplicated `availableActions` — single source of truth on `ItemStatus` enum + `StatusActionHelper`
+- Routed service calls through `@State` instances — no more inline `ItemService()`/`PaymentService()` per call
+
 ---
 
 ## Up Next — Prioritized
@@ -83,11 +92,11 @@ Things users expect from a billing tracker.
 
 | # | Issue | Notes |
 |---|-------|-------|
-| 15 | **Remove hardcoded Supabase credentials** — fail loudly if env/plist missing instead of silent fallback to production. |
-| 16 | **Route all service calls through ViewModels** — some views create `ItemService()` inline, bypassing ViewModel. |
-| 17 | **Cache DateFormatters** — `ItemDetailView` creates new instances per render. Use static/cached like `DateHelper`. |
-| 18 | **Deduplicate `availableActions`** — `ItemDetailView` and `StatusChangeSheet` compute action lists independently with inconsistent results. |
-| 19 | **Remove `@Observable` from `SupabaseManager`** — singleton accessed by property, not observed by views. |
+| ~~15~~ | ~~Remove hardcoded Supabase credentials~~ | ✓ `fatalError` if env/plist missing |
+| ~~16~~ | ~~Route all service calls through shared instances~~ | ✓ `@State` service properties |
+| ~~17~~ | ~~Cache DateFormatters~~ | ✓ Static `mediumDateFormatter` in `DateHelper` |
+| ~~18~~ | ~~Deduplicate `availableActions`~~ | ✓ `ItemStatus.availableActions` + `StatusActionHelper` |
+| ~~19~~ | ~~Remove `@Observable` from `SupabaseManager`~~ | ✓ Removed |
 
 ### Phase 5: Post-Launch Features
 
@@ -106,12 +115,12 @@ Things users expect from a billing tracker.
 
 ## Suggested Next Session
 
-**Account management (#12)** is the next critical item — App Store requires password change + account deletion. After that, the remaining items are:
+Remaining items before App Store submission:
 
-1. **Account management** (#12) — password change + account deletion (App Store requirement)
-2. **App icon** (#14) — need 1024x1024 PNG
-3. **Remove hardcoded credentials** (#15) — fail loudly if missing
-4. **Code quality pass** (#15-19) — pre-release cleanup
+1. **App icon** (#14) — need 1024×1024 PNG design asset
+2. **Spending trend chart** (#4) — historical reconstruction (large effort)
+3. **Privacy policy URL** — needed in App Store Connect
+4. **Physical device testing** + accessibility audit
 
 ---
 
@@ -123,7 +132,7 @@ Before submitting to App Store Review:
 - [x] Account deletion option (#12) ✓
 - [x] Password change option (#12) ✓
 - [ ] App icon (#14)
-- [ ] Remove hardcoded credentials (#15)
+- [x] Remove hardcoded credentials (#15) ✓
 - [ ] Privacy policy URL in App Store Connect
 - [ ] Test on physical device
 - [ ] Accessibility audit (VoiceOver, Dynamic Type)
