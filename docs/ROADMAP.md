@@ -53,6 +53,17 @@
 - Deduplicated `availableActions` — single source of truth on `ItemStatus` enum + `StatusActionHelper`
 - Routed service calls through `@State` instances — no more inline `ItemService()`/`PaymentService()` per call
 
+### Analytics Charts & Historical Reconstruction ✓
+*Completed 2026-02-26. See `docs/plans/2026-02-26-analytics-charts-design.md` for details.*
+
+- Fixed flat spending trend chart — historical reconstruction from item metadata (`startDate`, `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil`), prefers real payment records when available
+- Segmented time range picker (3/6/12 months) on Analytics Trends tab
+- Category spending over time — stacked area chart with per-category colors and legend
+- Subscription count over time — line chart tracking active item count per month
+- Projected annual spend — forward-looking `yearlyAmount` sum on Dashboard and Analytics Overview
+- Cached `NumberFormatter` instances in `Double+Currency` — eliminated per-render allocations
+- `AnalyticsViewModel` now loads payments in parallel via `async let`
+
 ---
 
 ## Up Next — Prioritized
@@ -64,7 +75,7 @@
 | ~~1~~ | ~~Multi-currency math~~ | | ✓ Fixed — enforced single-currency (USD) |
 | ~~2~~ | ~~Expired trials never transition~~ | | ✓ Fixed — auto-cancel |
 | ~~3~~ | ~~Notification toggle doesn't persist~~ | | ✓ Fixed — @AppStorage |
-| 4 | **Spending trend chart is flat** — applies current items to all past months. Needs historical reconstruction. | Large | Medium |
+| ~~4~~ | ~~Spending trend chart is flat~~ | | ✓ Fixed — historical reconstruction + 3 new charts |
 
 ### Phase 2: Wire Half-Built Features
 
@@ -118,9 +129,9 @@ Things users expect from a billing tracker.
 Remaining items before App Store submission:
 
 1. **App icon** (#14) — need 1024×1024 PNG design asset
-2. **Spending trend chart** (#4) — historical reconstruction (large effort)
-3. **Privacy policy URL** — needed in App Store Connect
-4. **Physical device testing** + accessibility audit
+2. **Privacy policy URL** — needed in App Store Connect
+3. **Physical device testing** + accessibility audit
+4. **Notification channels** (#9) — wire up real channel data (low priority)
 
 ---
 
@@ -128,7 +139,7 @@ Remaining items before App Store submission:
 
 Before submitting to App Store Review:
 
-- [ ] Dark mode support ✓ (done)
+- [x] Dark mode support ✓
 - [x] Account deletion option (#12) ✓
 - [x] Password change option (#12) ✓
 - [ ] App icon (#14)

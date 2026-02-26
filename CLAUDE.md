@@ -84,9 +84,13 @@ Single-currency (USD) enforced. The `currency` field exists in the model/DB for 
 
 Local notifications are wired to item CRUD via `NotificationService` calls in `ItemService` (create/update/delete) and `DashboardViewModel` (post-maintenance reschedule). Settings persisted with `@AppStorage("notificationsEnabled")` and `@AppStorage("defaultReminderDays")` — these are read from `UserDefaults` in services.
 
+## Analytics
+
+`AnalyticsService` reconstructs historical spending from item metadata — checks `startDate`, `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil` to determine if an item was active in a given month. Prefers real `Payment` records when available. `AnalyticsViewModel` loads items and payments in parallel via `async let`, exposes `selectedMonthRange` (3/6/12) for the segmented time range picker. All formatters (`DateHelper`, `Double+Currency`) are cached static instances — do not create new formatters per render.
+
 ## What's not implemented
 
 - Offline/caching — every screen fetches fresh from Supabase on load
-- Unit tests — services are not constructor-injectable yet
+- Unit tests — services are not constructor-injectable yet (`ItemService` accepts injected `NotificationService` but others don't)
 - App icon — `Assets.xcassets/AppIcon.appiconset` slot exists, needs a 1024×1024 PNG
 - `delete_user` RPC needs to be deployed to Supabase (SQL in `docs/plans/2026-02-25-account-management-design.md`)
