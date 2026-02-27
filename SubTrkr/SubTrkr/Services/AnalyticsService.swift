@@ -57,9 +57,17 @@ final class AnalyticsService {
 
     /// Determines if an item was actively costing money during a given month.
     private func wasItemActive(item: Item, monthStart: Date, monthEnd: Date) -> Bool {
-        guard let startDateStr = item.startDate,
-              let startDate = DateHelper.parseDate(startDateStr),
-              startDate <= monthEnd else {
+        // Try startDate first, fall back to createdAt
+        let startDate: Date
+        if let startDateStr = item.startDate, let parsed = DateHelper.parseDate(startDateStr) {
+            startDate = parsed
+        } else if let createdAtStr = item.createdAt, let parsed = DateHelper.parseISO8601(createdAtStr) {
+            startDate = parsed
+        } else {
+            return false  // No date info at all
+        }
+
+        guard startDate <= monthEnd else {
             return false
         }
 

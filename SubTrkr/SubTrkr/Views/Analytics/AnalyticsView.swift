@@ -7,30 +7,28 @@ struct AnalyticsView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Tab Picker
-                    Picker("", selection: $selectedTab) {
-                        Text("Overview").tag(0)
-                        Text("Categories").tag(1)
-                        Text("Trends").tag(2)
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-
-                    switch selectedTab {
-                    case 0: overviewTab
-                    case 1: categoriesTab
-                    case 2: trendsTab
-                    default: EmptyView()
-                    }
+            Group {
+                if viewModel.isLoading && viewModel.items.isEmpty {
+                    analyticsLoadingView
+                } else if viewModel.items.isEmpty {
+                    EmptyStateView(
+                        icon: "chart.bar",
+                        title: "No data yet",
+                        message: "Add subscriptions or bills to see your analytics"
+                    )
+                } else {
+                    analyticsContent
                 }
-                .padding(.vertical)
             }
             .background(Color.bgBase)
             .navigationTitle("Analytics")
             .refreshable {
                 await viewModel.loadData()
+            }
+            .overlay(alignment: .top) {
+                if let error = viewModel.error {
+                    errorBanner(error)
+                }
             }
         }
         .task {
@@ -38,11 +36,117 @@ struct AnalyticsView: View {
         }
     }
 
+    // MARK: - Main Content
+
+    private var analyticsContent: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                Picker("", selection: $selectedTab) {
+                    Text("Overview").tag(0)
+                    Text("Categories").tag(1)
+                    Text("Trends").tag(2)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+
+                switch selectedTab {
+                case 0: overviewTab
+                case 1: categoriesTab
+                case 2: trendsTab
+                default: EmptyView()
+                }
+            }
+            .padding(.vertical)
+        }
+    }
+
+    // MARK: - Loading View
+
+    private var analyticsLoadingView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                // Fake segmented picker placeholder
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.bgCard)
+                    .frame(height: 32)
+                    .shimmer()
+                    .padding(.horizontal)
+
+                // Card placeholders
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 90)
+                        .shimmer()
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 90)
+                        .shimmer()
+                }
+                .padding(.horizontal)
+
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 90)
+                        .shimmer()
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 90)
+                        .shimmer()
+                }
+                .padding(.horizontal)
+
+                // Chart placeholder
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.bgCard)
+                    .frame(height: 200)
+                    .shimmer()
+                    .padding(.horizontal)
+
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.bgCard)
+                    .frame(height: 160)
+                    .shimmer()
+                    .padding(.horizontal)
+            }
+            .padding(.vertical)
+        }
+    }
+
+    // MARK: - Error Banner
+
+    private func errorBanner(_ message: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.accentAmber)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.textPrimary)
+                .lineLimit(2)
+            Spacer()
+            Button {
+                viewModel.error = nil
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.textMuted)
+            }
+        }
+        .padding(12)
+        .background(Color.bgCard)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+        .padding(.horizontal)
+        .padding(.top, 4)
+        .transition(.move(edge: .top).combined(with: .opacity))
+        .animation(.easeInOut(duration: 0.25), value: viewModel.error != nil)
+    }
+
     // MARK: - Overview Tab
 
     private var overviewTab: some View {
         VStack(spacing: 16) {
-            // Spending summary cards
             HStack(spacing: 12) {
                 AnalyticsCard(
                     title: "Monthly",
@@ -89,14 +193,15 @@ struct AnalyticsView: View {
             }
             .padding(.horizontal)
 
-            // Top Expenses
             if !viewModel.topExpenses.isEmpty {
-                topExpensesSection
+                TopExpensesCard(expenses: viewModel.topExpenses)
             }
 
-            // Status Distribution
             if !viewModel.statusCounts.isEmpty {
-                statusDistribution
+                StatusDistributionCard(
+                    statusCounts: viewModel.statusCounts,
+                    totalCount: viewModel.items.count
+                )
             }
         }
     }
@@ -106,7 +211,6 @@ struct AnalyticsView: View {
     private var categoriesTab: some View {
         VStack(spacing: 20) {
             if !viewModel.spendingByCategory.isEmpty {
-                // Donut Chart
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Monthly by Category")
                         .font(.headline)
@@ -125,7 +229,6 @@ struct AnalyticsView: View {
                     .frame(height: 240)
                     .padding(.horizontal)
 
-                    // Category List
                     VStack(spacing: 0) {
                         ForEach(viewModel.spendingByCategory) { category in
                             HStack(spacing: 12) {
@@ -179,7 +282,6 @@ struct AnalyticsView: View {
 
     private var trendsTab: some View {
         VStack(spacing: 20) {
-            // Month range picker
             Picker("Time Range", selection: $viewModel.selectedMonthRange) {
                 Text("3 Mo").tag(3)
                 Text("6 Mo").tag(6)
@@ -188,35 +290,53 @@ struct AnalyticsView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
 
-            // Spending Trend
-            if !viewModel.monthlyTrend.isEmpty {
-                spendingTrendChart
+            if viewModel.monthlyTrend.isEmpty && viewModel.categoryTrend.isEmpty && viewModel.itemCountTrend.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.title)
+                        .foregroundStyle(.textMuted)
+                    Text("Not enough history")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.textPrimary)
+                    Text("Trends will appear as your subscriptions accumulate billing history")
+                        .font(.caption)
+                        .foregroundStyle(.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(32)
+            } else {
+                if !viewModel.monthlyTrend.isEmpty {
+                    SpendingTrendChart(data: viewModel.monthlyTrend)
+                }
+
+                if !viewModel.categoryTrend.isEmpty {
+                    CategoryTrendChart(data: viewModel.categoryTrend)
+                }
+
+                if !viewModel.itemCountTrend.isEmpty {
+                    ItemCountChart(data: viewModel.itemCountTrend)
+                }
             }
 
-            // Category Breakdown Over Time
-            if !viewModel.categoryTrend.isEmpty {
-                categoryTrendChart
-            }
-
-            // Subscription Count
-            if !viewModel.itemCountTrend.isEmpty {
-                itemCountChart
-            }
-
-            // Cancellation history
             if !viewModel.cancelledItems.isEmpty {
-                cancellationHistory
+                CancellationHistoryCard(items: viewModel.cancelledItems)
             }
         }
     }
+}
 
-    private var spendingTrendChart: some View {
+// MARK: - Spending Trend Chart
+
+struct SpendingTrendChart: View {
+    let data: [MonthlySpending]
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Spending Trend")
                 .font(.headline)
                 .foregroundStyle(.textPrimary)
 
-            Chart(viewModel.monthlyTrend) { month in
+            Chart(data) { month in
                 AreaMark(
                     x: .value("Month", month.shortMonth),
                     y: .value("Amount", month.total)
@@ -262,28 +382,34 @@ struct AnalyticsView: View {
         .cardStyle()
         .padding(.horizontal)
     }
+}
 
-    private var categoryTrendColors: [Color] {
-        let unique = Dictionary(grouping: viewModel.categoryTrend, by: \.category)
+// MARK: - Category Trend Chart
+
+struct CategoryTrendChart: View {
+    let data: [CategoryMonthlySpending]
+
+    private var colors: [Color] {
+        let unique = Dictionary(grouping: data, by: \.category)
         return unique.keys.sorted().compactMap { name in
             unique[name]?.first.map { Color(hex: $0.color) }
         }
     }
 
-    private var categoryTrendChart: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Spending by Category")
                 .font(.headline)
                 .foregroundStyle(.textPrimary)
 
-            Chart(viewModel.categoryTrend) { entry in
+            Chart(data) { entry in
                 AreaMark(
                     x: .value("Month", entry.shortMonth),
                     y: .value("Amount", entry.total)
                 )
                 .foregroundStyle(by: .value("Category", entry.category))
             }
-            .chartForegroundStyleScale(range: categoryTrendColors)
+            .chartForegroundStyleScale(range: colors)
             .chartYAxis {
                 AxisMarks(position: .leading) { value in
                     AxisGridLine()
@@ -299,8 +425,7 @@ struct AnalyticsView: View {
             }
             .frame(height: 220)
 
-            // Legend
-            let categories = Dictionary(grouping: viewModel.categoryTrend, by: \.category)
+            let categories = Dictionary(grouping: data, by: \.category)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], alignment: .leading, spacing: 4) {
                 ForEach(Array(categories.keys.sorted()), id: \.self) { name in
                     if let entry = categories[name]?.first {
@@ -320,14 +445,20 @@ struct AnalyticsView: View {
         .cardStyle()
         .padding(.horizontal)
     }
+}
 
-    private var itemCountChart: some View {
+// MARK: - Item Count Chart
+
+struct ItemCountChart: View {
+    let data: [MonthlyItemCount]
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Active Subscriptions")
                 .font(.headline)
                 .foregroundStyle(.textPrimary)
 
-            Chart(viewModel.itemCountTrend) { month in
+            Chart(data) { month in
                 LineMark(
                     x: .value("Month", month.shortMonth),
                     y: .value("Count", month.count)
@@ -373,14 +504,20 @@ struct AnalyticsView: View {
         .cardStyle()
         .padding(.horizontal)
     }
+}
 
-    private var cancellationHistory: some View {
+// MARK: - Cancellation History Card
+
+struct CancellationHistoryCard: View {
+    let items: [Item]
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Cancellation History")
                 .font(.headline)
                 .foregroundStyle(.textPrimary)
 
-            ForEach(viewModel.cancelledItems.prefix(10)) { item in
+            ForEach(items.prefix(10)) { item in
                 HStack(spacing: 12) {
                     ServiceLogo(
                         url: item.logoURL,
@@ -415,16 +552,20 @@ struct AnalyticsView: View {
         .cardStyle()
         .padding(.horizontal)
     }
+}
 
-    // MARK: - Top Expenses
+// MARK: - Top Expenses Card
 
-    private var topExpensesSection: some View {
+struct TopExpensesCard: View {
+    let expenses: [TopExpense]
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Top Expenses")
                 .font(.headline)
                 .foregroundStyle(.textPrimary)
 
-            ForEach(viewModel.topExpenses) { expense in
+            ForEach(expenses) { expense in
                 HStack(spacing: 12) {
                     ServiceLogo(
                         url: expense.logoUrl.flatMap { URL(string: $0) },
@@ -451,10 +592,15 @@ struct AnalyticsView: View {
         .cardStyle()
         .padding(.horizontal)
     }
+}
 
-    // MARK: - Status Distribution
+// MARK: - Status Distribution Card
 
-    private var statusDistribution: some View {
+struct StatusDistributionCard: View {
+    let statusCounts: [ItemStatus: Int]
+    let totalCount: Int
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Status Overview")
                 .font(.headline)
@@ -462,8 +608,8 @@ struct AnalyticsView: View {
 
             HStack(spacing: 0) {
                 ForEach(ItemStatus.allCases) { status in
-                    if let count = viewModel.statusCounts[status], count > 0 {
-                        let total = Double(viewModel.items.count)
+                    if let count = statusCounts[status], count > 0 {
+                        let total = Double(totalCount)
                         let fraction = Double(count) / total
 
                         RoundedRectangle(cornerRadius: 4)
@@ -478,7 +624,7 @@ struct AnalyticsView: View {
 
             HStack(spacing: 16) {
                 ForEach(ItemStatus.allCases) { status in
-                    if let count = viewModel.statusCounts[status], count > 0 {
+                    if let count = statusCounts[status], count > 0 {
                         HStack(spacing: 4) {
                             Circle()
                                 .fill(Color.forStatus(status))

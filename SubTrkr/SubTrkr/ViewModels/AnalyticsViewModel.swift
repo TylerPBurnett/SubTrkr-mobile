@@ -1,6 +1,7 @@
 import Foundation
 
 @Observable
+@MainActor
 final class AnalyticsViewModel {
     private let itemService = ItemService()
     private let paymentService = PaymentService()
@@ -10,9 +11,12 @@ final class AnalyticsViewModel {
     var payments: [Payment] = []
     var isLoading = false
     var error: String?
-    var selectedMonthRange: Int = 6
 
-    // Existing analytics
+    var selectedMonthRange: Int = 6 {
+        didSet { recomputeTrends() }
+    }
+
+    // Existing analytics (lightweight — no history reconstruction)
     var monthlySpending: Double { analyticsService.calculateMonthlySpending(items: items) }
     var yearlySpending: Double { analyticsService.calculateYearlySpending(items: items) }
     var monthlySavings: Double { analyticsService.calculateMonthlySavings(items: items) }
@@ -20,26 +24,23 @@ final class AnalyticsViewModel {
     var topExpenses: [TopExpense] { analyticsService.getTopExpenses(items: items) }
     var statusCounts: [ItemStatus: Int] { analyticsService.getStatusCounts(items: items) }
 
-    // Reconstructed trends
-    var monthlyTrend: [MonthlySpending] {
-        analyticsService.reconstructMonthlySpending(items: items, payments: payments, months: selectedMonthRange)
-    }
-    var categoryTrend: [CategoryMonthlySpending] {
-        analyticsService.reconstructCategorySpending(items: items, payments: payments, months: selectedMonthRange)
-    }
-    var itemCountTrend: [MonthlyItemCount] {
-        analyticsService.reconstructMonthlyItemCount(items: items, months: selectedMonthRange)
-    }
-    var projectedAnnualSpend: Double {
-        analyticsService.calculateProjectedAnnualSpend(items: items)
-    }
-
     var totalActiveItems: Int {
         items.filter { $0.status == .active }.count
     }
 
-    var cancelledItems: [Item] {
-        items.filter { $0.status == .cancelled || $0.status == .archived }
+    // Cached trend data (recomputed on data change or range change)
+    private(set) var monthlyTrend: [MonthlySpending] = []
+    private(set) var categoryTrend: [CategoryMonthlySpending] = []
+    private(set) var itemCountTrend: [MonthlyItemCount] = []
+    private(set) var projectedAnnualSpend: Double = 0
+    private(set) var cancelledItems: [Item] = []
+
+    private func recomputeTrends() {
+        monthlyTrend = analyticsService.reconstructMonthlySpending(items: items, payments: payments, months: selectedMonthRange)
+        categoryTrend = analyticsService.reconstructCategorySpending(items: items, payments: payments, months: selectedMonthRange)
+        itemCountTrend = analyticsService.reconstructMonthlyItemCount(items: items, months: selectedMonthRange)
+        projectedAnnualSpend = analyticsService.calculateProjectedAnnualSpend(items: items)
+        cancelledItems = items.filter { $0.status == .cancelled || $0.status == .archived }
     }
 
     // MARK: - Actions
@@ -53,6 +54,7 @@ final class AnalyticsViewModel {
             let (i, p) = try await (fetchedItems, fetchedPayments)
             items = i
             payments = p
+            recomputeTrends()
         } catch {
             self.error = error.localizedDescription
         }

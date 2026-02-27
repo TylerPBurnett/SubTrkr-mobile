@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-02-26
+> Last updated: 2026-02-27
 
 ---
 
@@ -63,6 +63,16 @@
 - Projected annual spend — forward-looking `yearlyAmount` sum on Dashboard and Analytics Overview
 - Cached `NumberFormatter` instances in `Double+Currency` — eliminated per-render allocations
 - `AnalyticsViewModel` now loads payments in parallel via `async let`
+
+### Analytics Tab Fixes ✓
+*Completed 2026-02-27. See `docs/plans/2026-02-27-analytics-fix-design.md` for details.*
+
+- Added `@MainActor` to all ViewModels for thread-safe SwiftUI observation
+- Cached trend computations — stored properties + `recomputeTrends()` instead of per-render computed properties
+- `createdAt` fallback in `wasItemActive` — items without `startDate` now appear in trend charts
+- Loading shimmer skeleton, error banner, and empty states on Analytics tab
+- Contextual "Not enough history" message when trend data is empty
+- Extracted chart views into standalone structs for optimal SwiftUI diffing
 
 ---
 

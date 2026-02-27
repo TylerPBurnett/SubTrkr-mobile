@@ -1,6 +1,7 @@
 import Foundation
 
 @Observable
+@MainActor
 final class SettingsViewModel {
     private let categoryService = CategoryService()
     private let notificationService = NotificationService()

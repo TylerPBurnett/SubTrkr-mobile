@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 @Observable
+@MainActor
 final class ItemListViewModel {
     private let itemService = ItemService()
     private let categoryService = CategoryService()

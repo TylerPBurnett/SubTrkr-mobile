@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 @Observable
+@MainActor
 final class AuthViewModel {
     enum AuthMode: String, CaseIterable {
         case signIn = "Sign In"

@@ -1,6 +1,7 @@
 import Foundation
 
 @Observable
+@MainActor
 final class DashboardViewModel {
     private let itemService = ItemService()
     private let analyticsService = AnalyticsService()

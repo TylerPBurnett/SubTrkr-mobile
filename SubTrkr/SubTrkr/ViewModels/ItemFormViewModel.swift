@@ -1,6 +1,7 @@
 import Foundation
 
 @Observable
+@MainActor
 final class ItemFormViewModel {
     private let itemService = ItemService()
     private let categoryService = CategoryService()

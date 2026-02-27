@@ -46,7 +46,7 @@ View → ViewModel (@Observable) → Service → Supabase SDK → PostgreSQL
 **Layer responsibilities:**
 - `Models/` — `Codable` structs matching Supabase table columns exactly. `CodingKeys` map snake_case DB columns to camelCase Swift properties. Separate `Insert`/`Update` structs for API writes. Computed properties (e.g. `monthlyAmount`, `daysUntilDue`) belong on the model.
 - `Services/` — all Supabase calls. One service per domain (Item, Category, Payment, Analytics, Auth, Notification). No business logic in views or ViewModels beyond what drives UI state.
-- `ViewModels/` — `@Observable` classes. Load data in `.task` blocks. Expose `isLoading`, `error`, and domain data as plain properties. One ViewModel per screen.
+- `ViewModels/` — `@Observable @MainActor` classes. Load data in `.task` blocks. Expose `isLoading`, `error`, and domain data as plain properties. One ViewModel per screen. All ViewModels must be annotated `@MainActor` for thread-safe SwiftUI observation.
 - `Views/` — pure SwiftUI. No direct Supabase calls. Receive state from ViewModel, dispatch actions back to it.
 
 **Auth flow:** `SubTrkrApp` injects `AuthService` via `.environment()`. `ContentView` gates on `authService.isAuthenticated` — shows `AuthScreen` or `MainTabView`. OAuth callbacks handled via `subtrkr://` URL scheme in `onOpenURL`.
@@ -86,7 +86,7 @@ Local notifications are wired to item CRUD via `NotificationService` calls in `I
 
 ## Analytics
 
-`AnalyticsService` reconstructs historical spending from item metadata — checks `startDate`, `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil` to determine if an item was active in a given month. Prefers real `Payment` records when available. `AnalyticsViewModel` loads items and payments in parallel via `async let`, exposes `selectedMonthRange` (3/6/12) for the segmented time range picker. All formatters (`DateHelper`, `Double+Currency`) are cached static instances — do not create new formatters per render.
+`AnalyticsService` reconstructs historical spending from item metadata — checks `startDate` (falls back to `createdAt`), `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil` to determine if an item was active in a given month. Prefers real `Payment` records when available. `AnalyticsViewModel` loads items and payments in parallel via `async let`, caches trend computations as stored properties (recomputed via `recomputeTrends()` on data load or range change), and exposes `selectedMonthRange` (3/6/12) for the segmented time range picker. Chart views are extracted into standalone structs (`SpendingTrendChart`, `CategoryTrendChart`, `ItemCountChart`, etc.) receiving only `let` data for optimal diffing. All formatters (`DateHelper`, `Double+Currency`) are cached static instances — do not create new formatters per render.
 
 ## What's not implemented
 
