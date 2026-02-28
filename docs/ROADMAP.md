@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-02-27
+> Last updated: 2026-02-28
 
 ---
 
@@ -74,6 +74,33 @@
 - Contextual "Not enough history" message when trend data is empty
 - Extracted chart views into standalone structs for optimal SwiftUI diffing
 
+### Calendar View ✓
+*Completed 2026-02-28. See `docs/plans/2026-02-28-calendar-view-design.md` for details.*
+
+- Monthly calendar grid as Dashboard sub-tab (segmented control: Overview/Calendar)
+- Billing date projection — forward-advances `nextBillingDate` by billing cycle to populate future months
+- Colored dot indicators (up to 3) showing items due on each day
+- Day-detail card with item list, navigation to ItemDetailView
+- Month summary card showing total spend and payment count
+- Handles weekly items with multiple billing dates per month
+- CalendarViewModel hoisted into DashboardView to prevent recreation on tab switch
+- Cached stored properties with explicit recomputation (matching AnalyticsViewModel pattern)
+
+### SwiftUI Review & Fixes ✓
+*Completed 2026-02-27. Review against SwiftUI Expert skill checklist.*
+
+- Shared `NotificationService` via injection — `ItemService` accepts it via init, `NotificationSettingsView` uses `@State` instance instead of inline creation
+- Fixed unstructured `Task` in `SubTrkrApp` — `observeAuthChanges()` now runs in structured `.task` block for proper cancellation
+- Cached `NumberFormatter` in `Double+Currency` — two static formatters replace per-call allocations
+- Cached `DateFormatter` in `AnalyticsModels` — static formatters with POSIX locale for `MonthlySpending.monthDate`/`shortMonth`
+- Hoisted `DateFormatter` out of loop in `AnalyticsService.getMonthlySpendingTrend`
+- Replaced ~16 `Binding(get:set:)` wrappers with `@Bindable` in `ItemFormView`, `AuthScreen`, `SettingsView`
+- Fixed `AuthScreen` deferred ViewModel init — `ProgressView` replaces blank `Color.clear` flash
+- Extracted `GridItem` array to file-level `let` constant in `SettingsView`
+- Surfaced maintenance errors to UI in `DashboardViewModel` — `self.error` instead of `print()`
+- Guarded unknown status actions in `ItemService.executeStatusChange` — no fabricated `.active` history records
+- Cleared stale error in `SettingsViewModel.loadData` — `error = nil` at start
+
 ---
 
 ## Up Next — Prioritized
@@ -123,14 +150,15 @@ Things users expect from a billing tracker.
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 20 | **WidgetKit** — home screen widget for upcoming payments or monthly spend. High visibility, read-only. |
-| 21 | **Budget / spending limits** — monthly cap with progress bar on dashboard. |
-| 22 | **Offline caching** — SwiftData or JSON cache. App is unusable without internet today. |
-| 23 | **Supabase Realtime** — live sync with desktop app edits. |
-| 24 | **Export / sharing** — CSV or PDF export of spending data. |
-| 25 | **iPad optimization** — split-view layout (list + detail sidebar). |
-| 26 | **Filter persistence** — save filter/sort state with `@AppStorage`. |
-| 27 | **Deep linking** — extend `subtrkr://` scheme beyond OAuth to specific items/screens (for notifications, widgets). |
+| ~~20~~ | ~~Calendar view~~ | ✓ Dashboard sub-tab with billing date projection, dot indicators, day-detail sheet |
+| 21 | **WidgetKit** — home screen widget for upcoming payments or monthly spend. High visibility, read-only. |
+| 22 | **Budget / spending limits** — monthly cap with progress bar on dashboard. |
+| 23 | **Offline caching** — SwiftData or JSON cache. App is unusable without internet today. |
+| 24 | **Supabase Realtime** — live sync with desktop app edits. |
+| 25 | **Export / sharing** — CSV or PDF export of spending data. |
+| 26 | **iPad optimization** — split-view layout (list + detail sidebar). |
+| 27 | **Filter persistence** — save filter/sort state with `@AppStorage`. |
+| 28 | **Deep linking** — extend `subtrkr://` scheme beyond OAuth to specific items/screens (for notifications, widgets). |
 
 ---
 
