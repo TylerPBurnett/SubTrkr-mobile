@@ -88,6 +88,15 @@ Local notifications are wired to item CRUD via `NotificationService` calls in `I
 
 `AnalyticsService` reconstructs historical spending from item metadata — checks `startDate` (falls back to `createdAt`), `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil` to determine if an item was active in a given month. Prefers real `Payment` records when available. `AnalyticsViewModel` loads items and payments in parallel via `async let`, caches trend computations as stored properties (recomputed via `recomputeTrends()` on data load or range change), and exposes `selectedMonthRange` (3/6/12) for the segmented time range picker. Chart views are extracted into standalone structs (`SpendingTrendChart`, `CategoryTrendChart`, `ItemCountChart`, etc.) receiving only `let` data for optimal diffing. All formatters (`DateHelper`, `Double+Currency`) are cached static instances — do not create new formatters per render.
 
+## SwiftUI patterns
+
+- ViewModels are `@Observable @MainActor` — views hold them with `@State`, use `@Bindable` for bindings (not `Binding(get:set:)` unless mapping types like `Optional<T>` to `T`)
+- `NotificationService` is injected into `ItemService` via init — do not create inline `NotificationService()` instances
+- Structured concurrency only — no `Task { }` wrappers inside `.task` blocks; let SwiftUI manage cancellation
+- `NumberFormatter` and `DateFormatter` must be `static let` — never allocate in `body` or computed properties
+- `GridItem` arrays and other constant layout data should be `private let` or `static let` — not recreated per render
+- All `loadData()` methods must reset `error = nil` at the start to clear stale errors
+
 ## What's not implemented
 
 - Offline/caching — every screen fetches fresh from Supabase on load

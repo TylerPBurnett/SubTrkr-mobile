@@ -4,32 +4,32 @@ import Charts
 struct DashboardView: View {
     @Environment(AuthService.self) private var authService
     @State private var viewModel = DashboardViewModel()
+    @State private var calendarViewModel = CalendarViewModel()
     @State private var hasRunMaintenance = false
+    @State private var selectedTab = 0
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Stats Cards
-                    statsSection
-
-                    // Category Breakdown
-                    if !viewModel.spendingByCategory.isEmpty {
-                        categoryChart
-                    }
-
-                    // Upcoming Payments
-                    if !viewModel.upcomingPayments.isEmpty {
-                        upcomingSection
-                    }
+            VStack(spacing: 0) {
+                Picker("", selection: $selectedTab) {
+                    Text("Overview").tag(0)
+                    Text("Calendar").tag(1)
                 }
-                .padding()
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.top, 8)
+
+                switch selectedTab {
+                case 0:
+                    overviewContent
+                case 1:
+                    CalendarView(viewModel: calendarViewModel)
+                default:
+                    EmptyView()
+                }
             }
             .background(Color.bgBase)
             .navigationTitle("Dashboard")
-            .refreshable {
-                await viewModel.loadData()
-            }
         }
         .task {
             await viewModel.loadData()
@@ -38,6 +38,31 @@ struct DashboardView: View {
                 await viewModel.runMaintenance(userId: userId)
                 await viewModel.loadData()
             }
+        }
+    }
+
+    // MARK: - Overview Content
+
+    private var overviewContent: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // Stats Cards
+                statsSection
+
+                // Category Breakdown
+                if !viewModel.spendingByCategory.isEmpty {
+                    categoryChart
+                }
+
+                // Upcoming Payments
+                if !viewModel.upcomingPayments.isEmpty {
+                    upcomingSection
+                }
+            }
+            .padding()
+        }
+        .refreshable {
+            await viewModel.loadData()
         }
     }
 
