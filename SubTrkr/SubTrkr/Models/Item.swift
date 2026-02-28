@@ -107,13 +107,6 @@ struct Item: Codable, Identifiable, Hashable {
         categories?.name ?? "Uncategorized"
     }
 
-    static func == (lhs: Item, rhs: Item) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
 }
 
 struct ItemInsert: Codable {

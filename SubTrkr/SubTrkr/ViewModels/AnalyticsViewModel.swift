@@ -6,6 +6,7 @@ final class AnalyticsViewModel {
     private let itemService = ItemService()
     private let paymentService = PaymentService()
     private let analyticsService = AnalyticsService()
+    private let notificationService = NotificationService()
 
     var items: [Item] = []
     var payments: [Payment] = []
@@ -49,15 +50,40 @@ final class AnalyticsViewModel {
         isLoading = true
         error = nil
         do {
-            async let fetchedItems = itemService.getItems()
-            async let fetchedPayments = paymentService.getPayments()
-            let (i, p) = try await (fetchedItems, fetchedPayments)
-            items = i
-            payments = p
+            items = try await itemService.getItems()
+
+            // Payment history enriches trends, but summary metrics should still load without it.
+            do {
+                payments = try await paymentService.getPayments()
+            } catch {
+                payments = []
+                self.error = "Payment history unavailable: \(error.localizedDescription)"
+            }
             recomputeTrends()
         } catch {
             self.error = error.localizedDescription
         }
         isLoading = false
+    }
+
+    func runMaintenance(userId: String) async {
+        do {
+            try await itemService.advancePastDueItems()
+            try await itemService.archivePastCancellations()
+            try await itemService.resumePausedItems()
+            try await itemService.handleExpiredTrials(userId: userId)
+
+            // Keep notification schedule in sync with any maintenance-driven item changes.
+            if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
+                let allItems = try await itemService.getItems()
+                let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
+                await notificationService.rescheduleAllNotifications(
+                    items: allItems,
+                    daysBefore: days > 0 ? days : 3
+                )
+            }
+        } catch {
+            self.error = "Maintenance failed: \(error.localizedDescription)"
+        }
     }
 }

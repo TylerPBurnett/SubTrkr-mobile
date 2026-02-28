@@ -2,8 +2,10 @@ import SwiftUI
 import Charts
 
 struct AnalyticsView: View {
+    @Environment(AuthService.self) private var authService
     @State private var viewModel = AnalyticsViewModel()
     @State private var selectedTab = 0
+    @State private var hasRunMaintenance = false
 
     var body: some View {
         NavigationStack {
@@ -33,6 +35,11 @@ struct AnalyticsView: View {
         }
         .task {
             await viewModel.loadData()
+            if !hasRunMaintenance, let userId = authService.currentUser?.id.uuidString {
+                hasRunMaintenance = true
+                await viewModel.runMaintenance(userId: userId)
+                await viewModel.loadData()
+            }
         }
     }
 
