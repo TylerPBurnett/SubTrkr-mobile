@@ -8,7 +8,7 @@ private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
 // MARK: - CalendarView
 
 struct CalendarView: View {
-    @State private var viewModel = CalendarViewModel()
+    var viewModel: CalendarViewModel
 
     var body: some View {
         ScrollView {
@@ -28,7 +28,7 @@ struct CalendarView: View {
             await viewModel.loadData()
         }
         .refreshable {
-            await viewModel.loadData()
+            await viewModel.loadData(forceRefresh: true)
         }
     }
 

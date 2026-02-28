@@ -12,6 +12,7 @@ struct CalendarDay: Identifiable {
 @MainActor
 final class CalendarViewModel {
     private let itemService: ItemService
+    private var hasLoadedInitially = false
 
     var items: [Item] = []
     var isLoading = false
@@ -24,16 +25,17 @@ final class CalendarViewModel {
     private(set) var itemsByDay: [Int: [Item]] = [:]
     private(set) var monthTotal: Double = 0
     private(set) var monthItemCount: Int = 0
+    private(set) var selectedDayItems: [Item] = []
 
     // MARK: - Static DateFormatters
 
-    static let monthYearFormatter: DateFormatter = {
+    private static let monthYearFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "MMMM yyyy"
         return f
     }()
 
-    static let dayDetailFormatter: DateFormatter = {
+    private static let dayDetailFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "EEEE, MMMM d"
         return f
@@ -49,16 +51,6 @@ final class CalendarViewModel {
         Self.dayDetailFormatter.string(from: selectedDate)
     }
 
-    var selectedDayItems: [Item] {
-        let calendar = Calendar.current
-        let selectedComponents = calendar.dateComponents([.year, .month], from: selectedDate)
-        let displayedComponents = calendar.dateComponents([.year, .month], from: displayedMonth)
-        guard selectedComponents.year == displayedComponents.year,
-              selectedComponents.month == displayedComponents.month else { return [] }
-        let day = calendar.component(.day, from: selectedDate)
-        return itemsByDay[day] ?? []
-    }
-
     // MARK: - Init
 
     init(itemService: ItemService = ItemService()) {
@@ -72,11 +64,13 @@ final class CalendarViewModel {
 
     // MARK: - Actions
 
-    func loadData() async {
+    func loadData(forceRefresh: Bool = false) async {
+        guard !hasLoadedInitially || forceRefresh else { return }
         isLoading = true
         error = nil
         do {
             items = try await itemService.getItems()
+            hasLoadedInitially = true
             recomputeCalendar()
         } catch {
             self.error = error.localizedDescription
@@ -105,6 +99,7 @@ final class CalendarViewModel {
 
     func selectDate(_ date: Date) {
         selectedDate = date
+        recomputeSelectedDayItems()
     }
 
     // MARK: - Private Recomputation
@@ -112,6 +107,20 @@ final class CalendarViewModel {
     private func recomputeCalendar() {
         calendarDays = buildCalendarDays()
         recomputeItemsByDay()
+        recomputeSelectedDayItems()
+    }
+
+    private func recomputeSelectedDayItems() {
+        let calendar = Calendar.current
+        let selectedComponents = calendar.dateComponents([.year, .month], from: selectedDate)
+        let displayedComponents = calendar.dateComponents([.year, .month], from: displayedMonth)
+        guard selectedComponents.year == displayedComponents.year,
+              selectedComponents.month == displayedComponents.month else {
+            selectedDayItems = []
+            return
+        }
+        let day = calendar.component(.day, from: selectedDate)
+        selectedDayItems = itemsByDay[day] ?? []
     }
 
     private func buildCalendarDays() -> [CalendarDay] {

@@ -4,6 +4,7 @@ import Charts
 struct DashboardView: View {
     @Environment(AuthService.self) private var authService
     @State private var viewModel = DashboardViewModel()
+    @State private var calendarViewModel = CalendarViewModel()
     @State private var hasRunMaintenance = false
     @State private var selectedTab = 0
 
@@ -22,7 +23,7 @@ struct DashboardView: View {
                 case 0:
                     overviewContent
                 case 1:
-                    CalendarView()
+                    CalendarView(viewModel: calendarViewModel)
                 default:
                     EmptyView()
                 }
