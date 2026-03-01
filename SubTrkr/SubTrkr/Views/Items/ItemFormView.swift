@@ -81,6 +81,7 @@ struct ItemFormView: View {
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.textMuted)
+                    .accessibilityHidden(true)
                 TextField("Search for a service...", text: $vm.serviceSearchText)
                     .textInputAutocapitalization(.never)
                     .onChange(of: viewModel.serviceSearchText) { _, newValue in
@@ -124,6 +125,7 @@ struct ItemFormView: View {
                 Image(systemName: "tag.fill")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
+                    .accessibilityHidden(true)
                 TextField("Name", text: $vm.name)
             }
 
@@ -131,6 +133,7 @@ struct ItemFormView: View {
                 Image(systemName: "dollarsign.circle.fill")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
+                    .accessibilityHidden(true)
                 TextField("Amount", value: $vm.amount, format: .number.precision(.fractionLength(2)))
                     .keyboardType(.decimalPad)
             }
@@ -144,6 +147,7 @@ struct ItemFormView: View {
                         Image(systemName: "circle.dotted")
                             .foregroundStyle(.brand)
                             .frame(width: 24)
+                            .accessibilityHidden(true)
                         Text("Status")
                     }
                 }
@@ -165,6 +169,7 @@ struct ItemFormView: View {
                     Image(systemName: "repeat")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Billing Cycle")
                 }
             }
@@ -177,6 +182,7 @@ struct ItemFormView: View {
                     Image(systemName: "calendar")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Start Date")
                 }
             }
@@ -189,6 +195,7 @@ struct ItemFormView: View {
                     Image(systemName: "calendar.badge.clock")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Next Billing Date")
                 }
             }
@@ -221,6 +228,7 @@ struct ItemFormView: View {
                     Image(systemName: "folder.fill")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Category")
                 }
             }
@@ -240,6 +248,7 @@ struct ItemFormView: View {
                     Image(systemName: "clock.fill")
                         .foregroundStyle(.statusTrial)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Trial End Date")
                 }
             }
@@ -256,6 +265,7 @@ struct ItemFormView: View {
                 Image(systemName: "link")
                     .foregroundStyle(.brand)
                     .frame(width: 24)
+                    .accessibilityHidden(true)
                 TextField("Website URL", text: $vm.url)
                     .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
@@ -266,6 +276,7 @@ struct ItemFormView: View {
                     .foregroundStyle(.brand)
                     .frame(width: 24)
                     .padding(.top, 4)
+                    .accessibilityHidden(true)
                 TextField("Notes", text: $vm.notes, axis: .vertical)
                     .lineLimit(3...6)
             }
@@ -285,6 +296,7 @@ struct ItemFormView: View {
                     Image(systemName: "bell.fill")
                         .foregroundStyle(.brand)
                         .frame(width: 24)
+                        .accessibilityHidden(true)
                     Text("Reminder")
                 }
             }
