@@ -55,6 +55,7 @@ struct ItemDetailView: View {
                         Image(systemName: "ellipsis.circle")
                             .foregroundStyle(.brand)
                     }
+                    .accessibilityLabel("More options")
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
@@ -88,6 +89,7 @@ struct ItemDetailView: View {
                                 Image(systemName: "dollarsign.circle.fill")
                                     .foregroundStyle(.brand)
                                     .frame(width: 24)
+                                    .accessibilityHidden(true)
                                 TextField("Amount", value: $paymentAmount, format: .number.precision(.fractionLength(2)))
                                     .keyboardType(.decimalPad)
                             }
@@ -97,6 +99,7 @@ struct ItemDetailView: View {
                                     Image(systemName: "calendar")
                                         .foregroundStyle(.brand)
                                         .frame(width: 24)
+                                        .accessibilityHidden(true)
                                     Text("Date")
                                 }
                             }
@@ -142,7 +145,8 @@ struct ItemDetailView: View {
 
             VStack(spacing: 4) {
                 Text(currentItem.amount.formatted(currency: currentItem.currency))
-                    .font(.system(size: 32, weight: .heavy, design: .monospaced))
+                    .font(.system(.title, design: .monospaced))
+                    .fontWeight(.heavy)
                     .foregroundStyle(.textPrimary)
 
                 Text(currentItem.billingCycle.displayName)
@@ -221,7 +225,8 @@ struct ItemDetailView: View {
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: StatusActionHelper.icon(for: action))
-                                .font(.system(size: 18))
+                                .font(.system(.body))
+                                .accessibilityHidden(true)
                             Text(StatusActionHelper.label(for: action))
                                 .font(.caption2.weight(.medium))
                         }
@@ -325,6 +330,7 @@ struct ItemDetailView: View {
                                 Image(systemName: entry.status.iconName)
                                     .font(.caption)
                                     .foregroundStyle(Color.forStatus(entry.status))
+                                    .accessibilityHidden(true)
                                 Text(entry.status.displayName)
                                     .font(.subheadline.weight(.medium))
                                     .foregroundStyle(.textPrimary)
