@@ -122,6 +122,12 @@ struct DashboardView: View {
                 .cornerRadius(4)
             }
             .frame(height: 200)
+            .accessibilityLabel("Spending by category")
+            .accessibilityValue(
+                viewModel.spendingByCategory
+                    .map { "\($0.category): \($0.total.formatted(currency: "USD"))" }
+                    .joined(separator: ", ")
+            )
 
             // Legend
             VStack(spacing: 8) {
