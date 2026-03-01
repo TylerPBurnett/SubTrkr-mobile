@@ -46,7 +46,7 @@ struct ItemListView: View {
             .searchable(text: Binding(
                 get: { viewModel.searchText },
                 set: { viewModel.searchText = $0 }
-            ), prompt: "Search \(viewModel.itemType.pluralName.lowercased())")
+            ), prompt: "Search")
             .refreshable {
                 await viewModel.loadData()
             }
@@ -200,6 +200,8 @@ struct ItemRow: View {
                     .font(.system(.subheadline, design: .monospaced))
                     .fontWeight(.semibold)
                     .foregroundStyle(.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(item.billingCycle.displayName)
                     .font(.caption2)
