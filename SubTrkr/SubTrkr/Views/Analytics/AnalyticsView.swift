@@ -127,6 +127,7 @@ struct AnalyticsView: View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.accentAmber)
+                .accessibilityHidden(true)
             Text(message)
                 .font(.caption)
                 .foregroundStyle(.textPrimary)
@@ -139,6 +140,7 @@ struct AnalyticsView: View {
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.textMuted)
             }
+            .accessibilityLabel("Dismiss")
         }
         .padding(12)
         .background(Color.bgCard)
@@ -302,6 +304,7 @@ struct AnalyticsView: View {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.title)
                         .foregroundStyle(.textMuted)
+                        .accessibilityHidden(true)
                     Text("Not enough history")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.textPrimary)
@@ -440,6 +443,7 @@ struct CategoryTrendChart: View {
                             Circle()
                                 .fill(Color(hex: entry.color))
                                 .frame(width: 8, height: 8)
+                                .accessibilityHidden(true)
                             Text(name)
                                 .font(.caption2)
                                 .foregroundStyle(.textSecondary)
@@ -636,6 +640,7 @@ struct StatusDistributionCard: View {
                             Circle()
                                 .fill(Color.forStatus(status))
                                 .frame(width: 8, height: 8)
+                                .accessibilityHidden(true)
                             Text("\(count) \(status.displayName)")
                                 .font(.caption2)
                                 .foregroundStyle(.textSecondary)
@@ -671,7 +676,8 @@ struct AnalyticsCard: View {
             }
 
             Text(value)
-                .font(.system(size: 18, weight: .heavy, design: .monospaced))
+                .font(.system(.body, design: .monospaced))
+                .fontWeight(.heavy)
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
