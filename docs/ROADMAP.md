@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-02-28
+> Last updated: 2026-03-01
 
 ---
 
@@ -134,7 +134,7 @@ Things users expect from a billing tracker.
 | ~~11~~ | ~~Auto-calculate next billing date~~ | | ✓ Reactive calc from startDate + billingCycle |
 | ~~12~~ | ~~Account management~~ | | ✓ Password change + account deletion |
 | ~~13~~ | ~~Haptic feedback~~ | | ✓ Save, delete, status change, payment |
-| 14 | **App icon** — `AppIcon.appiconset` slot is empty. Need 1024x1024 PNG. | Small | Required before submission |
+| ~~14~~ | ~~App icon~~ | | ✓ Light (green bg + white logo), Dark (black bg + green logo), Tinted (grayscale for iOS tinting) |
 
 ### Phase 4: Code Quality (Pre-Release)
 
@@ -168,7 +168,7 @@ Remaining items before App Store submission:
 
 1. **App icon** (#14) — need 1024×1024 PNG design asset
 2. **Privacy policy URL** — needed in App Store Connect
-3. **Physical device testing** + accessibility audit
+3. **Physical device testing**
 4. **Notification channels** (#9) — wire up real channel data (low priority)
 
 ---
@@ -180,8 +180,8 @@ Before submitting to App Store Review:
 - [x] Dark mode support ✓
 - [x] Account deletion option (#12) ✓
 - [x] Password change option (#12) ✓
-- [ ] App icon (#14)
+- [x] App icon (#14) ✓
 - [x] Remove hardcoded credentials (#15) ✓
 - [ ] Privacy policy URL in App Store Connect
 - [ ] Test on physical device
-- [ ] Accessibility audit (VoiceOver, Dynamic Type)
+- [x] Accessibility audit (VoiceOver, Dynamic Type) ✓
