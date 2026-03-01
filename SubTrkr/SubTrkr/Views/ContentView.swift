@@ -40,12 +40,14 @@ struct LaunchScreen: View {
 
             VStack(spacing: 16) {
                 Image(systemName: "creditcard.fill")
-                    .font(.system(size: 56))
+                    .font(.system(.largeTitle))
+                    .accessibilityHidden(true)
                     .foregroundStyle(.brand)
                     .scaleEffect(scale)
 
                 Text("SubTrkr")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(.title, design: .rounded))
+                    .fontWeight(.bold)
                     .foregroundStyle(.textPrimary)
             }
             .opacity(opacity)
