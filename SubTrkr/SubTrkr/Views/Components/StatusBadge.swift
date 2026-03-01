@@ -19,7 +19,7 @@ struct StatusBadge: View {
         .lineLimit(1)
         .minimumScaleFactor(0.75)
         .fixedSize(horizontal: true, vertical: false)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Status: \(status.displayName)")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(status.displayName)
     }
 }
