@@ -45,12 +45,14 @@ struct StatusChangeSheet: View {
                                 Image(systemName: StatusActionHelper.icon(for: action))
                                     .foregroundStyle(StatusActionHelper.color(for: action))
                                     .frame(width: 24)
+                                    .accessibilityHidden(true)
                                 Text(StatusActionHelper.label(for: action))
                                     .foregroundStyle(.textPrimary)
                                 Spacer()
                                 if selectedAction == action {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundStyle(.brand)
+                                        .accessibilityLabel("Selected")
                                 }
                             }
                         }
