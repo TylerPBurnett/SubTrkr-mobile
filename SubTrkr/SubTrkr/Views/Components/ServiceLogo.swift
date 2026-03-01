@@ -30,6 +30,7 @@ struct ServiceLogo: View {
                 fallbackIcon
             }
         }
+        .accessibilityHidden(true)
     }
 
     private var fallbackIcon: some View {
