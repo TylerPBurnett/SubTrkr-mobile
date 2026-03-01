@@ -10,8 +10,9 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: 48))
+                .font(.system(.largeTitle))
                 .foregroundStyle(.textMuted)
+                .accessibilityHidden(true)
 
             VStack(spacing: 6) {
                 Text(title)
@@ -28,6 +29,7 @@ struct EmptyStateView: View {
                 Button(action: action) {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
+                            .accessibilityHidden(true)
                         Text(actionLabel)
                     }
                     .font(.subheadline.weight(.semibold))
