@@ -66,7 +66,7 @@ extension Color {
 extension Color {
     static let textPrimary = Color.adaptive(light: "#171717", dark: "#fafafa")
     static let textSecondary = Color.adaptive(light: "#525252", dark: "#a3a3a3")
-    static let textMuted = Color.adaptive(light: "#a3a3a3", dark: "#525252")
+    static let textMuted = Color.adaptive(light: "#a3a3a3", dark: "#838383")
     static let textInverse = Color.adaptive(light: "#ffffff", dark: "#171717")
 }
 
