@@ -122,6 +122,7 @@ struct CalendarView: View {
                         Image(systemName: "calendar.badge.minus")
                             .font(.title2)
                             .foregroundStyle(.textMuted)
+                            .accessibilityHidden(true)
                         Text("No payments due")
                             .font(.subheadline)
                             .foregroundStyle(.textSecondary)
@@ -170,6 +171,7 @@ struct CalendarHeader: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
+            .accessibilityLabel("Previous month")
 
             Spacer()
 
@@ -186,6 +188,7 @@ struct CalendarHeader: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
+            .accessibilityLabel("Next month")
         }
     }
 }
@@ -196,6 +199,20 @@ struct CalendarDayCell: View {
     let day: CalendarDay
     let isSelected: Bool
     let dotColors: [String]
+
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .long
+        f.timeStyle = .none
+        return f
+    }()
+
+    private var accessibilityDateLabel: String {
+        let dateStr = Self.dateFormatter.string(from: day.date)
+        let count = dotColors.count
+        guard count > 0 else { return dateStr }
+        return "\(dateStr), \(count) payment\(count == 1 ? "" : "s") due"
+    }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -224,10 +241,14 @@ struct CalendarDayCell: View {
                 }
             }
             .frame(height: 4)
+            .accessibilityHidden(true)
         }
         .frame(height: 44)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
+        .accessibilityLabel(accessibilityDateLabel)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var dayTextColor: Color {
@@ -288,7 +309,8 @@ struct MonthSummaryCard: View {
                     .foregroundStyle(.textSecondary)
 
                 Text(total.formatted(currency: "USD"))
-                    .font(.system(size: 20, weight: .heavy, design: .monospaced))
+                    .font(.system(.headline, design: .monospaced))
+                    .fontWeight(.heavy)
                     .foregroundStyle(.textPrimary)
             }
 
@@ -300,7 +322,8 @@ struct MonthSummaryCard: View {
                     .foregroundStyle(.textSecondary)
 
                 Text("\(itemCount)")
-                    .font(.system(size: 20, weight: .heavy, design: .monospaced))
+                    .font(.system(.headline, design: .monospaced))
+                    .fontWeight(.heavy)
                     .foregroundStyle(.textPrimary)
             }
         }
