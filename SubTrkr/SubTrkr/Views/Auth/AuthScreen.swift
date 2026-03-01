@@ -27,11 +27,13 @@ struct AuthScreen: View {
                     // Logo & Title
                     VStack(spacing: 12) {
                         Image(systemName: "creditcard.fill")
-                            .font(.system(size: 48))
+                            .font(.system(.largeTitle))
                             .foregroundStyle(.brand)
+                            .accessibilityHidden(true)
 
                         Text("SubTrkr")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .font(.system(.title, design: .rounded))
+                            .fontWeight(.bold)
                             .foregroundStyle(.textPrimary)
 
                         Text("Track your subscriptions & bills")
@@ -102,6 +104,7 @@ struct AuthScreen: View {
             if let error = vm.errorMessage {
                 HStack {
                     Image(systemName: "exclamationmark.triangle.fill")
+                        .accessibilityHidden(true)
                     Text(error)
                 }
                 .font(.caption)
@@ -113,6 +116,7 @@ struct AuthScreen: View {
             if let success = vm.successMessage {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
+                        .accessibilityHidden(true)
                     Text(success)
                 }
                 .font(.caption)
@@ -319,6 +323,7 @@ struct AuthTextField: View {
             Image(systemName: icon)
                 .foregroundStyle(.textMuted)
                 .frame(width: 20)
+                .accessibilityHidden(true)
 
             if isSecure {
                 SecureField(placeholder, text: $text)
