@@ -387,6 +387,7 @@ struct OAuthButton: View {
         Button(action: action) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
+                    .accessibilityHidden(true)
                 Text(label)
                     .fontWeight(.medium)
             }
