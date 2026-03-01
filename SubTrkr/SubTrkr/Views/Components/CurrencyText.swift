@@ -19,7 +19,8 @@ struct CurrencyText: View {
                 .fontWeight(.semibold)
         case .large:
             Text(amount.formatted(currency: currency))
-                .font(.system(size: 28, weight: .bold, design: .monospaced))
+                .font(.system(.title2, design: .monospaced))
+                .fontWeight(.bold)
         case .compact:
             Text(amount.formattedCompact(currency: currency))
                 .font(.system(.caption, design: .monospaced))
