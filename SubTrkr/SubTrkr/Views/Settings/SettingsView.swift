@@ -38,7 +38,8 @@ struct SettingsView: View {
                                     .fill(.brand.opacity(0.15))
                                     .frame(width: 44, height: 44)
                                 Text(String(email.prefix(1)).uppercased())
-                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.bold)
                                     .foregroundStyle(.brand)
                             }
 
@@ -50,6 +51,7 @@ struct SettingsView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: authService.isEmailVerified ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
                                         .font(.caption2)
+                                        .accessibilityLabel(authService.isEmailVerified ? "Email verified" : "Email not verified")
                                     Text(authService.isEmailVerified ? "Verified" : "Not verified")
                                         .font(.caption)
                                 }
@@ -323,6 +325,7 @@ struct AddCategorySheet: View {
                                         Image(systemName: "checkmark")
                                             .font(.caption.weight(.bold))
                                             .foregroundStyle(.white)
+                                            .accessibilityLabel("Selected")
                                     }
                                 }
                                 .onTapGesture {
@@ -391,6 +394,7 @@ struct EditCategorySheet: View {
                                         Image(systemName: "checkmark")
                                             .font(.caption.weight(.bold))
                                             .foregroundStyle(.white)
+                                            .accessibilityLabel("Selected")
                                     }
                                 }
                                 .onTapGesture { color = colorHex }
