@@ -130,6 +130,7 @@ struct DashboardView: View {
                         Circle()
                             .fill(Color(hex: category.color))
                             .frame(width: 10, height: 10)
+                            .accessibilityHidden(true)
                         Text(category.category)
                             .font(.subheadline)
                             .foregroundStyle(.textPrimary)
@@ -185,15 +186,17 @@ struct StatsCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
+                    .font(.system(.caption))
                     .foregroundStyle(color)
+                    .accessibilityHidden(true)
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.textSecondary)
             }
 
             Text(value)
-                .font(.system(size: 20, weight: .heavy, design: .monospaced))
+                .font(.system(.headline, design: .monospaced))
+                .fontWeight(.heavy)
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
