@@ -111,6 +111,11 @@ struct SettingsView: View {
                             .font(.subheadline)
                             .foregroundStyle(.textMuted)
                     }
+
+                    Link(destination: URL(string: "https://subtrkr.app/privacy")!) {
+                        Label("Privacy Policy", systemImage: "hand.raised.fill")
+                            .foregroundStyle(.textPrimary)
+                    }
                 } header: {
                     Text("About")
                 }
