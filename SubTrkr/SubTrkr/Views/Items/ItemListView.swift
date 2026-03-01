@@ -138,6 +138,7 @@ struct ItemListView: View {
             Image(systemName: hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
                 .foregroundStyle(hasActiveFilters ? .brand : .textSecondary)
         }
+        .accessibilityLabel(hasActiveFilters ? "Filter, active" : "Filter")
     }
 
     private var addButton: some View {
@@ -145,6 +146,7 @@ struct ItemListView: View {
             Image(systemName: "plus.circle.fill")
                 .foregroundStyle(.brand)
         }
+        .accessibilityLabel("Add \(viewModel.itemType.displayName.lowercased())")
     }
 
     private var hasActiveFilters: Bool {
@@ -229,6 +231,7 @@ struct FilterSheet: View {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(.brand)
                                     .fontWeight(.semibold)
+                                    .accessibilityHidden(true)
                             }
                         }
                         .contentShape(Rectangle())
@@ -253,6 +256,7 @@ struct FilterSheet: View {
                                     Image(systemName: "checkmark")
                                         .foregroundStyle(.brand)
                                         .fontWeight(.semibold)
+                                        .accessibilityHidden(true)
                                 }
                             }
                             .contentShape(Rectangle())
@@ -274,6 +278,7 @@ struct FilterSheet: View {
                             Image(systemName: option.iconName)
                                 .foregroundStyle(.textSecondary)
                                 .frame(width: 24)
+                                .accessibilityHidden(true)
                             Text(option.displayName)
                                 .foregroundStyle(.textPrimary)
                             Spacer()
@@ -281,6 +286,7 @@ struct FilterSheet: View {
                                 Image(systemName: viewModel.sortAscending ? "arrow.up" : "arrow.down")
                                     .foregroundStyle(.brand)
                                     .fontWeight(.semibold)
+                                    .accessibilityHidden(true)
                             }
                         }
                         .contentShape(Rectangle())
