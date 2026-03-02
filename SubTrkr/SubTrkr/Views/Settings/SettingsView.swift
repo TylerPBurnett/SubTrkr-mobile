@@ -48,10 +48,11 @@ struct SettingsView: View {
                                     .font(.subheadline.weight(.medium))
                                     .foregroundStyle(.textPrimary)
                                     .lineLimit(1)
+                                    .accessibilityLabel("Account email")
                                 HStack(spacing: 4) {
                                     Image(systemName: authService.isEmailVerified ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
                                         .font(.caption2)
-                                        .accessibilityLabel(authService.isEmailVerified ? "Email verified" : "Email not verified")
+                                        .accessibilityHidden(true)
                                     Text(authService.isEmailVerified ? "Verified" : "Not verified")
                                         .font(.caption)
                                 }
@@ -103,6 +104,7 @@ struct SettingsView: View {
                         Text("1.0.0")
                             .font(.subheadline)
                             .foregroundStyle(.textMuted)
+                            .accessibilityLabel("Version 1.0.0")
                     }
 
                     HStack {
