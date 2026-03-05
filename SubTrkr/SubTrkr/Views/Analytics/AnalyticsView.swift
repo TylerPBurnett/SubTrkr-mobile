@@ -670,6 +670,7 @@ struct AnalyticsCard: View {
                 Image(systemName: icon)
                     .font(.caption)
                     .foregroundStyle(color)
+                    .accessibilityHidden(true)
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.textSecondary)
