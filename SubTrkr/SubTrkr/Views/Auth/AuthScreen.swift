@@ -26,9 +26,10 @@ struct AuthScreen: View {
                 VStack(spacing: 32) {
                     // Logo & Title
                     VStack(spacing: 12) {
-                        Image(systemName: "creditcard.fill")
-                            .font(.system(.largeTitle))
-                            .foregroundStyle(.brand)
+                        Image("AppLogoMark")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 72, height: 72)
                             .accessibilityHidden(true)
 
                         Text("SubTrkr")
@@ -150,6 +151,7 @@ struct AuthScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .disabled(vm.isLoading)
+            .buttonStyle(.plain)
 
             // Magic Link
             Button {
@@ -162,14 +164,15 @@ struct AuthScreen: View {
                 .font(.subheadline.weight(.medium))
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
-                .background(Color.bgSurface)
                 .foregroundStyle(.textPrimary)
+                .background(Color.borderDefault.opacity(0.3))
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(Color.borderDefault, lineWidth: 1)
                 )
             }
+            .buttonStyle(.plain)
 
             // Divider
             HStack {
@@ -199,6 +202,7 @@ struct AuthScreen: View {
                         .font(.caption)
                         .foregroundStyle(.brand)
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal)
@@ -244,6 +248,7 @@ struct AuthScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .disabled(vm.isLoading)
+            .buttonStyle(.plain)
 
             Button("Back") {
                 vm.step = .credentials
@@ -252,6 +257,7 @@ struct AuthScreen: View {
             }
             .font(.subheadline)
             .foregroundStyle(.brand)
+            .buttonStyle(.plain)
         }
         .padding(.horizontal)
     }
@@ -295,6 +301,7 @@ struct AuthScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .disabled(vm.isLoading)
+            .buttonStyle(.plain)
 
             Button("Back to Sign In") {
                 vm.step = .credentials
@@ -303,6 +310,7 @@ struct AuthScreen: View {
             }
             .font(.subheadline)
             .foregroundStyle(.brand)
+            .buttonStyle(.plain)
         }
         .padding(.horizontal)
     }
@@ -394,13 +402,14 @@ struct OAuthButton: View {
             .font(.subheadline)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
-            .background(Color.bgSurface)
             .foregroundStyle(.textPrimary)
+            .background(Color.borderDefault.opacity(0.3))
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
                     .stroke(Color.borderDefault, lineWidth: 1)
             )
         }
+        .buttonStyle(.plain)
     }
 }
