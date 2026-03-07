@@ -55,5 +55,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>SubTrkr uses Face ID to quickly unlock your account.</string>
 </dict>
 </plist>
