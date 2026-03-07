@@ -3,19 +3,33 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthService.self) private var authService
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+    @AppStorage("biometricUnlockEnabled") private var biometricUnlockEnabled = true
+    @State private var biometricLocked = true
+    private let biometricService = BiometricService()
 
     var body: some View {
         Group {
             if authService.isLoading {
                 LaunchScreen()
-            } else if authService.isAuthenticated {
-                MainTabView()
-            } else {
+            } else if !authService.isAuthenticated {
                 AuthScreen()
+            } else if biometricLocked && biometricUnlockEnabled && biometricService.canUseBiometrics() {
+                BiometricLockScreen(
+                    onUnlocked: { biometricLocked = false },
+                    onSignOut: { Task { try? await authService.signOut() } }
+                )
+            } else {
+                MainTabView()
             }
         }
         .animation(.smooth(duration: 0.3), value: authService.isAuthenticated)
         .animation(.smooth(duration: 0.3), value: authService.isLoading)
+        .animation(.smooth(duration: 0.3), value: biometricLocked)
+        .onChange(of: authService.isAuthenticated) { _, isAuth in
+            if !isAuth {
+                biometricLocked = true
+            }
+        }
         .preferredColorScheme(colorScheme)
     }
 
@@ -39,10 +53,11 @@ struct LaunchScreen: View {
             Color.bgBase.ignoresSafeArea()
 
             VStack(spacing: 16) {
-                Image(systemName: "creditcard.fill")
-                    .font(.system(.largeTitle))
+                Image("AppLogoMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
                     .accessibilityHidden(true)
-                    .foregroundStyle(.brand)
                     .scaleEffect(scale)
 
                 Text("SubTrkr")
