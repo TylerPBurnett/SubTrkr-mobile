@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var accountError: String?
     @State private var accountSuccess: String?
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+    @AppStorage("biometricUnlockEnabled") private var biometricUnlockEnabled = true
 
     var body: some View {
         NavigationStack {
@@ -92,6 +93,31 @@ struct SettingsView: View {
                     } label: {
                         Label("Notifications", systemImage: "bell.fill")
                             .foregroundStyle(.textPrimary)
+                    }
+                }
+
+                // Security
+                if BiometricService().canUseBiometrics() {
+                    Section {
+                        Toggle(isOn: $biometricUnlockEnabled) {
+                            Label("Unlock with Face ID", systemImage: "faceid")
+                                .foregroundStyle(.textPrimary)
+                        }
+                        .tint(.brand)
+                        .onChange(of: biometricUnlockEnabled) { _, newValue in
+                            if newValue {
+                                Task {
+                                    let success = try? await BiometricService().authenticate()
+                                    if success != true {
+                                        biometricUnlockEnabled = false
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Security")
+                    } footer: {
+                        Text("Require Face ID to unlock SubTrkr when you open the app.")
                     }
                 }
 
