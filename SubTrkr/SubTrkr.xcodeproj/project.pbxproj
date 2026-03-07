@@ -30,6 +30,7 @@
 		CC000000000000000000CC14 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB14 /* ContentView.swift */; };
 		CC000000000000000000CC15 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB15 /* AnalyticsView.swift */; };
 		CC000000000000000000CC16 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB16 /* AuthScreen.swift */; };
+		CC000000000000000000CC2B /* BiometricLockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB2A /* BiometricLockScreen.swift */; };
 		CC000000000000000000CC17 /* CurrencyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB17 /* CurrencyText.swift */; };
 		CC000000000000000000CC18 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB18 /* EmptyState.swift */; };
 		CC000000000000000000CC19 /* ServiceLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB19 /* ServiceLogo.swift */; };
@@ -79,6 +80,7 @@
 		BB000000000000000000BB14 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB15 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB16 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB2A /* BiometricLockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricLockScreen.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB17 /* CurrencyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyText.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB18 /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB19 /* ServiceLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLogo.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				BB000000000000000000BB16 /* AuthScreen.swift */,
+				BB000000000000000000BB2A /* BiometricLockScreen.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				CC000000000000000000CC14 /* ContentView.swift in Sources */,
 				CC000000000000000000CC15 /* AnalyticsView.swift in Sources */,
 				CC000000000000000000CC16 /* AuthScreen.swift in Sources */,
+				CC000000000000000000CC2B /* BiometricLockScreen.swift in Sources */,
 				CC000000000000000000CC17 /* CurrencyText.swift in Sources */,
 				CC000000000000000000CC18 /* EmptyState.swift in Sources */,
 				CC000000000000000000CC19 /* ServiceLogo.swift in Sources */,
