@@ -21,6 +21,7 @@
 		CC000000000000000000CC0C /* KnownServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0C /* KnownServices.swift */; };
 		CC000000000000000000CC0D /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0D /* AnalyticsService.swift */; };
 		CC000000000000000000CC0E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0E /* AuthService.swift */; };
+		CC000000000000000000CC2A /* BiometricService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB29 /* BiometricService.swift */; };
 		CC000000000000000000CC0F /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0F /* CategoryService.swift */; };
 		CC000000000000000000CC10 /* ItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB10 /* ItemService.swift */; };
 		CC000000000000000000CC11 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB11 /* NotificationService.swift */; };
@@ -69,6 +70,7 @@
 		BB000000000000000000BB0C /* KnownServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownServices.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0D /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0E /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB29 /* BiometricService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0F /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB10 /* ItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB11 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 			children = (
 				BB000000000000000000BB0D /* AnalyticsService.swift */,
 				BB000000000000000000BB0E /* AuthService.swift */,
+				BB000000000000000000BB29 /* BiometricService.swift */,
 				BB000000000000000000BB0F /* CategoryService.swift */,
 				BB000000000000000000BB10 /* ItemService.swift */,
 				BB000000000000000000BB11 /* NotificationService.swift */,
@@ -362,6 +365,7 @@
 				CC000000000000000000CC0C /* KnownServices.swift in Sources */,
 				CC000000000000000000CC0D /* AnalyticsService.swift in Sources */,
 				CC000000000000000000CC0E /* AuthService.swift in Sources */,
+				CC000000000000000000CC2A /* BiometricService.swift in Sources */,
 				CC000000000000000000CC0F /* CategoryService.swift in Sources */,
 				CC000000000000000000CC10 /* ItemService.swift in Sources */,
 				CC000000000000000000CC11 /* NotificationService.swift in Sources */,
