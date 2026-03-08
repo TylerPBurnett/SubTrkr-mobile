@@ -33,15 +33,6 @@ struct ItemListView: View {
                         addButton
                     }
                 }
-
-                ToolbarItem(placement: .topBarLeading) {
-                    if viewModel.activeTotal > 0 {
-                        Text(viewModel.activeTotal.formatted(currency: "USD") + "/mo")
-                            .font(.system(.caption, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.brand)
-                    }
-                }
             }
             .searchable(text: Binding(
                 get: { viewModel.searchText },
@@ -86,6 +77,16 @@ struct ItemListView: View {
 
     private var itemsList: some View {
         List {
+            if viewModel.activeTotal > 0 {
+                ActiveTotalSummaryCard(
+                    title: "Active monthly total",
+                    value: viewModel.activeTotal.formatted(currency: "USD") + "/mo",
+                    subtitle: "\(viewModel.filteredItems.count) tracked \(viewModel.itemType.pluralName.lowercased())"
+                )
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 6, trailing: 16))
+            }
             ForEach(viewModel.filteredItems) { item in
                 ItemRow(item: item)
                     .listRowBackground(Color.clear)
@@ -154,6 +155,41 @@ struct ItemListView: View {
         !viewModel.selectedCategoryIds.isEmpty ||
         viewModel.selectedStatuses != [.active, .trial] ||
         viewModel.sortOption != .nextBillingDate
+    }
+}
+
+struct ActiveTotalSummaryCard: View {
+    let title: String
+    let value: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.textSecondary)
+
+                Spacer()
+
+                Image(systemName: "sum")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.brand)
+                    .accessibilityHidden(true)
+            }
+
+            Text(value)
+                .font(.system(.title3, design: .monospaced))
+                .fontWeight(.heavy)
+                .foregroundStyle(.textPrimary)
+
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(.textMuted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .cardStyle(cornerRadius: 14)
     }
 }
 
