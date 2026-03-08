@@ -173,6 +173,73 @@ Remaining items before App Store submission:
 
 ---
 
+## Phase 6: UI/UX Polish
+
+### Global / Cross-cutting
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 29 | **Silent error handling** — failed loads show nothing on most screens. Only Analytics has an error banner. Standardize error display across Dashboard, Item List, and Item Detail. | Small |
+| 30 | **No unsaved-changes guard** — sheets with forms (ItemFormView, RecordPayment) can be swiped down mid-edit with no warning. Add `interactiveDismissDisabled` when form is dirty. | Small |
+| 31 | **Stat number transitions** — values in stats cards snap instantly when data loads. Add `.contentTransition(.numericText())` for a polished count-up feel. | Small |
+| 32 | **Tab switch animations** — no transition between tab content. Add `.animation` or `matchedGeometryEffect` for smoother tab switching. | Medium |
+| 33 | **Sheet entrance polish** — default sheet spring is fine but untuned. Evaluate custom `presentationCornerRadius`, drag indicator visibility, and detent behavior across all sheets. | Small |
+
+### Dashboard
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 34 | **No loading/skeleton state** — Dashboard has no shimmer while data loads unlike Analytics and Item List. Add skeleton cards. | Small |
+| 35 | **Donut chart missing center label** — the category donut shows no summary in the center. Add total monthly spend as a center annotation. | Small |
+| 36 | **Stats cards are non-interactive** — tapping a card does nothing. Consider navigating to a relevant filtered view or drilled-down detail on tap. | Medium |
+| 37 | **Upcoming Payments truncated** — list is hard-capped at 8 with no "See All" link. Add a "See All" button that navigates to the full filtered item list. | Small |
+| 38 | **Segmented picker floats** — Overview/Calendar picker sits directly under the nav bar with no visual separation. Add a subtle divider or background treatment. | Small |
+
+### Item List
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 39 | **Swipe actions too limited** — only Delete is available on swipe. Add trailing swipe for Archive and a leading swipe for Record Payment on active items. | Medium |
+| 40 | **Shimmer nearly invisible** — shimmer overlay is `white.opacity(0.05)`, essentially invisible in dark mode. Increase contrast or switch to a skeleton fill approach. | Small |
+| 41 | **Filter state not persisted** — filters and sort reset on every app load. Persist with `@AppStorage`. | Small |
+| 42 | **Monthly total placement** — the `/mo` total in the nav bar leading position looks misplaced. Move it inline below the title or into a subtle header band. | Small |
+| 43 | **No grouping option** — flat list with no optional grouping by category or next billing date. Add as a sort/group option in the filter sheet. | Medium |
+
+### Item Detail
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 44 | **Record Payment is buried** — the action lives in the payment history section header, easy to miss. Promote it to the Quick Actions row alongside status actions. | Small |
+| 45 | **Quick Actions all open the same sheet** — every action button opens `StatusChangeSheet` generically. Each should deep-link to its specific action within the sheet. | Small |
+| 46 | **Payment history lacks summary** — no total paid to date shown. Add a running total above the payment list. | Small |
+| 47 | **No logo/service reassignment** — service search is hidden when editing an item. Add a way to change the logo/service association on edit. | Medium |
+
+### Item Form
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 48 | **No keyboard-adjacent save** — Save is only in the toolbar. When the keyboard is up, it's out of reach. Add a toolbar input accessory or keyboard dismiss + save button. | Small |
+| 49 | **No inline validation** — errors only surface on Save tap. Show inline feedback (e.g., "Name required", "Amount must be > 0") as the user types. | Small |
+| 50 | **Category picker color dot broken** — the color dot in the inline category picker label doesn't render in most SwiftUI picker styles. Fix or switch to a custom picker. | Small |
+
+### Analytics
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 51 | **Asymmetric Savings card** — "Savings" `AnalyticsCard` has a bare `Spacer()` sibling creating an obvious grid gap. Fill with a meaningful metric or remove the grid layout for that row. | Small |
+| 52 | **Two stacked segmented pickers** — Trends tab has a top-level Overview/Categories/Trends picker plus a 3/6/12 month picker inside, visually busy. Move the time range picker into the Trends tab only, or style it as a smaller inline control. | Small |
+| 53 | **Charts have no interactivity** — tapping a chart point does nothing. Add `.chartOverlay` for tap-to-select with a callout showing the exact value. | Medium |
+| 54 | **Cancellation History placement** — it appears at the bottom of the Trends tab but is conceptually Overview data. Move it to the Overview tab. | Small |
+
+### Settings
+
+| # | Issue | Effort |
+|---|-------|--------|
+| 55 | **"Platform: iOS" row is filler** — meaningless in an iOS-only app. Remove it. | Trivial |
+| 56 | **Silent "Resend Verification Email"** — no success or failure feedback when tapped. Show a brief inline confirmation. | Small |
+
+---
+
 ## App Store Readiness Checklist
 
 Before submitting to App Store Review:

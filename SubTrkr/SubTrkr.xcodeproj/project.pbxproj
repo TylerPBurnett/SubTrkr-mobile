@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F072D0B0A3A483380857F90 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A44B6B954F4C7980781C4B /* CalendarView.swift */; };
+		914AEA8B6F0943BA84DCE1B4 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */; };
 		CC000000000000000000CC01 /* SubTrkrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB01 /* SubTrkrApp.swift */; };
 		CC000000000000000000CC02 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB02 /* Color+Theme.swift */; };
 		CC000000000000000000CC03 /* Date+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB03 /* Date+Helpers.swift */; };
@@ -21,7 +23,6 @@
 		CC000000000000000000CC0C /* KnownServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0C /* KnownServices.swift */; };
 		CC000000000000000000CC0D /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0D /* AnalyticsService.swift */; };
 		CC000000000000000000CC0E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0E /* AuthService.swift */; };
-		CC000000000000000000CC2A /* BiometricService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB29 /* BiometricService.swift */; };
 		CC000000000000000000CC0F /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB0F /* CategoryService.swift */; };
 		CC000000000000000000CC10 /* ItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB10 /* ItemService.swift */; };
 		CC000000000000000000CC11 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB11 /* NotificationService.swift */; };
@@ -30,7 +31,6 @@
 		CC000000000000000000CC14 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB14 /* ContentView.swift */; };
 		CC000000000000000000CC15 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB15 /* AnalyticsView.swift */; };
 		CC000000000000000000CC16 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB16 /* AuthScreen.swift */; };
-		CC000000000000000000CC2B /* BiometricLockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB2A /* BiometricLockScreen.swift */; };
 		CC000000000000000000CC17 /* CurrencyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB17 /* CurrencyText.swift */; };
 		CC000000000000000000CC18 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB18 /* EmptyState.swift */; };
 		CC000000000000000000CC19 /* ServiceLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB19 /* ServiceLogo.swift */; };
@@ -50,11 +50,13 @@
 		CC000000000000000000CC27 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB27 /* SettingsViewModel.swift */; };
 		CC000000000000000000CC28 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AA000000000000000000AA1E /* Supabase */; };
 		CC000000000000000000CC29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB28 /* Assets.xcassets */; };
-		914AEA8B6F0943BA84DCE1B4 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */; };
-		6F072D0B0A3A483380857F90 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A44B6B954F4C7980781C4B /* CalendarView.swift */; };
+		CC000000000000000000CC2A /* BiometricService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB29 /* BiometricService.swift */; };
+		CC000000000000000000CC2B /* BiometricLockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB2A /* BiometricLockScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		03A44B6B954F4C7980781C4B /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		AA000000000000000000AA08 /* SubTrkr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTrkr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA000000000000000000AA15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BB000000000000000000BB01 /* SubTrkrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrkrApp.swift; sourceTree = "<group>"; };
@@ -71,7 +73,6 @@
 		BB000000000000000000BB0C /* KnownServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownServices.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0D /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0E /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
-		BB000000000000000000BB29 /* BiometricService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB0F /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB10 /* ItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB11 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -80,7 +81,6 @@
 		BB000000000000000000BB14 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB15 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB16 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
-		BB000000000000000000BB2A /* BiometricLockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricLockScreen.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB17 /* CurrencyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyText.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB18 /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB19 /* ServiceLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLogo.swift; sourceTree = "<group>"; };
@@ -99,8 +99,8 @@
 		BB000000000000000000BB26 /* ItemListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewModel.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB27 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB28 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
-		03A44B6B954F4C7980781C4B /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB29 /* BiometricService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricService.swift; sourceTree = "<group>"; };
+		BB000000000000000000BB2A /* BiometricLockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricLockScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,7 +115,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AA000000000000000000AA06 /* / */ = {
+		AA000000000000000000AA06 = {
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000AA09 /* SubTrkr */,
@@ -442,7 +442,10 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)");
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -519,11 +522,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
 				INFOPLIST_FILE = SubTrkr/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.subtrkr.app";
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -539,11 +546,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
 				INFOPLIST_FILE = SubTrkr/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.subtrkr.app";
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -581,7 +592,7 @@
 			repositoryURL = "https://github.com/supabase/supabase-swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = "2.0.0";
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -593,7 +604,6 @@
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = AA000000000000000000AA01 /* Project object */;
 }
