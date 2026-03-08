@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var accountSuccess: String?
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
     @AppStorage("biometricUnlockEnabled") private var biometricUnlockEnabled = true
+    private let biometricService = BiometricService()
 
     var body: some View {
         NavigationStack {
@@ -97,7 +98,7 @@ struct SettingsView: View {
                 }
 
                 // Security
-                if BiometricService().canUseBiometrics() {
+                if biometricService.canUseBiometrics() {
                     Section {
                         Toggle(isOn: $biometricUnlockEnabled) {
                             Label("Unlock with Face ID", systemImage: "faceid")
@@ -107,7 +108,7 @@ struct SettingsView: View {
                         .onChange(of: biometricUnlockEnabled) { _, newValue in
                             if newValue {
                                 Task {
-                                    let success = try? await BiometricService().authenticate()
+                                    let success = try? await biometricService.authenticate()
                                     if success != true {
                                         biometricUnlockEnabled = false
                                     }

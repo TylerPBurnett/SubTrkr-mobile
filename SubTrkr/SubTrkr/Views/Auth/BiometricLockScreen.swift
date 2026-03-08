@@ -1,4 +1,5 @@
 import SwiftUI
+import LocalAuthentication
 
 struct BiometricLockScreen: View {
     let onUnlocked: () -> Void
@@ -78,6 +79,8 @@ struct BiometricLockScreen: View {
             } else {
                 authFailed = true
             }
+        } catch let error as LAError where error.code == .userCancel {
+            // User tapped Cancel — don't show error, just stay on screen
         } catch {
             authFailed = true
         }

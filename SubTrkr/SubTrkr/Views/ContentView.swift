@@ -2,9 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthService.self) private var authService
+    @Environment(\.scenePhase) private var scenePhase
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
     @AppStorage("biometricUnlockEnabled") private var biometricUnlockEnabled = true
     @State private var biometricLocked = true
+    @State private var canUseBiometrics = false
     private let biometricService = BiometricService()
 
     var body: some View {
@@ -13,7 +15,7 @@ struct ContentView: View {
                 LaunchScreen()
             } else if !authService.isAuthenticated {
                 AuthScreen()
-            } else if biometricLocked && biometricUnlockEnabled && biometricService.canUseBiometrics() {
+            } else if biometricLocked && biometricUnlockEnabled && canUseBiometrics {
                 BiometricLockScreen(
                     onUnlocked: { biometricLocked = false },
                     onSignOut: { Task { try? await authService.signOut() } }
@@ -29,6 +31,16 @@ struct ContentView: View {
             if !isAuth {
                 biometricLocked = true
             }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                biometricLocked = true
+            } else if newPhase == .active {
+                canUseBiometrics = biometricService.canUseBiometrics()
+            }
+        }
+        .task {
+            canUseBiometrics = biometricService.canUseBiometrics()
         }
         .preferredColorScheme(colorScheme)
     }
