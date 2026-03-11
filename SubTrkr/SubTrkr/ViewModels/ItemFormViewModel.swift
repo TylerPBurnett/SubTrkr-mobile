@@ -3,8 +3,26 @@ import Foundation
 @Observable
 @MainActor
 final class ItemFormViewModel {
+    private struct Snapshot: Equatable {
+        let name: String
+        let amount: Double
+        let currency: String
+        let billingCycle: BillingCycle
+        let categoryId: String?
+        let startDate: String
+        let nextBillingDate: String
+        let reminderDays: Int?
+        let notes: String
+        let url: String
+        let logoUrl: String
+        let status: ItemStatus
+        let trialEndDate: String?
+        let serviceSearchText: String
+    }
+
     private let itemService = ItemService()
     private let categoryService = CategoryService()
+    private var initialSnapshot: Snapshot?
 
     // Form fields
     var name = ""
@@ -56,9 +74,50 @@ final class ItemFormViewModel {
             status = item.status
             trialEndDate = item.trialEndDateFormatted
         }
+
+        initialSnapshot = Snapshot(
+            name: name,
+            amount: amount,
+            currency: currency,
+            billingCycle: billingCycle,
+            categoryId: categoryId,
+            startDate: DateHelper.formatDate(startDate),
+            nextBillingDate: DateHelper.formatDate(nextBillingDate),
+            reminderDays: reminderDays,
+            notes: notes,
+            url: url,
+            logoUrl: logoUrl,
+            status: status,
+            trialEndDate: trialEndDate.map(DateHelper.formatDate),
+            serviceSearchText: serviceSearchText
+        )
     }
 
     var isEditing: Bool { editingItem != nil }
+
+    private var currentSnapshot: Snapshot {
+        Snapshot(
+            name: name,
+            amount: amount,
+            currency: currency,
+            billingCycle: billingCycle,
+            categoryId: categoryId,
+            startDate: DateHelper.formatDate(startDate),
+            nextBillingDate: DateHelper.formatDate(nextBillingDate),
+            reminderDays: reminderDays,
+            notes: notes,
+            url: url,
+            logoUrl: logoUrl,
+            status: status,
+            trialEndDate: trialEndDate.map(DateHelper.formatDate),
+            serviceSearchText: serviceSearchText
+        )
+    }
+
+    var isDirty: Bool {
+        guard let initialSnapshot else { return false }
+        return currentSnapshot != initialSnapshot
+    }
 
     var isValid: Bool {
         !name.isEmpty && (amount > 0 || status == .trial)
@@ -68,9 +127,9 @@ final class ItemFormViewModel {
         guard !isEditing, !userEditedNextBillingDate else { return }
         var date = startDate
         let now = Date.now
-        // Roll forward until the date is in the future
-        while date <= now {
-            date = DateHelper.advanceDate(date, by: billingCycle)
+        // Keep "due today" on today instead of skipping ahead because the current time is past midnight.
+        while DateHelper.isBeforeDay(date, than: now) {
+            date = DateHelper.advanceDate(date, by: billingCycle, anchorDate: startDate)
         }
         nextBillingDate = date
     }

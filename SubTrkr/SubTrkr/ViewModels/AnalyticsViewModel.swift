@@ -12,6 +12,7 @@ final class AnalyticsViewModel {
     var payments: [Payment] = []
     var isLoading = false
     var error: String?
+    private var statusHistoryByItem: [String: [StatusHistory]] = [:]
 
     var selectedMonthRange: Int = 6 {
         didSet { recomputeTrends() }
@@ -37,9 +38,23 @@ final class AnalyticsViewModel {
     private(set) var cancelledItems: [Item] = []
 
     private func recomputeTrends() {
-        monthlyTrend = analyticsService.reconstructMonthlySpending(items: items, payments: payments, months: selectedMonthRange)
-        categoryTrend = analyticsService.reconstructCategorySpending(items: items, payments: payments, months: selectedMonthRange)
-        itemCountTrend = analyticsService.reconstructMonthlyItemCount(items: items, months: selectedMonthRange)
+        monthlyTrend = analyticsService.reconstructMonthlySpending(
+            items: items,
+            payments: payments,
+            statusHistoryByItem: statusHistoryByItem,
+            months: selectedMonthRange
+        )
+        categoryTrend = analyticsService.reconstructCategorySpending(
+            items: items,
+            payments: payments,
+            statusHistoryByItem: statusHistoryByItem,
+            months: selectedMonthRange
+        )
+        itemCountTrend = analyticsService.reconstructMonthlyItemCount(
+            items: items,
+            statusHistoryByItem: statusHistoryByItem,
+            months: selectedMonthRange
+        )
         projectedAnnualSpend = analyticsService.calculateProjectedAnnualSpend(items: items)
         cancelledItems = items.filter { $0.status == .cancelled || $0.status == .archived }
     }
@@ -50,7 +65,9 @@ final class AnalyticsViewModel {
         isLoading = true
         error = nil
         do {
-            items = try await itemService.getItems()
+            async let fetchedItems = itemService.getItems()
+            async let fetchedStatusHistory = itemService.getAllStatusHistory()
+            items = try await fetchedItems
 
             // Payment history enriches trends, but summary metrics should still load without it.
             do {
@@ -59,6 +76,17 @@ final class AnalyticsViewModel {
                 payments = []
                 self.error = "Payment history unavailable: \(error.localizedDescription)"
             }
+
+            do {
+                let statusHistory = try await fetchedStatusHistory
+                statusHistoryByItem = Dictionary(grouping: statusHistory, by: \.itemId)
+            } catch {
+                statusHistoryByItem = [:]
+                if self.error == nil {
+                    self.error = "Status history unavailable: \(error.localizedDescription)"
+                }
+            }
+
             recomputeTrends()
         } catch {
             self.error = error.localizedDescription

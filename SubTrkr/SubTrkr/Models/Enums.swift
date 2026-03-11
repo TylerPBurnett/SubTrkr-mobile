@@ -90,7 +90,7 @@ enum ItemStatus: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .active: return ["pause", "cancel", "archive", "start_trial"]
         case .paused: return ["resume", "cancel", "archive"]
-        case .cancelled: return ["reactivate", "archive"]
+        case .cancelled: return ["edit_cancellation", "reactivate", "archive"]
         case .archived: return ["reactivate"]
         case .trial: return ["convert_trial", "cancel", "archive"]
         }
@@ -149,6 +149,7 @@ enum StatusActionHelper {
         switch action {
         case "pause": return "pause.circle.fill"
         case "resume", "reactivate": return "play.circle.fill"
+        case "edit_cancellation": return "calendar.badge.clock"
         case "cancel": return "xmark.circle.fill"
         case "archive": return "archivebox.fill"
         case "start_trial": return "clock.fill"
@@ -161,6 +162,7 @@ enum StatusActionHelper {
         switch action {
         case "pause": return .statusPaused
         case "resume", "reactivate", "convert_trial": return .brand
+        case "edit_cancellation": return .brand
         case "cancel": return .statusCancelled
         case "archive": return .statusArchived
         case "start_trial": return .statusTrial
@@ -173,6 +175,7 @@ enum StatusActionHelper {
         case "pause": return "Pause"
         case "resume": return "Resume"
         case "reactivate": return "Reactivate"
+        case "edit_cancellation": return "Edit Cancel Date"
         case "cancel": return "Cancel"
         case "archive": return "Archive"
         case "start_trial": return "Start Trial"

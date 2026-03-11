@@ -5,6 +5,7 @@ struct ItemFormView: View {
     @Environment(AuthService.self) private var authService
 
     @State private var viewModel: ItemFormViewModel
+    @State private var showDiscardConfirmation = false
     var onSave: (() async -> Void)?
 
     init(itemType: ItemType, editingItem: Item? = nil, onSave: (() async -> Void)? = nil) {
@@ -34,7 +35,7 @@ struct ItemFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel", action: handleCancelTapped)
                         .foregroundStyle(.brand)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -57,6 +58,12 @@ struct ItemFormView: View {
             } message: {
                 Text(viewModel.error ?? "")
             }
+            .confirmationDialog("Discard changes?", isPresented: $showDiscardConfirmation, titleVisibility: .visible) {
+                Button("Discard Changes", role: .destructive, action: discardChanges)
+                Button("Keep Editing", role: .cancel) {}
+            } message: {
+                Text("Your unsaved changes will be lost.")
+            }
             .onChange(of: viewModel.isSaved) { _, saved in
                 if saved {
                     Task {
@@ -71,6 +78,19 @@ struct ItemFormView: View {
             await viewModel.loadCategories()
         }
         .presentationDetents([.large])
+        .interactiveDismissDisabled(viewModel.isDirty)
+    }
+
+    private func handleCancelTapped() {
+        if viewModel.isDirty {
+            showDiscardConfirmation = true
+        } else {
+            dismiss()
+        }
+    }
+
+    private func discardChanges() {
+        dismiss()
     }
 
     // MARK: - Service Search

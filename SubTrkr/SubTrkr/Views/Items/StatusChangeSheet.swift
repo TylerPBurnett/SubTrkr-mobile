@@ -39,7 +39,7 @@ struct StatusChangeSheet: View {
                 Section("Change To") {
                     ForEach(item.status.availableActions, id: \.self) { action in
                         Button {
-                            selectedAction = action
+                            selectAction(action)
                         } label: {
                             HStack {
                                 Image(systemName: StatusActionHelper.icon(for: action))
@@ -66,9 +66,14 @@ struct StatusChangeSheet: View {
                         }
                     }
 
-                    if selectedAction == "cancel" {
-                        Section("Cancellation Date") {
-                            DatePicker("Effective", selection: $effectiveDate, displayedComponents: .date)
+                    if let historicalEffectiveDateSectionTitle {
+                        Section(historicalEffectiveDateSectionTitle) {
+                            DatePicker(
+                                "Effective",
+                                selection: $effectiveDate,
+                                in: historicalEffectiveDateRange,
+                                displayedComponents: .date
+                            )
                         }
                     }
 
@@ -121,7 +126,7 @@ struct StatusChangeSheet: View {
 
         let statusData = StatusChangeData(
             action: selectedAction,
-            effectiveDate: (selectedAction == "cancel" || selectedAction == "start_trial") ? effectiveDate : nil,
+            effectiveDate: selectedActionUsesEffectiveDate ? effectiveDate : nil,
             reason: reason.isEmpty ? nil : reason,
             notes: notes.isEmpty ? nil : notes,
             autoResumeDate: selectedAction == "pause" ? autoResumeDate : nil
@@ -141,6 +146,55 @@ struct StatusChangeSheet: View {
         }
 
         isLoading = false
+    }
+
+    private func selectAction(_ action: String) {
+        selectedAction = action
+
+        switch action {
+        case "cancel", "edit_cancellation":
+            effectiveDate = clampedEffectiveDate(item.cancellationDateFormatted ?? Date.now, for: action)
+        case "resume", "reactivate", "convert_trial":
+            effectiveDate = clampedEffectiveDate(Date.now, for: action)
+        case "start_trial":
+            effectiveDate = item.trialEndDateFormatted ?? Date.now
+        default:
+            break
+        }
+    }
+
+    private var selectedActionUsesEffectiveDate: Bool {
+        switch selectedAction {
+        case "cancel", "edit_cancellation", "resume", "reactivate", "convert_trial", "start_trial":
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var historicalEffectiveDateSectionTitle: String? {
+        switch selectedAction {
+        case "cancel", "edit_cancellation":
+            return "Cancellation Date"
+        case "resume":
+            return "Resume Date"
+        case "reactivate":
+            return "Reactivation Date"
+        case "convert_trial":
+            return "Conversion Date"
+        default:
+            return nil
+        }
+    }
+
+    private var historicalEffectiveDateRange: ClosedRange<Date> {
+        let lowerBound = min(item.minimumEffectiveDate(for: selectedAction) ?? Date.distantPast, Date.now)
+        return lowerBound...Date.now
+    }
+
+    private func clampedEffectiveDate(_ preferredDate: Date, for action: String) -> Date {
+        let minimumDate = item.minimumEffectiveDate(for: action) ?? Date.distantPast
+        return max(minimumDate, min(preferredDate, Date.now))
     }
 
 }

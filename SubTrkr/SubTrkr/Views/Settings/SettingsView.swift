@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct SettingsView: View {
+    private enum VerificationEmailState {
+        case idle
+        case sending
+        case sent
+    }
+
     @Environment(AuthService.self) private var authService
     @State private var viewModel = SettingsViewModel()
     @State private var showSignOutAlert = false
@@ -9,7 +15,7 @@ struct SettingsView: View {
     @State private var deleteConfirmText = ""
     @State private var showDeleteConfirm = false
     @State private var accountError: String?
-    @State private var accountSuccess: String?
+    @State private var verificationEmailState: VerificationEmailState = .idle
     @AppStorage("appearanceMode") private var appearanceMode: String = "system"
     @AppStorage("biometricUnlockEnabled") private var biometricUnlockEnabled = true
     private let biometricService = BiometricService()
@@ -75,6 +81,16 @@ struct SettingsView: View {
                     Text("Account")
                 }
 
+                if let accountError {
+                    Section {
+                        Text(accountError)
+                            .font(.caption)
+                            .foregroundStyle(.accentRed)
+                    } header: {
+                        Text("Account Status")
+                    }
+                }
+
                 // Categories
                 Section {
                     NavigationLink {
@@ -134,15 +150,6 @@ struct SettingsView: View {
                             .accessibilityLabel("Version 1.0.0")
                     }
 
-                    HStack {
-                        Label("Platform", systemImage: "iphone")
-                            .foregroundStyle(.textPrimary)
-                        Spacer()
-                        Text("iOS")
-                            .font(.subheadline)
-                            .foregroundStyle(.textMuted)
-                    }
-
                     Link(destination: URL(string: "https://subtrkr.app/privacy")!) {
                         Label("Privacy Policy", systemImage: "hand.raised.fill")
                             .foregroundStyle(.textPrimary)
@@ -154,12 +161,11 @@ struct SettingsView: View {
                 // Actions
                 Section {
                     if !authService.isEmailVerified {
-                        Button {
-                            Task { try? await authService.resendVerificationEmail() }
-                        } label: {
-                            Label("Resend Verification Email", systemImage: "envelope.badge")
+                        Button(action: resendVerificationEmail) {
+                            verificationEmailButtonLabel
                                 .foregroundStyle(.brand)
                         }
+                        .disabled(verificationEmailState != .idle)
                     }
 
                     Button {
@@ -229,6 +235,33 @@ struct SettingsView: View {
                 await viewModel.seedDefaults(userId: userId)
             }
             await viewModel.loadData()
+        }
+    }
+
+    @ViewBuilder
+    private var verificationEmailButtonLabel: some View {
+        switch verificationEmailState {
+        case .idle:
+            Label("Resend Verification Email", systemImage: "envelope.badge")
+        case .sending:
+            Label("Sending Verification Email...", systemImage: "hourglass")
+        case .sent:
+            Label("Verification Email Sent", systemImage: "checkmark.circle.fill")
+        }
+    }
+
+    private func resendVerificationEmail() {
+        Task {
+            accountError = nil
+            verificationEmailState = .sending
+
+            do {
+                try await authService.resendVerificationEmail()
+                verificationEmailState = .sent
+            } catch {
+                verificationEmailState = .idle
+                accountError = error.localizedDescription
+            }
         }
     }
 }

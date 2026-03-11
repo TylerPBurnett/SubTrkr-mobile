@@ -198,7 +198,15 @@ struct AnalyticsView: View {
                     icon: "arrow.down.circle",
                     color: .statusPaused
                 )
-                Spacer()
+                AnalyticsCard(
+                    title: "Avg / Item",
+                    value: viewModel.totalActiveItems > 0
+                        ? (viewModel.monthlySpending / Double(viewModel.totalActiveItems)).formatted(currency: "USD")
+                        : "$0.00",
+                    subtitle: "per month",
+                    icon: "divide.circle",
+                    color: .accentPurple
+                )
             }
             .padding(.horizontal)
 
@@ -211,6 +219,10 @@ struct AnalyticsView: View {
                     statusCounts: viewModel.statusCounts,
                     totalCount: viewModel.items.count
                 )
+            }
+
+            if !viewModel.cancelledItems.isEmpty {
+                CancellationHistoryCard(items: viewModel.cancelledItems)
             }
         }
     }
@@ -328,9 +340,6 @@ struct AnalyticsView: View {
                 }
             }
 
-            if !viewModel.cancelledItems.isEmpty {
-                CancellationHistoryCard(items: viewModel.cancelledItems)
-            }
         }
     }
 }
@@ -682,6 +691,8 @@ struct AnalyticsCard: View {
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .contentTransition(.numericText())
+                .animation(.default, value: value)
 
             if let subtitle {
                 Text(subtitle)

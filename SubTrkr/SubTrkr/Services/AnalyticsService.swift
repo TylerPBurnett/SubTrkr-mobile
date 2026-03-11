@@ -1,6 +1,12 @@
 import Foundation
 
 final class AnalyticsService {
+    private struct StatusTransition {
+        let status: ItemStatus
+        let effectiveDate: Date
+        let action: String?
+        let recordedAt: Date?
+    }
 
     // MARK: - Spending Calculations
 
@@ -56,10 +62,14 @@ final class AnalyticsService {
     // MARK: - Historical Reconstruction
 
     /// Determines if an item was actively costing money during a given month.
-    private func wasItemActive(item: Item, monthStart: Date, monthEnd: Date) -> Bool {
+    private func wasItemActive(item: Item, monthStart: Date, monthEndExclusive: Date, statusHistory: [StatusHistory]) -> Bool {
+        guard !statusHistory.isEmpty else {
+            return wasItemActiveUsingCurrentFields(item: item, monthStart: monthStart, monthEndExclusive: monthEndExclusive)
+        }
+
         // Try startDate first, fall back to createdAt
         let startDate: Date
-        if let startDateStr = item.startDate, let parsed = DateHelper.parseDate(startDateStr) {
+        if let parsed = item.startDateFormatted {
             startDate = parsed
         } else if let createdAtStr = item.createdAt, let parsed = DateHelper.parseISO8601(createdAtStr) {
             startDate = parsed
@@ -67,36 +77,78 @@ final class AnalyticsService {
             return false  // No date info at all
         }
 
+        let calendar = Calendar.current
+        let normalizedStartDate = calendar.startOfDay(for: startDate)
+
+        guard normalizedStartDate < monthEndExclusive else {
+            return false
+        }
+
+        let transitions = statusTransitions(for: statusHistory)
+        var currentStatus = inferredInitialStatus(for: item, transitions: transitions)
+        var segmentStart = normalizedStartDate
+
+        for transition in transitions {
+            let transitionDate = calendar.startOfDay(for: transition.effectiveDate)
+
+            if transitionDate <= segmentStart {
+                currentStatus = transition.status
+                continue
+            }
+
+            if currentStatus == .active && segmentStart < monthEndExclusive && transitionDate > monthStart {
+                return true
+            }
+
+            guard transitionDate < monthEndExclusive else { break }
+
+            currentStatus = transition.status
+            segmentStart = transitionDate
+        }
+
+        return currentStatus == .active && segmentStart < monthEndExclusive
+    }
+
+    private func wasItemActiveUsingCurrentFields(item: Item, monthStart: Date, monthEndExclusive: Date) -> Bool {
+        let calendar = Calendar.current
+        let monthEnd = calendar.date(byAdding: .second, value: -1, to: monthEndExclusive) ?? monthEndExclusive
+
+        let startDate: Date
+        if let parsed = item.startDateFormatted {
+            startDate = parsed
+        } else if let createdAtStr = item.createdAt, let parsed = DateHelper.parseISO8601(createdAtStr) {
+            startDate = parsed
+        } else {
+            return false
+        }
+
         guard startDate <= monthEnd else {
             return false
         }
 
-        // Trial items don't cost money
         if item.status == .trial {
             return false
         }
 
-        // Cancelled before this month started
-        if let cancelledAtStr = item.cancelledAt,
-           let cancelledAt = DateHelper.parseISO8601(cancelledAtStr),
-           cancelledAt < monthStart {
+        if let cancellationDate = item.cancellationDateFormatted,
+           DateHelper.isOnOrBeforeDay(cancellationDate, comparedTo: monthStart) {
             return false
         }
 
-        // Archived before this month started
-        if let archivedAtStr = item.archivedAt,
-           let archivedAt = DateHelper.parseISO8601(archivedAtStr),
-           archivedAt < monthStart {
+        if let cancelledAt = item.cancelledAtFormatted,
+           DateHelper.isOnOrBeforeDay(cancelledAt, comparedTo: monthStart) {
             return false
         }
 
-        // Paused for the entire month
-        if let pausedAtStr = item.pausedAt,
-           let pausedAt = DateHelper.parseISO8601(pausedAtStr),
-           pausedAt < monthStart {
-            if let pausedUntilStr = item.pausedUntil,
-               let pausedUntil = DateHelper.parseDate(pausedUntilStr) {
-                if pausedUntil > monthEnd {
+        if let archivedAt = item.archivedAtFormatted,
+           DateHelper.isOnOrBeforeDay(archivedAt, comparedTo: monthStart) {
+            return false
+        }
+
+        if let pausedAt = item.pausedAtFormatted,
+           DateHelper.isOnOrBeforeDay(pausedAt, comparedTo: monthStart) {
+            if let pausedUntil = item.pausedUntilFormatted {
+                if DateHelper.isOnOrBeforeDay(monthEnd, comparedTo: pausedUntil) {
                     return false
                 }
             } else if item.status == .paused {
@@ -107,15 +159,52 @@ final class AnalyticsService {
         return true
     }
 
-    private func monthRange(for date: Date) -> (start: Date, end: Date) {
+    private func monthRange(for date: Date) -> (start: Date, endExclusive: Date) {
         let calendar = Calendar.current
         let start = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
-        let end = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: start)!
+        let end = calendar.date(byAdding: .month, value: 1, to: start)!
         return (start, end)
     }
 
+    private func statusTransitions(for statusHistory: [StatusHistory]) -> [StatusTransition] {
+        let calendar = Calendar.current
+
+        return statusHistory.compactMap { entry in
+            let effectiveDate = entry.effectiveDateFormatted
+                ?? entry.changedAtFormatted.map { calendar.startOfDay(for: $0) }
+
+            guard let effectiveDate else { return nil }
+
+            return StatusTransition(
+                status: entry.status,
+                effectiveDate: calendar.startOfDay(for: effectiveDate),
+                action: entry.metadata?.action,
+                recordedAt: entry.changedAtFormatted
+            )
+        }
+        .sorted { lhs, rhs in
+            if lhs.effectiveDate != rhs.effectiveDate {
+                return lhs.effectiveDate < rhs.effectiveDate
+            }
+
+            return (lhs.recordedAt ?? lhs.effectiveDate) < (rhs.recordedAt ?? rhs.effectiveDate)
+        }
+    }
+
+    private func inferredInitialStatus(for item: Item, transitions: [StatusTransition]) -> ItemStatus {
+        if let firstTransition = transitions.first, firstTransition.action == "convert_trial" {
+            return .trial
+        }
+
+        if item.status == .trial || item.trialStartedAtFormatted != nil {
+            return .trial
+        }
+
+        return .active
+    }
+
     /// Reconstructed monthly spending using item metadata + real payments when available.
-    func reconstructMonthlySpending(items: [Item], payments: [Payment], months: Int) -> [MonthlySpending] {
+    func reconstructMonthlySpending(items: [Item], payments: [Payment], statusHistoryByItem: [String: [StatusHistory]] = [:], months: Int) -> [MonthlySpending] {
         let calendar = Calendar.current
         let now = Date.now
 
@@ -130,14 +219,19 @@ final class AnalyticsService {
 
         for i in (0..<months).reversed() {
             guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
-            let (monthStart, monthEnd) = monthRange(for: monthDate)
+            let (monthStart, monthEndExclusive) = monthRange(for: monthDate)
             let monthKey = DateHelper.formatYearMonth(monthStart)
 
             var total = 0.0
             for item in items {
                 if let paidAmount = paymentIndex[item.id]?[monthKey] {
                     total += paidAmount
-                } else if wasItemActive(item: item, monthStart: monthStart, monthEnd: monthEnd) {
+                } else if wasItemActive(
+                    item: item,
+                    monthStart: monthStart,
+                    monthEndExclusive: monthEndExclusive,
+                    statusHistory: statusHistoryByItem[item.id] ?? []
+                ) {
                     total += item.monthlyAmount
                 }
             }
@@ -149,7 +243,7 @@ final class AnalyticsService {
     }
 
     /// Category spending over time (for stacked area chart).
-    func reconstructCategorySpending(items: [Item], payments: [Payment], months: Int) -> [CategoryMonthlySpending] {
+    func reconstructCategorySpending(items: [Item], payments: [Payment], statusHistoryByItem: [String: [StatusHistory]] = [:], months: Int) -> [CategoryMonthlySpending] {
         let calendar = Calendar.current
         let now = Date.now
 
@@ -164,7 +258,7 @@ final class AnalyticsService {
 
         for i in (0..<months).reversed() {
             guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
-            let (monthStart, monthEnd) = monthRange(for: monthDate)
+            let (monthStart, monthEndExclusive) = monthRange(for: monthDate)
             let monthKey = DateHelper.formatYearMonth(monthStart)
 
             var categoryTotals: [String: (color: String, total: Double)] = [:]
@@ -173,7 +267,12 @@ final class AnalyticsService {
                 var amount = 0.0
                 if let paidAmount = paymentIndex[item.id]?[monthKey] {
                     amount = paidAmount
-                } else if wasItemActive(item: item, monthStart: monthStart, monthEnd: monthEnd) {
+                } else if wasItemActive(
+                    item: item,
+                    monthStart: monthStart,
+                    monthEndExclusive: monthEndExclusive,
+                    statusHistory: statusHistoryByItem[item.id] ?? []
+                ) {
                     amount = item.monthlyAmount
                 }
 
@@ -198,7 +297,7 @@ final class AnalyticsService {
     }
 
     /// Active item count per month.
-    func reconstructMonthlyItemCount(items: [Item], months: Int) -> [MonthlyItemCount] {
+    func reconstructMonthlyItemCount(items: [Item], statusHistoryByItem: [String: [StatusHistory]] = [:], months: Int) -> [MonthlyItemCount] {
         let calendar = Calendar.current
         let now = Date.now
 
@@ -206,9 +305,16 @@ final class AnalyticsService {
 
         for i in (0..<months).reversed() {
             guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
-            let (monthStart, monthEnd) = monthRange(for: monthDate)
+            let (monthStart, monthEndExclusive) = monthRange(for: monthDate)
 
-            let count = items.filter { wasItemActive(item: $0, monthStart: monthStart, monthEnd: monthEnd) }.count
+            let count = items.filter {
+                wasItemActive(
+                    item: $0,
+                    monthStart: monthStart,
+                    monthEndExclusive: monthEndExclusive,
+                    statusHistory: statusHistoryByItem[$0.id] ?? []
+                )
+            }.count
             result.append(MonthlyItemCount(month: monthStart, count: count))
         }
 

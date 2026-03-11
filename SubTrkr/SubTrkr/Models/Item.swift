@@ -74,9 +74,25 @@ struct Item: Codable, Identifiable, Hashable {
         return DateHelper.parseDate(nextBillingDate)
     }
 
+    var startDateFormatted: Date? {
+        guard let startDate else { return nil }
+        return DateHelper.parseDate(startDate)
+    }
+
     var daysUntilDue: Int? {
         guard let date = nextBillingDateFormatted else { return nil }
         return Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: .now), to: Calendar.current.startOfDay(for: date)).day
+    }
+
+    var billingAnchorDate: Date? {
+        guard let nextBillingDateFormatted else { return startDateFormatted }
+        guard let startDateFormatted else { return nextBillingDateFormatted }
+
+        if DateHelper.isConsistentRecurringDate(nextBillingDateFormatted, withAnchor: startDateFormatted, cycle: billingCycle) {
+            return startDateFormatted
+        }
+
+        return nextBillingDateFormatted
     }
 
     var trialEndDateFormatted: Date? {
@@ -94,6 +110,36 @@ struct Item: Codable, Identifiable, Hashable {
         return days < 0
     }
 
+    var pausedUntilFormatted: Date? {
+        guard let pausedUntil else { return nil }
+        return DateHelper.parseDate(pausedUntil)
+    }
+
+    var pausedAtFormatted: Date? {
+        guard let pausedAt else { return nil }
+        return DateHelper.parseISO8601(pausedAt)
+    }
+
+    var cancellationDateFormatted: Date? {
+        guard let cancellationDate else { return nil }
+        return DateHelper.parseDate(cancellationDate)
+    }
+
+    var cancelledAtFormatted: Date? {
+        guard let cancelledAt else { return nil }
+        return DateHelper.parseISO8601(cancelledAt)
+    }
+
+    var archivedAtFormatted: Date? {
+        guard let archivedAt else { return nil }
+        return DateHelper.parseISO8601(archivedAt)
+    }
+
+    var trialStartedAtFormatted: Date? {
+        guard let trialStartedAt else { return nil }
+        return DateHelper.parseISO8601(trialStartedAt)
+    }
+
     var logoURL: URL? {
         guard let logoUrl, !logoUrl.isEmpty else { return nil }
         return URL(string: logoUrl)
@@ -105,6 +151,68 @@ struct Item: Codable, Identifiable, Hashable {
 
     var categoryName: String {
         categories?.name ?? "Uncategorized"
+    }
+
+    func minimumEffectiveDate(for action: String) -> Date? {
+        switch action {
+        case "cancel", "edit_cancellation":
+            return startDateFormatted
+
+        case "resume":
+            return [startDateFormatted, pausedAtFormatted]
+                .compactMap { $0 }
+                .max()
+
+        case "reactivate":
+            return [startDateFormatted, cancellationDateFormatted, cancelledAtFormatted, archivedAtFormatted]
+                .compactMap { $0 }
+                .max()
+
+        case "convert_trial":
+            return [startDateFormatted, trialStartedAtFormatted]
+                .compactMap { $0 }
+                .max()
+
+        default:
+            return startDateFormatted
+        }
+    }
+
+    func nextBillingDateForMaintenance(referenceDate: Date = .now) -> Date? {
+        guard let nextBillingDateFormatted else { return nil }
+        guard DateHelper.isBeforeDay(nextBillingDateFormatted, than: referenceDate) else { return nil }
+
+        var rolledDate = nextBillingDateFormatted
+        var iterations = 0
+        let maxIterations = 520
+
+        while DateHelper.isBeforeDay(rolledDate, than: referenceDate), iterations < maxIterations {
+            let nextDate = DateHelper.advanceDate(rolledDate, by: billingCycle, anchorDate: billingAnchorDate)
+            guard nextDate != rolledDate else { break }
+            rolledDate = nextDate
+            iterations += 1
+        }
+
+        return rolledDate
+    }
+
+    func nextBillingDateAfterLoggingPayment(on paymentDate: Date) -> Date? {
+        guard status == .active else { return nil }
+        guard let nextBillingDateFormatted else { return nil }
+        guard !DateHelper.isBeforeDay(paymentDate, than: nextBillingDateFormatted) else { return nil }
+
+        var rolledDate = nextBillingDateFormatted
+        var iterations = 0
+        let maxIterations = 520
+
+        while DateHelper.isOnOrBeforeDay(rolledDate, comparedTo: paymentDate), iterations < maxIterations {
+            let nextDate = DateHelper.advanceDate(rolledDate, by: billingCycle, anchorDate: billingAnchorDate)
+            guard nextDate != rolledDate else { break }
+            rolledDate = nextDate
+            iterations += 1
+        }
+
+        return rolledDate
     }
 
 }

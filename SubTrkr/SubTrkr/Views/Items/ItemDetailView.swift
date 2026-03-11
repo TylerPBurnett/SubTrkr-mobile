@@ -48,6 +48,11 @@ struct ItemDetailView: View {
                         Button { showEditForm = true } label: {
                             Label("Edit", systemImage: "pencil")
                         }
+                        if canLogPayment {
+                            Button(action: presentPaymentSheet) {
+                                Label("Log Payment", systemImage: "plus.circle")
+                            }
+                        }
                         Button { showStatusSheet = true } label: {
                             Label("Change Status", systemImage: "arrow.triangle.2.circlepath")
                         }
@@ -105,7 +110,7 @@ struct ItemDetailView: View {
                             }
                         }
                     }
-                    .navigationTitle("Record Payment")
+                    .navigationTitle("Log Payment")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
@@ -189,14 +194,12 @@ struct ItemDetailView: View {
                 )
             }
 
-            if currentItem.status == .paused, let pausedUntil = currentItem.pausedUntil,
-               let date = DateHelper.parseDate(pausedUntil) {
+            if currentItem.status == .paused, let date = currentItem.pausedUntilFormatted {
                 Divider().padding(.leading)
                 DetailRow(label: "Resumes", value: DateHelper.relativeDateString(date))
             }
 
-            if currentItem.status == .cancelled, let cancellationDate = currentItem.cancellationDate,
-               let date = DateHelper.parseDate(cancellationDate) {
+            if currentItem.status == .cancelled, let date = currentItem.cancellationDateFormatted {
                 Divider().padding(.leading)
                 DetailRow(label: "Cancellation Date", value: DateHelper.formatMediumDate(date))
             }
@@ -264,32 +267,23 @@ struct ItemDetailView: View {
 
     private var paymentHistorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Payment History")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.textSecondary)
-
-                Spacer()
-
-                if currentItem.status == .active || currentItem.status == .trial {
-                    Button {
-                        paymentAmount = currentItem.amount
-                        paymentDate = Date.now
-                        showPaymentSheet = true
-                    } label: {
-                        Label("Record Payment", systemImage: "plus.circle.fill")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.brand)
-                    }
-                }
-            }
+            Text("Payment History")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if payments.isEmpty {
-                Text("No payments recorded yet")
-                    .font(.caption)
-                    .foregroundStyle(.textMuted)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding()
+                VStack(spacing: 4) {
+                    Text("No confirmed payments logged")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.textSecondary)
+                    Text("Recurring charges are tracked automatically while this item is active.")
+                        .font(.caption)
+                        .foregroundStyle(.textMuted)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding()
             } else {
                 ForEach(payments.prefix(10)) { payment in
                     HStack {
@@ -359,6 +353,10 @@ struct ItemDetailView: View {
 
     // MARK: - Helpers
 
+    private var canLogPayment: Bool {
+        currentItem.status != .trial && currentItem.status != .archived
+    }
+
     private func refreshItem() async {
         do {
             currentItem = try await itemService.getItemById(currentItem.id)
@@ -383,6 +381,12 @@ struct ItemDetailView: View {
         }
     }
 
+    private func presentPaymentSheet() {
+        paymentAmount = currentItem.amount
+        paymentDate = Date.now
+        showPaymentSheet = true
+    }
+
     private func recordPayment() async {
         guard let userId = authService.currentUser?.id.uuidString else { return }
         isRecordingPayment = true
@@ -396,9 +400,7 @@ struct ItemDetailView: View {
                 paidDate: paymentDate
             )
 
-            // Auto-advance next billing date by one cycle
-            if let currentDate = currentItem.nextBillingDateFormatted {
-                let nextDate = DateHelper.advanceDate(currentDate, by: currentItem.billingCycle)
+            if let nextDate = currentItem.nextBillingDateAfterLoggingPayment(on: paymentDate) {
                 let update = ItemUpdate(nextBillingDate: DateHelper.formatDate(nextDate))
                 _ = try await itemService.updateItem(id: currentItem.id, data: update)
             }

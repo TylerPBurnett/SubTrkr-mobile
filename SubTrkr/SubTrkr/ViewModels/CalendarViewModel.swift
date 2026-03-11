@@ -218,8 +218,8 @@ final class CalendarViewModel {
         let year = calendar.component(.year, from: displayedMonth)
         let month = calendar.component(.month, from: displayedMonth)
 
-        // Filter to active/trial items only
-        let activeItems = items.filter { $0.status == .active || $0.status == .trial }
+        // Calendar projections only show recurring charges that are expected to bill automatically.
+        let activeItems = items.filter { $0.status == .active }
 
         var grouped: [Int: [Item]] = [:]
         var total: Double = 0
@@ -231,6 +231,7 @@ final class CalendarViewModel {
             let billingDays = projectBillingDays(
                 for: item.billingCycle,
                 nextBillingDate: nextBilling,
+                anchorDate: item.billingAnchorDate,
                 inYear: year,
                 month: month
             )
@@ -253,6 +254,7 @@ final class CalendarViewModel {
     private func projectBillingDays(
         for cycle: BillingCycle,
         nextBillingDate: Date,
+        anchorDate: Date?,
         inYear year: Int,
         month: Int
     ) -> [Int] {
@@ -277,7 +279,7 @@ final class CalendarViewModel {
         var iterations = 0
         let maxIterations = 520 // ~10 years of weekly advances
         while current < monthStart && iterations < maxIterations {
-            current = DateHelper.advanceDate(current, by: cycle)
+            current = DateHelper.advanceDate(current, by: cycle, anchorDate: anchorDate)
             iterations += 1
         }
 
@@ -285,7 +287,7 @@ final class CalendarViewModel {
         while current < monthEnd {
             let day = calendar.component(.day, from: current)
             billingDays.append(day)
-            current = DateHelper.advanceDate(current, by: cycle)
+            current = DateHelper.advanceDate(current, by: cycle, anchorDate: anchorDate)
         }
 
         return billingDays

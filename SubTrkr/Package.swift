@@ -16,6 +16,11 @@ let package = Package(
                 .product(name: "Supabase", package: "supabase-swift")
             ],
             path: "SubTrkr"
+        ),
+        .testTarget(
+            name: "SubTrkrTests",
+            dependencies: ["SubTrkr"],
+            path: "Tests/SubTrkrTests"
         )
     ],
     swiftLanguageModes: [.v5]

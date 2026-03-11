@@ -21,7 +21,11 @@ struct DashboardView: View {
 
                 switch selectedTab {
                 case 0:
-                    overviewContent
+                    if viewModel.isLoading && viewModel.items.isEmpty {
+                        dashboardLoadingView
+                    } else {
+                        overviewContent
+                    }
                 case 1:
                     CalendarView(viewModel: calendarViewModel)
                 default:
@@ -38,6 +42,44 @@ struct DashboardView: View {
                 await viewModel.runMaintenance(userId: userId)
                 await viewModel.loadData()
             }
+        }
+    }
+
+    // MARK: - Loading Skeleton
+
+    private var dashboardLoadingView: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 80)
+                        .shimmer()
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 80)
+                        .shimmer()
+                }
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 80)
+                        .shimmer()
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.bgCard)
+                        .frame(height: 80)
+                        .shimmer()
+                }
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.bgCard)
+                    .frame(height: 280)
+                    .shimmer()
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.bgCard)
+                    .frame(height: 200)
+                    .shimmer()
+            }
+            .padding()
         }
     }
 
@@ -120,6 +162,19 @@ struct DashboardView: View {
                 )
                 .foregroundStyle(Color(hex: category.color))
                 .cornerRadius(4)
+            }
+            .chartBackground { _ in
+                VStack(spacing: 2) {
+                    Text(viewModel.monthlySpending.formatted(currency: "USD"))
+                        .font(.system(.subheadline, design: .monospaced))
+                        .fontWeight(.heavy)
+                        .foregroundStyle(.textPrimary)
+                        .contentTransition(.numericText())
+                        .animation(.default, value: viewModel.monthlySpending)
+                    Text("/ month")
+                        .font(.caption2)
+                        .foregroundStyle(.textMuted)
+                }
             }
             .frame(height: 200)
             .accessibilityLabel("Spending by category")
@@ -206,6 +261,8 @@ struct StatsCard: View {
                 .foregroundStyle(.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .contentTransition(.numericText())
+                .animation(.default, value: value)
 
             if let subtitle {
                 Text(subtitle)

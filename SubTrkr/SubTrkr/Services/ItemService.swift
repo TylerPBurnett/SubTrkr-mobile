@@ -2,6 +2,23 @@ import Foundation
 import Supabase
 
 final class ItemService {
+    enum ItemServiceError: LocalizedError {
+        case futureCancellationDateUnsupported
+        case futureEffectiveDateUnsupported
+        case effectiveDateBeforeItemStart
+
+        var errorDescription: String? {
+            switch self {
+            case .futureCancellationDateUnsupported:
+                return "Cancellation dates must be today or earlier."
+            case .futureEffectiveDateUnsupported:
+                return "Effective dates must be today or earlier."
+            case .effectiveDateBeforeItemStart:
+                return "Effective dates must be on or after the item's start date."
+            }
+        }
+    }
+
     private let client: SupabaseClient
     private let notificationService: NotificationService
 
@@ -62,6 +79,14 @@ final class ItemService {
         return try await client.from("item_status_history")
             .select()
             .eq("item_id", value: itemId)
+            .order("changed_at", ascending: false)
+            .execute()
+            .value
+    }
+
+    func getAllStatusHistory() async throws -> [StatusHistory] {
+        return try await client.from("item_status_history")
+            .select()
             .order("changed_at", ascending: false)
             .execute()
             .value
@@ -129,45 +154,88 @@ final class ItemService {
     // MARK: - Status Change
 
     func executeStatusChange(id: String, userId: String, statusData: StatusChangeData) async throws -> Item {
+        let currentItem = try await getItemById(id)
         var update = ItemUpdate()
+        var historyEffectiveDate: Date?
 
         switch statusData.action {
         case "pause":
             update.status = .paused
             update.pausedAt = DateHelper.formatISO8601(Date.now)
+            historyEffectiveDate = Date.now
             if let resumeDate = statusData.autoResumeDate {
                 update.pausedUntil = DateHelper.formatDate(resumeDate)
             }
 
         case "cancel":
+            let effectiveDate = try resolvedHistoricalEffectiveDate(
+                statusData.effectiveDate,
+                futureDateError: .futureCancellationDateUnsupported,
+                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+            )
+
             update.status = .cancelled
             update.cancelledAt = DateHelper.formatISO8601(Date.now)
-            if let effectiveDate = statusData.effectiveDate {
-                update.cancellationDate = DateHelper.formatDate(effectiveDate)
-            }
+            update.cancellationDate = DateHelper.formatDate(effectiveDate)
+            historyEffectiveDate = effectiveDate
+
+        case "edit_cancellation":
+            let effectiveDate = try resolvedHistoricalEffectiveDate(
+                statusData.effectiveDate,
+                futureDateError: .futureCancellationDateUnsupported,
+                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+            )
+
+            update.status = .cancelled
+            update.cancellationDate = DateHelper.formatDate(effectiveDate)
+            historyEffectiveDate = effectiveDate
 
         case "resume", "reactivate":
+            let effectiveDate = try resolvedHistoricalEffectiveDate(
+                statusData.effectiveDate,
+                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+            )
+
             update.status = .active
             update.pausedAt = nil
             update.pausedUntil = nil
             update.cancelledAt = nil
             update.cancellationDate = nil
+            update.archivedAt = nil
+            update.trialStartedAt = nil
+            update.trialEndDate = nil
+            update.nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: effectiveDate)
+            historyEffectiveDate = effectiveDate
 
         case "archive":
             update.status = .archived
             update.archivedAt = DateHelper.formatISO8601(Date.now)
+            historyEffectiveDate = Date.now
 
         case "start_trial":
             update.status = .trial
             update.trialStartedAt = DateHelper.formatISO8601(Date.now)
+            historyEffectiveDate = Date.now
             if let endDate = statusData.effectiveDate {
                 update.trialEndDate = DateHelper.formatDate(endDate)
             }
 
         case "convert_trial":
+            let effectiveDate = try resolvedHistoricalEffectiveDate(
+                statusData.effectiveDate,
+                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+            )
+
             update.status = .active
+            update.pausedAt = nil
+            update.pausedUntil = nil
+            update.cancelledAt = nil
+            update.cancellationDate = nil
+            update.archivedAt = nil
             update.trialStartedAt = nil
             update.trialEndDate = nil
+            update.nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: effectiveDate)
+            historyEffectiveDate = effectiveDate
 
         default:
             break
@@ -182,12 +250,14 @@ final class ItemService {
         let item = try await updateItem(id: id, data: update)
 
         // Record status history
-        let history = StatusHistoryInsert(
+        let history = makeStatusHistoryInsert(
             itemId: id,
             userId: userId,
             status: newStatus,
+            action: statusData.action,
             reason: statusData.reason,
-            notes: statusData.notes
+            userNotes: statusData.notes,
+            effectiveDate: historyEffectiveDate
         )
         try await client.from("item_status_history")
             .insert(history)
@@ -203,31 +273,14 @@ final class ItemService {
         let now = Date.now
 
         for item in items {
-            guard let nextDate = item.nextBillingDateFormatted, nextDate < now else { continue }
-
-            var rolledDate = nextDate
-            while rolledDate < now {
-                rolledDate = DateHelper.advanceDate(rolledDate, by: item.billingCycle)
-            }
-
+            guard let rolledDate = item.nextBillingDateForMaintenance(referenceDate: now) else { continue }
             let update = ItemUpdate(nextBillingDate: DateHelper.formatDate(rolledDate))
             _ = try await updateItem(id: item.id, data: update)
         }
     }
 
     func archivePastCancellations() async throws {
-        let items = try await getItems()
-        let today = DateHelper.formatDate(Date.now)
-
-        for item in items where item.status == .cancelled {
-            guard let cancellationDate = item.cancellationDate, cancellationDate < today else { continue }
-
-            let update = ItemUpdate(
-                status: .archived,
-                archivedAt: DateHelper.formatISO8601(Date.now)
-            )
-            _ = try await updateItem(id: item.id, data: update)
-        }
+        // Phase 1 keeps cancelled items editable so users can correct the effective date later.
     }
 
     func resumePausedItems() async throws {
@@ -235,9 +288,12 @@ final class ItemService {
         let today = DateHelper.formatDate(Date.now)
 
         for item in items where item.status == .paused {
-            guard let pausedUntil = item.pausedUntil, pausedUntil <= today else { continue }
+            guard let pausedUntil = item.pausedUntil,
+                  pausedUntil <= today,
+                  let resumeDate = DateHelper.parseDate(pausedUntil) else { continue }
 
             let update = ItemUpdate(
+                nextBillingDate: nextBillingDateAfterActivation(for: item, effectiveDate: resumeDate),
                 status: .active,
                 pausedAt: nil,
                 pausedUntil: nil
@@ -267,7 +323,13 @@ final class ItemService {
                 userId: userId,
                 status: .cancelled,
                 reason: "Trial expired",
-                notes: "Trial ended on \(trialEndDate)"
+                notes: StatusHistoryMetadataCodec.encode(
+                    metadata: StatusHistoryMetadata(
+                        action: "trial_expired",
+                        effectiveDate: today
+                    ),
+                    userNotes: "Trial ended on \(trialEndDate)"
+                )
             )
             try await client.from("item_status_history")
                 .insert(history)
@@ -283,5 +345,47 @@ final class ItemService {
                   days >= 0 && days <= withinDays else { return false }
             return true
         }
+    }
+
+    private func resolvedHistoricalEffectiveDate(_ effectiveDate: Date?,
+                                                 futureDateError: ItemServiceError = .futureEffectiveDateUnsupported,
+                                                 minimumDate: Date? = nil) throws -> Date {
+        let resolvedDate = effectiveDate ?? Date.now
+
+        guard !DateHelper.isBeforeDay(Date.now, than: resolvedDate) else {
+            throw futureDateError
+        }
+
+        if let minimumDate, DateHelper.isBeforeDay(resolvedDate, than: minimumDate) {
+            throw ItemServiceError.effectiveDateBeforeItemStart
+        }
+
+        return resolvedDate
+    }
+
+    private func nextBillingDateAfterActivation(for item: Item, effectiveDate: Date) -> String {
+        let nextBillingDate = DateHelper.nextFutureBillingDate(from: effectiveDate, by: item.billingCycle)
+        return DateHelper.formatDate(nextBillingDate)
+    }
+
+    private func makeStatusHistoryInsert(itemId: String,
+                                         userId: String,
+                                         status: ItemStatus,
+                                         action: String,
+                                         reason: String?,
+                                         userNotes: String?,
+                                         effectiveDate: Date?) -> StatusHistoryInsert {
+        let metadata = StatusHistoryMetadata(
+            action: action,
+            effectiveDate: effectiveDate.map(DateHelper.formatDate)
+        )
+
+        return StatusHistoryInsert(
+            itemId: itemId,
+            userId: userId,
+            status: status,
+            reason: reason,
+            notes: StatusHistoryMetadataCodec.encode(metadata: metadata, userNotes: userNotes)
+        )
     }
 }
