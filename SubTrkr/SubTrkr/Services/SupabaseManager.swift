@@ -7,18 +7,47 @@ final class SupabaseManager {
     let client: SupabaseClient
 
     private init() {
-        guard let url = ProcessInfo.processInfo.environment["SUPABASE_URL"]
-                ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String else {
-            fatalError("Missing SUPABASE_URL — set in environment variables or Info.plist")
+        guard let url = Self.configValue(
+            environmentKey: "SUPABASE_URL",
+            infoPlistKey: "SUPABASE_URL"
+        ) else {
+            fatalError(Self.missingConfigMessage(for: "SUPABASE_URL"))
         }
-        guard let key = ProcessInfo.processInfo.environment["SUPABASE_ANON_KEY"]
-                ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String else {
-            fatalError("Missing SUPABASE_ANON_KEY — set in environment variables or Info.plist")
+        guard let key = Self.configValue(
+            environmentKey: "SUPABASE_ANON_KEY",
+            infoPlistKey: "SUPABASE_ANON_KEY"
+        ) else {
+            fatalError(Self.missingConfigMessage(for: "SUPABASE_ANON_KEY"))
         }
 
         client = SupabaseClient(
             supabaseURL: URL(string: url)!,
             supabaseKey: key
         )
+    }
+
+    private static func configValue(environmentKey: String, infoPlistKey: String) -> String? {
+        if let value = normalizedValue(ProcessInfo.processInfo.environment[environmentKey]) {
+            return value
+        }
+
+        return normalizedValue(Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String)
+    }
+
+    private static func normalizedValue(_ value: String?) -> String? {
+        guard let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !trimmed.isEmpty else {
+            return nil
+        }
+
+        return trimmed
+    }
+
+    private static func missingConfigMessage(for key: String) -> String {
+        #if DEBUG
+        return "Missing \(key). Debug builds require explicit Supabase credentials. Set Xcode scheme environment variables or create SubTrkr/Secrets.xcconfig from SubTrkr/Secrets.example.xcconfig."
+        #else
+        return "Missing \(key) — set in environment variables or Info.plist"
+        #endif
     }
 }

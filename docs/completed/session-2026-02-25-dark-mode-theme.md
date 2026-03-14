@@ -82,8 +82,8 @@ Implemented a full light/dark adaptive color system matching the SubTrkr desktop
 
 | File | Purpose |
 |------|---------|
-| `docs/plans/2026-02-25-dark-mode-design.md` | Design decisions and adjustments from handoff |
-| `docs/plans/2026-02-25-dark-mode-implementation.md` | 12-task implementation plan (completed) |
+| `docs/completed-plans/2026-02-25-dark-mode-design.md` | Design decisions and adjustments from handoff |
+| `docs/completed-plans/2026-02-25-dark-mode-implementation.md` | 12-task implementation plan (completed) |
 
 ## Architectural Notes
 

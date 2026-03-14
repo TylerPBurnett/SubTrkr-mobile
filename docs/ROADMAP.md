@@ -1,13 +1,14 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-03-08
+> Last updated: 2026-03-11
+> Navigation: `docs/plans/` contains active work only. Finished implementation/design docs live in `docs/completed-plans/`; completed summaries and audits live in `docs/completed/`.
 
 ---
 
 ## Completed
 
 ### Dark Mode & Adaptive Theme System ✓
-*Completed 2026-02-25. See `docs/session-2026-02-25-dark-mode-theme.md` for details.*
+*Completed 2026-02-25. See `docs/completed/session-2026-02-25-dark-mode-theme.md` for details.*
 
 - Full light/dark adaptive color system with 30+ semantic tokens matching desktop design handoff
 - Card depth treatment (borders, shadows) across all views
@@ -17,7 +18,7 @@
 - Heavy font weight on stat numbers
 
 ### Bugfixes & Notifications ✓
-*Completed 2026-02-25. See `docs/plans/2026-02-25-bugfixes-notifications-design.md` for details.*
+*Completed 2026-02-25. See `docs/completed-plans/2026-02-25-bugfixes-notifications-design.md` for details.*
 
 - Enforced single-currency (USD) — form always writes USD, resolves multi-currency math bug
 - Expired trials auto-cancel — `handleExpiredTrials` now transitions to `.cancelled` status, flows through archive pipeline
@@ -25,7 +26,7 @@
 - Local notifications wired — schedule on create, reschedule on update, cancel on delete, bulk reschedule after maintenance
 
 ### Record Payment & Auto-Calc Billing Date ✓
-*Completed 2026-02-25. See `docs/plans/2026-02-25-payment-billing-design.md` for details.*
+*Completed 2026-02-25. See `docs/completed-plans/2026-02-25-payment-billing-design.md` for details.*
 
 - Record Payment sheet in ItemDetailView — pre-filled amount, date picker, auto-advances nextBillingDate by one cycle
 - Auto-calculate next billing date in item form — rolls startDate forward by billingCycle until future, respects manual overrides
@@ -40,14 +41,14 @@ Note: product direction has since shifted to an autopay-first model for both sub
 - Haptic feedback — `.sensoryFeedback(.success)` on save/status change/payment, `.warning` on delete
 
 ### Account Management ✓
-*Completed 2026-02-25. See `docs/plans/2026-02-25-account-management-design.md` for details.*
+*Completed 2026-02-25. See `docs/completed-plans/2026-02-25-account-management-design.md` for details.*
 
 - Change password — sheet with new/confirm fields, calls `client.auth.update(user:)`
 - Delete account — two-step confirmation (alert + type "DELETE"), calls `client.rpc("delete_user")`, signs out
 - Requires `delete_user` RPC deployed to Supabase (SQL in design doc)
 
 ### Code Quality Pass ✓
-*Completed 2026-02-26. See `docs/plans/2026-02-26-code-quality-design.md` for details.*
+*Completed 2026-02-26. See `docs/completed-plans/2026-02-26-code-quality-design.md` for details.*
 
 - Removed hardcoded Supabase credentials — `fatalError` if env/plist missing
 - Removed `@Observable` from `SupabaseManager` — singleton, not observed by views
@@ -56,7 +57,7 @@ Note: product direction has since shifted to an autopay-first model for both sub
 - Routed service calls through `@State` instances — no more inline `ItemService()`/`PaymentService()` per call
 
 ### Analytics Charts & Historical Reconstruction ✓
-*Completed 2026-02-26. See `docs/plans/2026-02-26-analytics-charts-design.md` for details.*
+*Completed 2026-02-26. See `docs/completed-plans/2026-02-26-analytics-charts-design.md` for details.*
 
 - Fixed flat spending trend chart — historical reconstruction from item metadata (`startDate`, `cancelledAt`, `archivedAt`, `pausedAt/pausedUntil`), prefers real payment records when available
 - Segmented time range picker (3/6/12 months) on Analytics Trends tab
@@ -67,7 +68,7 @@ Note: product direction has since shifted to an autopay-first model for both sub
 - `AnalyticsViewModel` now loads payments in parallel via `async let`
 
 ### Analytics Tab Fixes ✓
-*Completed 2026-02-27. See `docs/plans/2026-02-27-analytics-fix-design.md` for details.*
+*Completed 2026-02-27. See `docs/completed-plans/2026-02-27-analytics-fix-design.md` for details.*
 
 - Added `@MainActor` to all ViewModels for thread-safe SwiftUI observation
 - Cached trend computations — stored properties + `recomputeTrends()` instead of per-render computed properties
@@ -77,7 +78,7 @@ Note: product direction has since shifted to an autopay-first model for both sub
 - Extracted chart views into standalone structs for optimal SwiftUI diffing
 
 ### Calendar View ✓
-*Completed 2026-02-28. See `docs/plans/2026-02-28-calendar-view-design.md` for details.*
+*Completed 2026-02-28. See `docs/completed-plans/2026-02-28-calendar-view-design.md` for details.*
 
 - Monthly calendar grid as Dashboard sub-tab (segmented control: Overview/Calendar)
 - Billing date projection — forward-advances `nextBillingDate` by billing cycle to populate future months
@@ -172,9 +173,9 @@ Future note:
 Remaining items before App Store submission:
 
 1. **Billing anchor accuracy / date drift** — preserve recurring day-of-month semantics and fix due-today rollover before the autopay-first model ships broadly. See `docs/plans/2026-03-08-billing-anchor-accuracy-implementation-spec.md`.
-2. **Retroactive lifecycle corrections** — effective cancellation/pause dates must backfill analytics and upcoming-payment logic when users update the app late. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
-3. **App icon** (#14) — need 1024×1024 PNG design asset
-4. **Privacy policy URL** — needed in App Store Connect
+2. **Retroactive lifecycle corrections** — persist effective dates as first-class lifecycle history so analytics and upcoming-payment logic backfill correctly. See `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
+3. **Autopay-first behavioral cleanup** — align item detail messaging, recurring-charge assumptions, and manual payment semantics with the updated product model. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
+4. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
 5. **Physical device testing**
 6. **Notification channels** (#9) — wire up real channel data (low priority)
 

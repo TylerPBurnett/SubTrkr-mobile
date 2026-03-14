@@ -41,9 +41,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>SUPABASE_URL</key>
-	<string>https://bpgsfyallqqvvtjorybl.supabase.co</string>
+	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>
-	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ3NmeWFsbHFxdnZ0am9yeWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMjM4OTEsImV4cCI6MjA4NDY5OTg5MX0.sj5SH8t80RFRF2HQuCG9dxFgJS5cylUjirbvF57g4w4</string>
+	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

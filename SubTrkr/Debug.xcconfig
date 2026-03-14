@@ -1,0 +1,5 @@
+// Debug builds must opt into a backend explicitly.
+SUPABASE_URL =
+SUPABASE_ANON_KEY =
+
+#include? "Secrets.xcconfig"

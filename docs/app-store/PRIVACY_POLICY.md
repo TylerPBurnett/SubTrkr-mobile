@@ -108,6 +108,6 @@ You need to make sure this email address actually receives mail before submittin
 
 ## Related Files
 
-- Design doc: `docs/plans/2026-02-28-privacy-policy-design.md`
-- Implementation plan: `docs/plans/2026-02-28-privacy-policy-plan.md`
+- Design doc: `docs/completed-plans/2026-02-28-privacy-policy-design.md`
+- Implementation plan: `docs/completed-plans/2026-02-28-privacy-policy-plan.md`
 - Landing site repo: `/Users/tyler/Development/SubTrkr-app`

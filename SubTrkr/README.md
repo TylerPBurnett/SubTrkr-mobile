@@ -7,9 +7,9 @@ Native iOS companion app for [SubTrkr](https://github.com/TylerPBurnett/SubTrkr)
 1. Clone this repository
 2. Open `SubTrkr/Package.swift` in Xcode
 3. Configure your Supabase credentials:
-   - Create `Secrets.xcconfig` in the project root (gitignored)
+   - Copy `Secrets.example.xcconfig` to `Secrets.xcconfig`
    - Add your Supabase URL and anon key
-   - Or set them in `SupabaseManager.swift`
+   - Or set `SUPABASE_URL` / `SUPABASE_ANON_KEY` in the Xcode scheme environment
 
 4. Build and run on iOS 17+ simulator or device
 
@@ -24,6 +24,8 @@ Native iOS companion app for [SubTrkr](https://github.com/TylerPBurnett/SubTrkr)
 ## Shared Backend
 
 This app connects to the same Supabase project as the desktop app. All data (subscriptions, bills, categories, payments) syncs across platforms via RLS-protected tables scoped to `auth.uid()`.
+
+Debug builds do not silently use production anymore. If you have not configured `Secrets.xcconfig` or scheme environment variables, the app will stop on launch with a clear configuration error instead.
 
 ## Requirements
 

@@ -8,7 +8,7 @@
 
 **Tech Stack:** SwiftUI, `@Observable @MainActor`, `LazyVGrid`, `Calendar` API
 
-**Design doc:** `docs/plans/2026-02-28-calendar-view-design.md`
+**Design doc:** `docs/completed-plans/2026-02-28-calendar-view-design.md`
 
 **No test suite configured** — verify via terminal build after each task.
 

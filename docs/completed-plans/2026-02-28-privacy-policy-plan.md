@@ -8,7 +8,7 @@
 
 **Tech Stack:** React 18, react-router-dom v6, Tailwind CSS, Vite, Vercel CLI (landing site); SwiftUI (iOS app)
 
-**Design doc:** `docs/plans/2026-02-28-privacy-policy-design.md`
+**Design doc:** `docs/completed-plans/2026-02-28-privacy-policy-design.md`
 
 ---
 

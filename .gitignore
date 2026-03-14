@@ -24,6 +24,9 @@ Pods/
 # Secrets - NEVER commit
 Secrets.xcconfig
 *.xcconfig
+!SubTrkr/Debug.xcconfig
+!SubTrkr/Release.xcconfig
+!SubTrkr/Secrets.example.xcconfig
 
 # Environment
 .env

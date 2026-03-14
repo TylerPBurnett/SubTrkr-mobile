@@ -133,13 +133,47 @@ Model (Models/) → Service (Services/) → ViewModel (ViewModels/) → View (Vi
 
 ## Credentials and config
 
-Supabase credentials are in `Services/SupabaseManager.swift`. The lookup order is:
+Supabase credentials are resolved by `Services/SupabaseManager.swift` in this order:
 
 1. `SUPABASE_URL` / `SUPABASE_ANON_KEY` environment variables (CI/CD use)
-2. `Info.plist` keys (xcconfig approach)
-3. Hardcoded fallback (current dev setup)
+2. `Info.plist` keys populated by build settings
 
-To switch environments, change the fallback strings in `SupabaseManager.swift`. The anon key is safe to commit; do not commit the service role key.
+### Debug vs Release
+
+- **Debug** uses `SubTrkr/Debug.xcconfig`, which is intentionally blank unless you opt into a backend.
+- **Release** uses `SubTrkr/Release.xcconfig`, which keeps the current production project values.
+
+To run a Debug build against a backend, use one of these:
+
+1. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in the Xcode scheme environment.
+2. Create `SubTrkr/Secrets.xcconfig` from `SubTrkr/Secrets.example.xcconfig` and set your target values there.
+
+If you do neither, Debug will fail fast on launch instead of silently talking to production. The anon key is safe to commit; do not commit the service role key.
+
+## Supabase CLI workflow
+
+- The repo is linked to Supabase project `bpgsfyallqqvvtjorybl` (`SubTrkr`).
+- Existing remote migration history has been fetched into `supabase/migrations/`.
+- `supabase db pull` currently needs Docker Desktop on this machine because the CLI creates a shadow database for schema diffing.
+
+Use these commands from the repo root:
+
+```bash
+# See local vs remote migration history
+supabase migration list
+
+# Create a new migration file
+supabase migration new add_feature_name
+
+# Fetch migration history that already exists in the remote project
+supabase migration fetch
+
+# Preview a remote apply before touching the linked project
+supabase db push --dry-run
+
+# Dump a pre-change backup from the linked remote database
+supabase db dump --linked --file supabase/backups/pre_change.sql
+```
 
 ---
 
