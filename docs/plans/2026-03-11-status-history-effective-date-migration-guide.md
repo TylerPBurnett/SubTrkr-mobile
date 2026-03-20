@@ -99,9 +99,9 @@ Do not make these columns required in the first pass.
 
 ### Recommended migration SQL
 
-This migration should live in the desktop repo because that repo owns the Supabase migrations:
+This migration should live in the mobile repo because that repo is the current shared-backend migration source of truth:
 
-- `/Users/tyler/Development/SubTrkr/supabase/migrations/20260311_add_item_status_history_effective_date.sql`
+- `/Users/tyler/Development/SubTrkr-mobile/supabase/migrations/20260311_add_item_status_history_effective_date.sql`
 
 Recommended contents:
 
@@ -188,7 +188,7 @@ Persist the lifecycle dates desktop already captures in its UI and align its his
 
 ### Changes
 
-1. Add the database migration in the desktop repo.
+1. Do not create a second migration in the desktop repo; use the shared migration from the mobile repo as the backend source of truth.
 2. Extend `StatusHistory` in `src/types/index.ts` to include:
    - `action?: string | null`
    - `effective_date?: string | null`
@@ -254,6 +254,27 @@ This is not just a schema cleanup. It gives both apps a stable product contract:
 - a path to remove the temporary metadata shim from mobile later
 
 Without this migration, the apps can still function, but they will keep relying on weaker heuristics or private encoding tricks when history needs to answer real product questions.
+
+## Deferred Hardening
+
+One important follow-up should remain separate from this migration rollout:
+
+- move status changes to a transactional backend path so item-row updates and `item_status_history` inserts succeed or fail together
+
+Today both apps still perform those writes in two separate requests. That is acceptable for the current rollout, but it means a partial failure can leave current item state and historical reconstruction out of sync.
+
+## Spawned Follow-Ups
+
+Review of the first-pass rollout produced a small follow-up queue:
+
+- `TASK-010` — fix the iOS reactivation lower bound after auto-expired trials
+- `TASK-011` — close the biggest desktop parity gaps for status-history analytics and UI
+- `TASK-012` — mobile cleanup pass for history query scoping and helper reuse
+- `TASK-006` — keep transactional status-change writes as a separate hardening task
+
+Detailed follow-up plan:
+
+- `docs/plans/2026-03-15-status-history-rollout-follow-ups.md`
 
 ## Recommendation
 

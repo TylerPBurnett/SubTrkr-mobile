@@ -1,7 +1,7 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-03-11
-> Navigation: `docs/plans/` contains active work only. Finished implementation/design docs live in `docs/completed-plans/`; completed summaries and audits live in `docs/completed/`.
+> Last updated: 2026-03-19
+> Navigation: `docs/TASKS.md` is the operational queue for actionable work. `docs/plans/` contains active work only. Finished implementation/design docs live in `docs/completed-plans/`; completed summaries and audits live in `docs/completed/`.
 
 ---
 
@@ -104,6 +104,14 @@ Note: product direction has since shifted to an autopay-first model for both sub
 - Guarded unknown status actions in `ItemService.executeStatusChange` — no fabricated `.active` history records
 - Cleared stale error in `SettingsViewModel.loadData` — `error = nil` at start
 
+### Billing Anchor Accuracy & Xcode Test Coverage ✓
+*Completed 2026-03-19. See `docs/plans/2026-03-08-billing-anchor-accuracy-implementation-spec.md` and `docs/MOBILE_TESTING_STRATEGY.md`.*
+
+- Preserved recurring billing anchors across short months and leap-year boundaries
+- Kept due-today items visible through the full day instead of rolling them forward early
+- Fixed future-start form recalculation so auto-filled next billing dates do not block later updates
+- Added shared Xcode unit and UI test targets for billing and lifecycle regression coverage
+
 ---
 
 ## Up Next — Prioritized
@@ -172,12 +180,11 @@ Future note:
 
 Remaining items before App Store submission:
 
-1. **Billing anchor accuracy / date drift** — preserve recurring day-of-month semantics and fix due-today rollover before the autopay-first model ships broadly. See `docs/plans/2026-03-08-billing-anchor-accuracy-implementation-spec.md`.
-2. **Retroactive lifecycle corrections** — persist effective dates as first-class lifecycle history so analytics and upcoming-payment logic backfill correctly. See `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
-3. **Autopay-first behavioral cleanup** — align item detail messaging, recurring-charge assumptions, and manual payment semantics with the updated product model. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
-4. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
-5. **Physical device testing**
-6. **Notification channels** (#9) — wire up real channel data (low priority)
+1. **Autopay-first behavioral cleanup** — align item detail messaging, recurring-charge assumptions, and manual payment semantics with the updated product model. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
+2. **Status-history hardening** — the mobile follow-up fixes are in; remaining work is desktop parity in the other repo plus the separate transactional backend write hardening task. See `docs/plans/2026-03-15-status-history-rollout-follow-ups.md` and `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
+3. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
+4. **Physical device testing** — use `docs/MOBILE_TESTING_STRATEGY.md` as the release smoke checklist owner.
+5. **Notification channels** (#9) — wire up real channel data (low priority)
 
 ---
 
@@ -252,11 +259,13 @@ Remaining items before App Store submission:
 
 Before submitting to App Store Review:
 
+- [x] Xcode unit/UI test suite configured ✓
 - [x] Dark mode support ✓
 - [x] Account deletion option (#12) ✓
 - [x] Password change option (#12) ✓
 - [x] App icon (#14) ✓
 - [x] Remove hardcoded credentials (#15) ✓
+- [ ] Release-candidate full simulator test pass
 - [ ] Privacy policy URL in App Store Connect
-- [ ] Test on physical device
+- [ ] Physical-device smoke checklist completed
 - [x] Accessibility audit (VoiceOver, Dynamic Type) ✓

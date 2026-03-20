@@ -326,6 +326,10 @@ Code-level verification target:
 
 - Add focused unit coverage for recurrence helper behavior once test infrastructure exists
 
+## Spawned Follow-Ups
+
+- `[TASK-009] Explicit stored billing anchor field` — only add this if real-world data shows too many legacy items without a reliable `startDate`. Track it in `docs/TASKS.md` instead of expanding phase 1.
+
 ## Recommendation
 
 This should be implemented as the next data-correctness task after the autopay-first product alignment.

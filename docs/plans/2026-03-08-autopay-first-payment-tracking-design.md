@@ -334,6 +334,10 @@ Resolved product direction:
 - Retroactive corrections must be supported for lifecycle changes, especially cancellations
 - Effective dates should drive analytics and future billing behavior
 
+## Spawned Follow-Ups
+
+- `[TASK-008] Optional per-item automatic/manual payment mode` — keep this out of phase 1 and only revisit it if real bill workflows need stricter manual confirmation. Track it in `docs/TASKS.md`.
+
 ## Recommendation
 
 For the next iteration:
