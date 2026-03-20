@@ -9,6 +9,14 @@
 /* Begin PBXBuildFile section */
 		6F072D0B0A3A483380857F90 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A44B6B954F4C7980781C4B /* CalendarView.swift */; };
 		914AEA8B6F0943BA84DCE1B4 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */; };
+		DD000000000000000000DD01 /* UITestBillingAnchorHarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD19 /* UITestBillingAnchorHarnessView.swift */; };
+		DD000000000000000000DD02 /* AnalyticsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD13 /* AnalyticsServiceTests.swift */; };
+		DD000000000000000000DD03 /* ItemEffectiveDateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD14 /* ItemEffectiveDateTests.swift */; };
+		DD000000000000000000DD04 /* RecurringBillingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD15 /* RecurringBillingTests.swift */; };
+		DD000000000000000000DD05 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD18 /* XCTest.framework */; };
+		DD000000000000000000DD06 /* SubTrkrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD16 /* SubTrkrUITests.swift */; };
+		DD000000000000000000DD07 /* SubTrkrUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD17 /* SubTrkrUITestsLaunchTests.swift */; };
+		DD000000000000000000DD08 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD000000000000000000DD18 /* XCTest.framework */; };
 		CC000000000000000000CC01 /* SubTrkrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB01 /* SubTrkrApp.swift */; };
 		CC000000000000000000CC02 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB02 /* Color+Theme.swift */; };
 		CC000000000000000000CC03 /* Date+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB03 /* Date+Helpers.swift */; };
@@ -54,6 +62,23 @@
 		CC000000000000000000CC2B /* BiometricLockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB2A /* BiometricLockScreen.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DD000000000000000000DD41 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA000000000000000000AA01 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000000000000000000AA02;
+			remoteInfo = SubTrkr;
+		};
+		DD000000000000000000DD42 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA000000000000000000AA01 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000000000000000000AA02;
+			remoteInfo = SubTrkr;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		03A44B6B954F4C7980781C4B /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		A441CE2B67D44EEFB8BE0A79 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
@@ -62,6 +87,15 @@
 		AA000000000000000000AA20 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ../Debug.xcconfig; sourceTree = "<group>"; };
 		AA000000000000000000AA21 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ../Release.xcconfig; sourceTree = "<group>"; };
 		AA000000000000000000AA22 /* Secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "../Secrets.example.xcconfig"; sourceTree = "<group>"; };
+		DD000000000000000000DD11 /* SubTrkrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SubTrkrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD000000000000000000DD12 /* SubTrkrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SubTrkrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD000000000000000000DD13 /* AnalyticsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTests.swift; sourceTree = "<group>"; };
+		DD000000000000000000DD14 /* ItemEffectiveDateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemEffectiveDateTests.swift; sourceTree = "<group>"; };
+		DD000000000000000000DD15 /* RecurringBillingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringBillingTests.swift; sourceTree = "<group>"; };
+		DD000000000000000000DD16 /* SubTrkrUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrkrUITests.swift; sourceTree = "<group>"; };
+		DD000000000000000000DD17 /* SubTrkrUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrkrUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		DD000000000000000000DD18 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		DD000000000000000000DD19 /* UITestBillingAnchorHarnessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestBillingAnchorHarnessView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB01 /* SubTrkrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrkrApp.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB02 /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
 		BB000000000000000000BB03 /* Date+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Helpers.swift"; sourceTree = "<group>"; };
@@ -115,6 +149,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DD000000000000000000DD31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD000000000000000000DD05 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD000000000000000000DD32 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD000000000000000000DD08 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -122,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000AA09 /* SubTrkr */,
+				DD000000000000000000DD21 /* Tests */,
 				AA000000000000000000AA07 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,6 +181,8 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000AA08 /* SubTrkr.app */,
+				DD000000000000000000DD11 /* SubTrkrTests.xctest */,
+				DD000000000000000000DD12 /* SubTrkrUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -210,6 +263,7 @@
 				AA000000000000000000AA12 /* Dashboard */,
 				AA000000000000000000AA13 /* Items */,
 				AA000000000000000000AA14 /* Settings */,
+				DD000000000000000000DD24 /* Testing */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -285,6 +339,42 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		DD000000000000000000DD21 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				DD000000000000000000DD22 /* SubTrkrTests */,
+				DD000000000000000000DD23 /* SubTrkrUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		DD000000000000000000DD22 /* SubTrkrTests */ = {
+			isa = PBXGroup;
+			children = (
+				DD000000000000000000DD13 /* AnalyticsServiceTests.swift */,
+				DD000000000000000000DD14 /* ItemEffectiveDateTests.swift */,
+				DD000000000000000000DD15 /* RecurringBillingTests.swift */,
+			);
+			path = SubTrkrTests;
+			sourceTree = "<group>";
+		};
+		DD000000000000000000DD23 /* SubTrkrUITests */ = {
+			isa = PBXGroup;
+			children = (
+				DD000000000000000000DD16 /* SubTrkrUITests.swift */,
+				DD000000000000000000DD17 /* SubTrkrUITestsLaunchTests.swift */,
+			);
+			path = ../UITests/SubTrkrUITests;
+			sourceTree = "<group>";
+		};
+		DD000000000000000000DD24 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				DD000000000000000000DD19 /* UITestBillingAnchorHarnessView.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -308,6 +398,46 @@
 			productReference = AA000000000000000000AA08 /* SubTrkr.app */;
 			productType = "com.apple.product-type.application";
 		};
+		DD000000000000000000DD51 /* SubTrkrTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD000000000000000000DD71 /* Build configuration list for PBXNativeTarget "SubTrkrTests" */;
+			buildPhases = (
+				DD000000000000000000DD35 /* Sources */,
+				DD000000000000000000DD31 /* Frameworks */,
+				DD000000000000000000DD33 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DD000000000000000000DD43 /* PBXTargetDependency */,
+			);
+			name = SubTrkrTests;
+			packageProductDependencies = (
+			);
+			productName = SubTrkrTests;
+			productReference = DD000000000000000000DD11 /* SubTrkrTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DD000000000000000000DD52 /* SubTrkrUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD000000000000000000DD72 /* Build configuration list for PBXNativeTarget "SubTrkrUITests" */;
+			buildPhases = (
+				DD000000000000000000DD36 /* Sources */,
+				DD000000000000000000DD32 /* Frameworks */,
+				DD000000000000000000DD34 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DD000000000000000000DD44 /* PBXTargetDependency */,
+			);
+			name = SubTrkrUITests;
+			packageProductDependencies = (
+			);
+			productName = SubTrkrUITests;
+			productReference = DD000000000000000000DD12 /* SubTrkrUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -320,6 +450,14 @@
 				TargetAttributes = {
 					AA000000000000000000AA02 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					DD000000000000000000DD51 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = AA000000000000000000AA02;
+					};
+					DD000000000000000000DD52 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = AA000000000000000000AA02;
 					};
 				};
 			};
@@ -340,6 +478,8 @@
 			projectRoot = "";
 			targets = (
 				AA000000000000000000AA02 /* SubTrkr */,
+				DD000000000000000000DD51 /* SubTrkrTests */,
+				DD000000000000000000DD52 /* SubTrkrUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -350,6 +490,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				CC000000000000000000CC29 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD000000000000000000DD33 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD000000000000000000DD34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +547,7 @@
 				CC000000000000000000CC1D /* ItemFormView.swift in Sources */,
 				CC000000000000000000CC1E /* ItemListView.swift in Sources */,
 				CC000000000000000000CC1F /* StatusChangeSheet.swift in Sources */,
+				DD000000000000000000DD01 /* UITestBillingAnchorHarnessView.swift in Sources */,
 				CC000000000000000000CC20 /* NotificationSettingsView.swift in Sources */,
 				CC000000000000000000CC21 /* SettingsView.swift in Sources */,
 				CC000000000000000000CC22 /* AnalyticsViewModel.swift in Sources */,
@@ -406,7 +561,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DD000000000000000000DD35 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD000000000000000000DD02 /* AnalyticsServiceTests.swift in Sources */,
+				DD000000000000000000DD03 /* ItemEffectiveDateTests.swift in Sources */,
+				DD000000000000000000DD04 /* RecurringBillingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD000000000000000000DD36 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD000000000000000000DD06 /* SubTrkrUITests.swift in Sources */,
+				DD000000000000000000DD07 /* SubTrkrUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DD000000000000000000DD43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000000000000000000AA02 /* SubTrkr */;
+			targetProxy = DD000000000000000000DD41 /* PBXContainerItemProxy */;
+		};
+		DD000000000000000000DD44 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000000000000000000AA02 /* SubTrkr */;
+			targetProxy = DD000000000000000000DD42 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AA000000000000000000AA17 /* Debug */ = {
@@ -571,6 +758,98 @@
 			};
 			name = Release;
 		};
+		DD000000000000000000DD61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.appTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SubTrkr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SubTrkr";
+			};
+			name = Debug;
+		};
+		DD000000000000000000DD62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.appTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SubTrkr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SubTrkr";
+			};
+			name = Release;
+		};
+		DD000000000000000000DD63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.appUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SubTrkr;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		DD000000000000000000DD64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D6969AC39P;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subtrkr.appUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SubTrkr;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -588,6 +867,24 @@
 			buildConfigurations = (
 				AA000000000000000000AA19 /* Debug */,
 				AA000000000000000000AA1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD000000000000000000DD71 /* Build configuration list for PBXNativeTarget "SubTrkrTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD000000000000000000DD61 /* Debug */,
+				DD000000000000000000DD62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD000000000000000000DD72 /* Build configuration list for PBXNativeTarget "SubTrkrUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD000000000000000000DD63 /* Debug */,
+				DD000000000000000000DD64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

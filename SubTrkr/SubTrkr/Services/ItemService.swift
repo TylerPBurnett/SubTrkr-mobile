@@ -75,10 +75,11 @@ final class ItemService {
             .value
     }
 
-    func getStatusHistory(itemId: String) async throws -> [StatusHistory] {
+    func getStatusHistory(itemId: String, userId: String) async throws -> [StatusHistory] {
         return try await client.from("item_status_history")
             .select()
             .eq("item_id", value: itemId)
+            .eq("user_id", value: userId)
             .order("changed_at", ascending: false)
             .execute()
             .value
@@ -299,6 +300,19 @@ final class ItemService {
                 pausedUntil: nil
             )
             _ = try await updateItem(id: item.id, data: update)
+
+            let history = makeStatusHistoryInsert(
+                itemId: item.id,
+                userId: item.userId,
+                status: .active,
+                action: "resume",
+                reason: "Auto-resumed",
+                userNotes: nil,
+                effectiveDate: resumeDate
+            )
+            try await client.from("item_status_history")
+                .insert(history)
+                .execute()
         }
     }
 
@@ -313,23 +327,19 @@ final class ItemService {
             let update = ItemUpdate(
                 status: .cancelled,
                 cancelledAt: DateHelper.formatISO8601(Date.now),
-                cancellationDate: today
+                cancellationDate: trialEndDate
             )
             _ = try await updateItem(id: item.id, data: update)
 
             // Record the automatic transition
-            let history = StatusHistoryInsert(
+            let history = makeStatusHistoryInsert(
                 itemId: item.id,
                 userId: userId,
                 status: .cancelled,
+                action: "trial_expired",
                 reason: "Trial expired",
-                notes: StatusHistoryMetadataCodec.encode(
-                    metadata: StatusHistoryMetadata(
-                        action: "trial_expired",
-                        effectiveDate: today
-                    ),
-                    userNotes: "Trial ended on \(trialEndDate)"
-                )
+                userNotes: "Trial ended on \(trialEndDate)",
+                effectiveDate: DateHelper.parseDate(trialEndDate)
             )
             try await client.from("item_status_history")
                 .insert(history)
@@ -375,17 +385,23 @@ final class ItemService {
                                          reason: String?,
                                          userNotes: String?,
                                          effectiveDate: Date?) -> StatusHistoryInsert {
-        let metadata = StatusHistoryMetadata(
-            action: action,
-            effectiveDate: effectiveDate.map(DateHelper.formatDate)
-        )
+        let formattedEffectiveDate = effectiveDate.map(DateHelper.formatDate)
 
         return StatusHistoryInsert(
             itemId: itemId,
             userId: userId,
             status: status,
             reason: reason,
-            notes: StatusHistoryMetadataCodec.encode(metadata: metadata, userNotes: userNotes)
+            // Dual-write metadata into notes for one release so older clients can still reconstruct history.
+            notes: StatusHistoryMetadataCodec.encode(
+                metadata: StatusHistoryMetadata(
+                    action: action,
+                    effectiveDate: formattedEffectiveDate
+                ),
+                userNotes: userNotes
+            ),
+            action: action,
+            effectiveDate: formattedEffectiveDate
         )
     }
 }

@@ -374,8 +374,13 @@ struct ItemDetailView: View {
     }
 
     private func loadStatusHistory() async {
+        guard let userId = authService.currentUser?.id.uuidString else {
+            statusHistory = []
+            return
+        }
+
         do {
-            statusHistory = try await itemService.getStatusHistory(itemId: currentItem.id)
+            statusHistory = try await itemService.getStatusHistory(itemId: currentItem.id, userId: userId)
         } catch {
             // Non-critical
         }

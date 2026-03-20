@@ -7,8 +7,18 @@ struct SubTrkrApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            rootView
                 .environment(authService)
+        }
+    }
+
+    @ViewBuilder
+    private var rootView: some View {
+#if DEBUG
+        if UITestHarness.isBillingFormEnabled {
+            UITestBillingAnchorHarnessView()
+        } else {
+            ContentView()
                 .onOpenURL { url in
                     Task {
                         try? await authService.handleOAuthCallback(url: url)
@@ -19,5 +29,17 @@ struct SubTrkrApp: App {
                     await authService.observeAuthChanges()
                 }
         }
+#else
+        ContentView()
+            .onOpenURL { url in
+                Task {
+                    try? await authService.handleOAuthCallback(url: url)
+                }
+            }
+            .task {
+                await authService.initialize()
+                await authService.observeAuthChanges()
+            }
+#endif
     }
 }

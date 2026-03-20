@@ -81,18 +81,20 @@ struct Item: Codable, Identifiable, Hashable {
 
     var daysUntilDue: Int? {
         guard let date = nextBillingDateFormatted else { return nil }
-        return Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: .now), to: Calendar.current.startOfDay(for: date)).day
+        return Calendar.current.dateComponents([.day], from: DateHelper.startOfToday(), to: DateHelper.startOfDay(date)).day
     }
 
     var billingAnchorDate: Date? {
-        guard let nextBillingDateFormatted else { return startDateFormatted }
-        guard let startDateFormatted else { return nextBillingDateFormatted }
-
-        if DateHelper.isConsistentRecurringDate(nextBillingDateFormatted, withAnchor: startDateFormatted, cycle: billingCycle) {
+        if let startDateFormatted {
             return startDateFormatted
         }
 
-        return nextBillingDateFormatted
+        if let nextBillingDateFormatted {
+            return nextBillingDateFormatted
+        }
+
+        guard let createdAt, let createdAtFormatted = DateHelper.parseISO8601(createdAt) else { return nil }
+        return DateHelper.startOfDay(createdAtFormatted)
     }
 
     var trialEndDateFormatted: Date? {
@@ -164,7 +166,9 @@ struct Item: Codable, Identifiable, Hashable {
                 .max()
 
         case "reactivate":
-            return [startDateFormatted, cancellationDateFormatted, cancelledAtFormatted, archivedAtFormatted]
+            // Prefer the effective cancellation date when present, but keep the
+            // archive timestamp as the lower bound for archived items.
+            return [startDateFormatted, cancellationDateFormatted ?? cancelledAtFormatted, archivedAtFormatted]
                 .compactMap { $0 }
                 .max()
 
@@ -180,39 +184,21 @@ struct Item: Codable, Identifiable, Hashable {
 
     func nextBillingDateForMaintenance(referenceDate: Date = .now) -> Date? {
         guard let nextBillingDateFormatted else { return nil }
-        guard DateHelper.isBeforeDay(nextBillingDateFormatted, than: referenceDate) else { return nil }
+        let referenceDay = DateHelper.startOfDay(referenceDate)
+        guard DateHelper.isBeforeDay(nextBillingDateFormatted, than: referenceDay) else { return nil }
 
-        var rolledDate = nextBillingDateFormatted
-        var iterations = 0
-        let maxIterations = 520
-
-        while DateHelper.isBeforeDay(rolledDate, than: referenceDate), iterations < maxIterations {
-            let nextDate = DateHelper.advanceDate(rolledDate, by: billingCycle, anchorDate: billingAnchorDate)
-            guard nextDate != rolledDate else { break }
-            rolledDate = nextDate
-            iterations += 1
-        }
-
-        return rolledDate
+        let anchorDate = billingAnchorDate ?? nextBillingDateFormatted
+        return DateHelper.nextRecurringDate(anchorDate: anchorDate, cycle: billingCycle, onOrAfter: referenceDay)
     }
 
     func nextBillingDateAfterLoggingPayment(on paymentDate: Date) -> Date? {
         guard status == .active else { return nil }
         guard let nextBillingDateFormatted else { return nil }
-        guard !DateHelper.isBeforeDay(paymentDate, than: nextBillingDateFormatted) else { return nil }
+        let paymentDay = DateHelper.startOfDay(paymentDate)
+        guard !DateHelper.isBeforeDay(paymentDay, than: nextBillingDateFormatted) else { return nil }
 
-        var rolledDate = nextBillingDateFormatted
-        var iterations = 0
-        let maxIterations = 520
-
-        while DateHelper.isOnOrBeforeDay(rolledDate, comparedTo: paymentDate), iterations < maxIterations {
-            let nextDate = DateHelper.advanceDate(rolledDate, by: billingCycle, anchorDate: billingAnchorDate)
-            guard nextDate != rolledDate else { break }
-            rolledDate = nextDate
-            iterations += 1
-        }
-
-        return rolledDate
+        let anchorDate = billingAnchorDate ?? nextBillingDateFormatted
+        return DateHelper.nextRecurringDate(anchorDate: anchorDate, cycle: billingCycle, strictlyAfter: paymentDay)
     }
 
 }

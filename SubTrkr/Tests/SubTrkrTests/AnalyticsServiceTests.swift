@@ -82,12 +82,127 @@ final class AnalyticsServiceTests: XCTestCase {
             status: .active,
             reason: "Back on plan",
             notes: encodedNotes,
+            action: nil,
+            effectiveDate: nil,
             changedAt: DateHelper.formatISO8601(Date.now)
         )
 
         XCTAssertEqual(history.metadata?.action, "reactivate")
         XCTAssertEqual(history.metadata?.effectiveDate, "2026-03-01")
         XCTAssertEqual(history.userNotes, "User added context")
+    }
+
+    func testHistoryPrefersFirstClassColumnsBeforeMetadataFallback() {
+        let encodedNotes = StatusHistoryMetadataCodec.encode(
+            metadata: StatusHistoryMetadata(action: "cancel", effectiveDate: "2026-02-01"),
+            userNotes: "Legacy payload"
+        )
+
+        let history = StatusHistory(
+            id: UUID().uuidString,
+            itemId: UUID().uuidString,
+            userId: UUID().uuidString,
+            status: .active,
+            reason: nil,
+            notes: encodedNotes,
+            action: "reactivate",
+            effectiveDate: "2026-03-01",
+            changedAt: DateHelper.formatISO8601(Date.now)
+        )
+
+        XCTAssertEqual(history.resolvedAction, "reactivate")
+        XCTAssertEqual(DateHelper.formatDate(history.effectiveDateFormatted!), "2026-03-01")
+        XCTAssertEqual(history.userNotes, "Legacy payload")
+    }
+
+    func testLegacyMetadataFallbackStillReconstructsConvertedTrialHistory() {
+        let calendar = Calendar.current
+        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: Date.now))!
+        let twoMonthsAgo = calendar.date(byAdding: .month, value: -2, to: monthStart)!
+
+        let item = makeItem(
+            status: .active,
+            startDate: DateHelper.formatDate(twoMonthsAgo)
+        )
+
+        let encodedNotes = StatusHistoryMetadataCodec.encode(
+            metadata: StatusHistoryMetadata(
+                action: "convert_trial",
+                effectiveDate: DateHelper.formatDate(monthStart)
+            ),
+            userNotes: nil
+        )
+
+        let history = [
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .active,
+                reason: nil,
+                notes: encodedNotes,
+                action: nil,
+                effectiveDate: nil,
+                changedAt: DateHelper.formatISO8601(Date.now)
+            )
+        ]
+
+        let trend = analyticsService.reconstructMonthlySpending(
+            items: [item],
+            payments: [],
+            statusHistoryByItem: [item.id: history],
+            months: 3
+        )
+
+        assertEqual(trend.map(\.total), [0, 0, 12.99], accuracy: 0.001)
+    }
+
+    func testSameDayTransitionsRespectRecordedOrder() {
+        let calendar = Calendar.current
+        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: Date.now))!
+        let twoMonthsAgo = calendar.date(byAdding: .month, value: -2, to: monthStart)!
+
+        let item = makeItem(
+            status: .active,
+            startDate: DateHelper.formatDate(twoMonthsAgo)
+        )
+
+        let cancelRecordedAt = calendar.date(byAdding: .hour, value: 9, to: monthStart)!
+        let reactivateRecordedAt = calendar.date(byAdding: .hour, value: 10, to: monthStart)!
+
+        let history = [
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .cancelled,
+                reason: nil,
+                notes: nil,
+                action: "cancel",
+                effectiveDate: DateHelper.formatDate(monthStart),
+                changedAt: DateHelper.formatISO8601(cancelRecordedAt)
+            ),
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .active,
+                reason: nil,
+                notes: nil,
+                action: "reactivate",
+                effectiveDate: DateHelper.formatDate(monthStart),
+                changedAt: DateHelper.formatISO8601(reactivateRecordedAt)
+            )
+        ]
+
+        let trend = analyticsService.reconstructMonthlySpending(
+            items: [item],
+            payments: [],
+            statusHistoryByItem: [item.id: history],
+            months: 1
+        )
+
+        assertEqual(trend.map(\.total), [12.99], accuracy: 0.001)
     }
 
     private func makeItem(status: ItemStatus, startDate: String) -> Item {
@@ -128,10 +243,9 @@ final class AnalyticsServiceTests: XCTestCase {
             userId: UUID().uuidString,
             status: status,
             reason: nil,
-            notes: StatusHistoryMetadataCodec.encode(
-                metadata: StatusHistoryMetadata(action: action, effectiveDate: effectiveDate),
-                userNotes: nil
-            ),
+            notes: nil,
+            action: action,
+            effectiveDate: effectiveDate,
             changedAt: DateHelper.formatISO8601(Date.now)
         )
     }

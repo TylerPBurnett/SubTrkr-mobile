@@ -220,7 +220,9 @@ struct ItemFormView: View {
                 }
             }
             .onChange(of: viewModel.nextBillingDate) { _, _ in
-                viewModel.userEditedNextBillingDate = true
+                if !viewModel.isAutoUpdatingNextBillingDate {
+                    viewModel.userEditedNextBillingDate = true
+                }
             }
         }
     }

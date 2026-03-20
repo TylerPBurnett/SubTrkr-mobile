@@ -178,7 +178,7 @@ final class AnalyticsService {
             return StatusTransition(
                 status: entry.status,
                 effectiveDate: calendar.startOfDay(for: effectiveDate),
-                action: entry.metadata?.action,
+                action: entry.resolvedAction,
                 recordedAt: entry.changedAtFormatted
             )
         }

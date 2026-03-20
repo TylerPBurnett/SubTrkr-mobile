@@ -20,8 +20,12 @@ final class SupabaseManager {
             fatalError(Self.missingConfigMessage(for: "SUPABASE_ANON_KEY"))
         }
 
+        guard let supabaseURL = URL(string: url), supabaseURL.host != nil else {
+            fatalError(Self.invalidURLMessage(url))
+        }
+
         client = SupabaseClient(
-            supabaseURL: URL(string: url)!,
+            supabaseURL: supabaseURL,
             supabaseKey: key
         )
     }
@@ -48,6 +52,14 @@ final class SupabaseManager {
         return "Missing \(key). Debug builds require explicit Supabase credentials. Set Xcode scheme environment variables or create SubTrkr/Secrets.xcconfig from SubTrkr/Secrets.example.xcconfig."
         #else
         return "Missing \(key) — set in environment variables or Info.plist"
+        #endif
+    }
+
+    private static func invalidURLMessage(_ value: String) -> String {
+        #if DEBUG
+        return "Invalid SUPABASE_URL: \(value). If you set it in an .xcconfig file, do not use a raw https:// value because xcconfig treats // as a comment."
+        #else
+        return "Invalid SUPABASE_URL: \(value)"
         #endif
     }
 }

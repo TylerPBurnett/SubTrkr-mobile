@@ -56,7 +56,7 @@ final class CalendarViewModel {
     init(itemService: ItemService = ItemService()) {
         self.itemService = itemService
         let calendar = Calendar.current
-        let now = Date.now
+        let now = DateHelper.startOfToday()
         let components = calendar.dateComponents([.year, .month], from: now)
         self.displayedMonth = calendar.date(from: components) ?? now
         self.selectedDate = now
@@ -84,7 +84,7 @@ final class CalendarViewModel {
         displayedMonth = newMonth
 
         // Auto-select today if navigating to the current month, otherwise select 1st
-        let now = Date.now
+        let now = DateHelper.startOfToday()
         let nowComponents = calendar.dateComponents([.year, .month], from: now)
         let newComponents = calendar.dateComponents([.year, .month], from: newMonth)
 
@@ -125,7 +125,7 @@ final class CalendarViewModel {
 
     private func buildCalendarDays() -> [CalendarDay] {
         let calendar = Calendar.current
-        let now = Date.now
+        let now = DateHelper.startOfToday()
         let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
 
         let year = calendar.component(.year, from: displayedMonth)
@@ -226,15 +226,7 @@ final class CalendarViewModel {
         var eventCount: Int = 0
 
         for item in activeItems {
-            guard let nextBilling = item.nextBillingDateFormatted else { continue }
-
-            let billingDays = projectBillingDays(
-                for: item.billingCycle,
-                nextBillingDate: nextBilling,
-                anchorDate: item.billingAnchorDate,
-                inYear: year,
-                month: month
-            )
+            let billingDays = projectBillingDays(for: item, inYear: year, month: month)
 
             for day in billingDays {
                 grouped[day, default: []].append(item)
@@ -248,48 +240,29 @@ final class CalendarViewModel {
         monthItemCount = eventCount
     }
 
-    /// Starting from `nextBillingDate`, advances forward by billing cycle until reaching
-    /// the target year/month, then collects all billing days that fall within that month.
-    /// Important for weekly items that may have multiple billing dates per month.
-    private func projectBillingDays(
-        for cycle: BillingCycle,
-        nextBillingDate: Date,
-        anchorDate: Date?,
-        inYear year: Int,
-        month: Int
-    ) -> [Int] {
+    /// Projects billing days within the target month using the item's preserved
+    /// billing anchor, while skipping occurrences earlier than the stored next billing date.
+    private func projectBillingDays(for item: Item, inYear year: Int, month: Int) -> [Int] {
         let calendar = Calendar.current
+        guard let nextBillingDate = item.nextBillingDateFormatted,
+              let anchorDate = item.billingAnchorDate else { return [] }
 
-        // Target month boundaries
         guard let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1)),
               let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) else {
             return []
         }
 
-        var billingDays: [Int] = []
-        var current = nextBillingDate
-
-        // If the billing date is already past the target month, no dates to project
-        if current >= monthEnd {
+        if nextBillingDate >= monthEnd {
             return []
         }
 
-        // Advance forward until we reach or pass the target month.
-        // Safety limit prevents runaway loops if date arithmetic stalls.
-        var iterations = 0
-        let maxIterations = 520 // ~10 years of weekly advances
-        while current < monthStart && iterations < maxIterations {
-            current = DateHelper.advanceDate(current, by: cycle, anchorDate: anchorDate)
-            iterations += 1
-        }
+        let intervalStart = max(monthStart, nextBillingDate)
+        let billingDates = DateHelper.recurringDates(
+            anchorDate: anchorDate,
+            cycle: item.billingCycle,
+            in: DateInterval(start: intervalStart, end: monthEnd)
+        )
 
-        // Collect all billing days within the target month
-        while current < monthEnd {
-            let day = calendar.component(.day, from: current)
-            billingDays.append(day)
-            current = DateHelper.advanceDate(current, by: cycle, anchorDate: anchorDate)
-        }
-
-        return billingDays
+        return billingDates.map { calendar.component(.day, from: $0) }
     }
 }

@@ -15,7 +15,12 @@ let package = Package(
             dependencies: [
                 .product(name: "Supabase", package: "supabase-swift")
             ],
-            path: "SubTrkr"
+            path: "SubTrkr",
+            exclude: [
+                "Assets.xcassets",
+                "Info.plist",
+                "SubTrkrApp.swift"
+            ]
         ),
         .testTarget(
             name: "SubTrkrTests",

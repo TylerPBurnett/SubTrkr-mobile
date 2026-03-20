@@ -47,6 +47,7 @@ final class ItemFormViewModel {
     var isSaved = false
     var editingItem: Item?
     var userEditedNextBillingDate = false
+    var isAutoUpdatingNextBillingDate = false
 
     // Service autocomplete
     var serviceSearchText = ""
@@ -125,13 +126,21 @@ final class ItemFormViewModel {
 
     func autoCalcNextBillingDate() {
         guard !isEditing, !userEditedNextBillingDate else { return }
-        var date = startDate
-        let now = Date.now
-        // Keep "due today" on today instead of skipping ahead because the current time is past midnight.
-        while DateHelper.isBeforeDay(date, than: now) {
-            date = DateHelper.advanceDate(date, by: billingCycle, anchorDate: startDate)
+
+        isAutoUpdatingNextBillingDate = true
+        defer { isAutoUpdatingNextBillingDate = false }
+
+        let today = DateHelper.startOfToday()
+        if DateHelper.isBeforeDay(today, than: startDate) {
+            nextBillingDate = startDate
+            return
         }
-        nextBillingDate = date
+
+        nextBillingDate = DateHelper.nextRecurringDate(
+            anchorDate: startDate,
+            cycle: billingCycle,
+            strictlyAfter: today
+        )
     }
 
     var relevantCategories: [Category] {

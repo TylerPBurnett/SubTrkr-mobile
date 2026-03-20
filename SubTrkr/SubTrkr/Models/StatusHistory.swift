@@ -58,6 +58,8 @@ struct StatusHistory: Codable, Identifiable {
     let status: ItemStatus
     let reason: String?
     let notes: String?
+    let action: String?
+    let effectiveDate: String?
     let changedAt: String?
 
     enum CodingKeys: String, CodingKey {
@@ -67,6 +69,8 @@ struct StatusHistory: Codable, Identifiable {
         case status
         case reason
         case notes
+        case action
+        case effectiveDate = "effective_date"
         case changedAt = "changed_at"
     }
 
@@ -79,13 +83,21 @@ struct StatusHistory: Codable, Identifiable {
         StatusHistoryMetadataCodec.decodeMetadata(from: notes)
     }
 
+    var resolvedAction: String? {
+        action ?? metadata?.action
+    }
+
     var userNotes: String? {
         StatusHistoryMetadataCodec.decodeUserNotes(from: notes)
     }
 
     var effectiveDateFormatted: Date? {
-        guard let effectiveDate = metadata?.effectiveDate else { return nil }
-        return DateHelper.parseDate(effectiveDate)
+        if let effectiveDate {
+            return DateHelper.parseDate(effectiveDate)
+        }
+
+        guard let metadataEffectiveDate = metadata?.effectiveDate else { return nil }
+        return DateHelper.parseDate(metadataEffectiveDate)
     }
 }
 
@@ -95,6 +107,8 @@ struct StatusHistoryInsert: Codable {
     let status: ItemStatus
     let reason: String?
     let notes: String?
+    let action: String?
+    let effectiveDate: String?
 
     enum CodingKeys: String, CodingKey {
         case itemId = "item_id"
@@ -102,6 +116,8 @@ struct StatusHistoryInsert: Codable {
         case status
         case reason
         case notes
+        case action
+        case effectiveDate = "effective_date"
     }
 }
 
