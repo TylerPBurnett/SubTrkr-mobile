@@ -9,28 +9,30 @@
 
 The first-pass effective-date rollout shipped the shared migration and dual-write compatibility path, but review uncovered a small set of follow-up items that should now be handled deliberately instead of being left implicit in chat history.
 
-This plan captures one iOS correctness fix, one desktop parity track, and one cleanup pass so they can be tackled one by one.
+This plan captured one iOS correctness fix, one desktop parity track, and one cleanup pass so they could be tackled one by one. That scoped follow-up work is now complete.
 
 ## Status Update
 
 - Completed on mobile on 2026-03-18:
   - `TASK-010` — reactivation now prefers `cancellationDate` over the later `cancelledAt` audit timestamp
   - `TASK-012` — history reads now scope by `user_id`, and expired-trial writes now go through `makeStatusHistoryInsert(...)`
+- Completed on desktop on 2026-03-24:
+  - `TASK-011` — analytics reconstruction now uses status-history effective dates, the status history timeline is visible, and desktop supports `archive`, `start_trial`, and `edit_cancellation`
 - Remaining from this follow-up plan:
-  - `TASK-011` — desktop status-history parity pass
+  - none
 - Still separate by design:
   - `TASK-006` — transactional status-change write hardening
 
 ## Problem
 
 - iOS auto-expired trials now backdate `cancellationDate` correctly, but reactivation still clamps against the later audit timestamp
-- desktop now writes richer status history rows, but still does not fully consume or expose that data in analytics and UI
+- desktop needed to fully consume and expose the richer status history rows it already wrote
 - a couple of cleanup items remain around query scoping and helper reuse
 
 ## Goals
 
 - fix the iOS reactivation lower bound so it respects effective lifecycle dates
-- define the desktop parity work needed to make the new history contract user-visible
+- define and land the desktop parity work needed to make the new history contract user-visible
 - isolate low-risk cleanup items from larger backend hardening work
 
 ## Non-Goals
@@ -76,5 +78,4 @@ This plan captures one iOS correctness fix, one desktop parity track, and one cl
 
 ## Recommendation
 
-1. Tackle the desktop parity pass next if cross-platform consistency is the immediate goal.
-2. Keep the transactional backend write path as a separate hardening task after that.
+1. Keep the transactional backend write path as the remaining separate hardening task.

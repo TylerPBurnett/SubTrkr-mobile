@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-03-19
+> Last updated: 2026-03-24
 > Navigation: `docs/TASKS.md` is the operational queue for actionable work. `docs/plans/` contains active work only. Finished implementation/design docs live in `docs/completed-plans/`; completed summaries and audits live in `docs/completed/`.
 
 ---
@@ -181,7 +181,7 @@ Future note:
 Remaining items before App Store submission:
 
 1. **Autopay-first behavioral cleanup** — align item detail messaging, recurring-charge assumptions, and manual payment semantics with the updated product model. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
-2. **Status-history hardening** — the mobile follow-up fixes are in; remaining work is desktop parity in the other repo plus the separate transactional backend write hardening task. See `docs/plans/2026-03-15-status-history-rollout-follow-ups.md` and `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
+2. **Status-history hardening** — cross-app rollout follow-ups are now in on both repos; only the separate transactional backend write hardening task remains. See `docs/plans/2026-03-15-status-history-rollout-follow-ups.md` and `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
 3. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
 4. **Physical device testing** — use `docs/MOBILE_TESTING_STRATEGY.md` as the release smoke checklist owner.
 5. **Notification channels** (#9) — wire up real channel data (low priority)

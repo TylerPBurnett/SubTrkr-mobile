@@ -101,7 +101,7 @@ Do not make these columns required in the first pass.
 
 This migration should live in the mobile repo because that repo is the current shared-backend migration source of truth:
 
-- `/Users/tyler/Development/SubTrkr-mobile/supabase/migrations/20260311_add_item_status_history_effective_date.sql`
+- `/Users/tyler/Development/SubTrkr-mobile/supabase/migrations/20260314073100_add_item_status_history_effective_date.sql`
 
 Recommended contents:
 
