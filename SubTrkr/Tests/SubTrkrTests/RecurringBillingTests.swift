@@ -288,6 +288,34 @@ final class RecurringBillingTests: XCTestCase {
         XCTAssertEqual(DateHelper.formatDate(nextDate), "2026-03-28")
     }
 
+    func testResumeBeforeNextBillingDatePreservesStoredSchedule() throws {
+        let resumeDate = try XCTUnwrap(DateHelper.parseDate("2026-03-27"))
+        let item = makeItem(
+            startDate: "2026-03-01",
+            nextBillingDate: "2026-04-01",
+            status: .paused,
+            pausedAt: "2026-03-05T12:00:00Z"
+        )
+
+        let nextDate = item.nextBillingDateAfterResuming(on: resumeDate)
+
+        XCTAssertEqual(DateHelper.formatDate(nextDate), "2026-04-01")
+    }
+
+    func testResumeAfterMissedBillingDateKeepsOriginalAnchor() throws {
+        let resumeDate = try XCTUnwrap(DateHelper.parseDate("2026-04-27"))
+        let item = makeItem(
+            startDate: "2026-03-01",
+            nextBillingDate: "2026-04-01",
+            status: .paused,
+            pausedAt: "2026-03-05T12:00:00Z"
+        )
+
+        let nextDate = item.nextBillingDateAfterResuming(on: resumeDate)
+
+        XCTAssertEqual(DateHelper.formatDate(nextDate), "2026-05-01")
+    }
+
     @MainActor
     func testItemFormAutoCalculationUsesNextRecurringDateForTodayAnchors() throws {
         let viewModel = ItemFormViewModel(itemType: .subscription)
@@ -307,7 +335,9 @@ final class RecurringBillingTests: XCTestCase {
     func testFutureStartDateRecalculationIsNotBlockedByPreviousAutoFill() throws {
         let viewModel = ItemFormViewModel(itemType: .subscription)
         let today = DateHelper.startOfToday()
-        let futureStartDate = try XCTUnwrap(DateHelper.parseDate("2026-03-31"))
+        let futureStartDate = try XCTUnwrap(
+            Calendar.current.date(byAdding: .day, value: 30, to: today).map(DateHelper.startOfDay)
+        )
 
         viewModel.startDate = today
         viewModel.billingCycle = .monthly
@@ -319,10 +349,14 @@ final class RecurringBillingTests: XCTestCase {
         viewModel.startDate = futureStartDate
         viewModel.autoCalcNextBillingDate()
 
-        XCTAssertEqual(DateHelper.formatDate(viewModel.nextBillingDate), "2026-03-31")
+        XCTAssertEqual(DateHelper.formatDate(viewModel.nextBillingDate), DateHelper.formatDate(futureStartDate))
     }
 
-    private func makeItem(startDate: String?, nextBillingDate: String?, createdAt: String? = DateHelper.formatISO8601(Date.now)) -> Item {
+    private func makeItem(startDate: String?,
+                          nextBillingDate: String?,
+                          status: ItemStatus = .active,
+                          pausedAt: String? = nil,
+                          createdAt: String? = DateHelper.formatISO8601(Date.now)) -> Item {
         Item(
             id: UUID().uuidString,
             userId: UUID().uuidString,
@@ -338,8 +372,8 @@ final class RecurringBillingTests: XCTestCase {
             url: nil,
             logoUrl: nil,
             itemType: .subscription,
-            status: .active,
-            pausedAt: nil,
+            status: status,
+            pausedAt: pausedAt,
             pausedUntil: nil,
             cancelledAt: nil,
             cancellationDate: nil,

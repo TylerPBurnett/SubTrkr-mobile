@@ -78,7 +78,10 @@ final class NotificationService {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
         for item in items where item.status == .active {
-            await scheduleRenewalReminder(for: item, daysBefore: daysBefore)
+            await scheduleRenewalReminder(
+                for: item,
+                daysBefore: item.notificationReminderDays(fallback: daysBefore)
+            )
         }
 
         for item in items where item.status == .trial {

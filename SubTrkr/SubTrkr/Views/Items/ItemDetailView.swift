@@ -82,6 +82,7 @@ struct ItemDetailView: View {
                     item: currentItem,
                     onStatusChanged: {
                         await refreshItem()
+                        await loadStatusHistory()
                         await onUpdate?()
                     }
                 )
