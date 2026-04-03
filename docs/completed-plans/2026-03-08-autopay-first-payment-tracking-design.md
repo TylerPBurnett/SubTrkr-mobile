@@ -2,6 +2,7 @@
 
 > Date: 2026-03-08
 > Scope: Align mobile payment tracking with the desktop app's autopay-first mental model
+> Status: Implemented 2026-03-25; manual payment logging is now secondary in the overflow menu and the item detail copy explains automatic recurring tracking.
 
 ---
 

@@ -38,7 +38,7 @@ Remove the remaining legacy status-history compatibility layer once the shared b
 
 ## Recommended Order
 
-1. Finish higher-priority work first: `TASK-003`, `TASK-005`, and `TASK-006`.
+1. Finish higher-priority work first: `TASK-003` and `TASK-005`; `TASK-006` is already complete.
 2. Do the backfill from the backend source-of-truth repo: `/Users/tyler/Development/SubTrkr-mobile`.
 3. Remove compatibility code only after the backfill has been verified against real data.
 

@@ -1,6 +1,6 @@
 # SubTrkr iOS — Roadmap & Next Steps
 
-> Last updated: 2026-03-24
+> Last updated: 2026-03-29
 > Navigation: `docs/TASKS.md` is the operational queue for actionable work. `docs/plans/` contains active work only. Finished implementation/design docs live in `docs/completed-plans/`; completed summaries and audits live in `docs/completed/`.
 
 ---
@@ -21,7 +21,7 @@
 *Completed 2026-02-25. See `docs/completed-plans/2026-02-25-bugfixes-notifications-design.md` for details.*
 
 - Enforced single-currency (USD) — form always writes USD, resolves multi-currency math bug
-- Expired trials auto-cancel — `handleExpiredTrials` now transitions to `.cancelled` status, flows through archive pipeline
+- Expired trials auto-cancel — `handleExpiredTrials` now transitions to `.cancelled` status and remains editable until the user explicitly archives it later
 - Notification toggle persists — `@AppStorage` for `notificationsEnabled` and `defaultReminderDays`
 - Local notifications wired — schedule on create, reschedule on update, cancel on delete, bulk reschedule after maintenance
 
@@ -31,7 +31,14 @@
 - Record Payment sheet in ItemDetailView — pre-filled amount, date picker, auto-advances nextBillingDate by one cycle
 - Auto-calculate next billing date in item form — rolls startDate forward by billingCycle until future, respects manual overrides
 
-Note: product direction has since shifted to an autopay-first model for both subscriptions and bills. Manual payment logging is now considered optional/secondary. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
+Note: product direction later shifted to an autopay-first model for both subscriptions and bills. Manual payment logging remains available, but now as an optional secondary action. See `docs/completed-plans/2026-03-08-autopay-first-payment-tracking-design.md`.
+
+### Autopay-First Behavioral Cleanup ✓
+*Completed 2026-03-25. See `docs/completed-plans/2026-03-08-autopay-first-payment-tracking-design.md` for details.*
+
+- Removed manual payment logging from Quick Actions and kept it in the overflow menu as an optional confirmation path
+- Updated the item detail payment-history empty state to explain that recurring charges are tracked automatically while an item is active
+- Kept recurring-charge assumptions aligned across detail-view messaging and the current recurring tracking model
 
 ### Status History, Category Editing & Haptics ✓
 *Completed 2026-02-25.*
@@ -180,11 +187,10 @@ Future note:
 
 Remaining items before App Store submission:
 
-1. **Autopay-first behavioral cleanup** — align item detail messaging, recurring-charge assumptions, and manual payment semantics with the updated product model. See `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md`.
-2. **Status-history hardening** — cross-app rollout follow-ups are now in on both repos; only the separate transactional backend write hardening task remains. See `docs/plans/2026-03-15-status-history-rollout-follow-ups.md` and `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
-3. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
-4. **Physical device testing** — use `docs/MOBILE_TESTING_STRATEGY.md` as the release smoke checklist owner.
-5. **Notification channels** (#9) — wire up real channel data (low priority)
+1. **Status-history cleanup** — the shared backend contract is now hardened; remaining lifecycle-history work is the deferred legacy cleanup and any future product follow-ups. See `docs/plans/2026-03-24-status-history-legacy-cleanup.md` and `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md`.
+2. **Privacy policy URL / nutrition labels** — manual App Store Connect follow-through remains. See `docs/app-store/PRIVACY_POLICY.md`.
+3. **Physical device testing** — use `docs/MOBILE_TESTING_STRATEGY.md` as the release smoke checklist owner.
+4. **Notification channels** (#9) — wire up real channel data (low priority)
 
 ---
 
@@ -224,7 +230,7 @@ Remaining items before App Store submission:
 
 | # | Issue | Effort |
 |---|-------|--------|
-| ~~44~~ | ~~**Manual payment entry is buried**~~ | ✓ Moved into Quick Actions row; may be demoted or removed under the autopay-first model |
+| ~~44~~ | ~~**Manual payment entry is buried**~~ | ✓ Demoted out of Quick Actions; overflow-only logging now reads as optional confirmation instead of required recurring bookkeeping |
 | 45 | **Quick Actions all open the same sheet** — every action button opens `StatusChangeSheet` generically. Each should deep-link to its specific action within the sheet. | Small |
 | 46 | **Payment history lacks summary** — no total paid to date shown. Add a running total above the payment list. | Small |
 | 47 | **No logo/service reassignment** — service search is hidden when editing an item. Add a way to change the logo/service association on edit. | Medium |

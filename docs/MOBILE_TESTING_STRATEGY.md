@@ -1,6 +1,6 @@
 # Mobile Testing Strategy
 
-> Last updated: 2026-03-19
+> Last updated: 2026-03-29
 > Goal: Ship quickly without flying blind. Testing should protect billing correctness, lifecycle integrity, and release-critical flows, not become its own long-running project.
 
 ## Current Position
@@ -63,7 +63,7 @@ Manual simulator smoke should cover:
 - sign in / launch
 - create item
 - edit item
-- cancel / reactivate / archive
+- cancel / edit cancellation date / reactivate / archive after cancellation only
 - calendar projection
 - analytics load
 - settings and account actions touched by the release

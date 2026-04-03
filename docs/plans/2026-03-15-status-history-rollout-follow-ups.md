@@ -18,10 +18,12 @@ This plan captured one iOS correctness fix, one desktop parity track, and one cl
   - `TASK-012` — history reads now scope by `user_id`, and expired-trial writes now go through `makeStatusHistoryInsert(...)`
 - Completed on desktop on 2026-03-24:
   - `TASK-011` — analytics reconstruction now uses status-history effective dates, the status history timeline is visible, and desktop supports `archive`, `start_trial`, and `edit_cancellation`
+- Completed in shared backend on 2026-03-29:
+  - `TASK-006` — lifecycle writes now run through the transactional `execute_item_status_change` RPC, archive is limited to `cancelled -> archived`, and `edit_cancellation` rewrites the authoritative cancellation event
 - Remaining from this follow-up plan:
   - none
 - Still separate by design:
-  - `TASK-006` — transactional status-change write hardening
+  - none
 
 ## Problem
 
@@ -53,7 +55,7 @@ This plan captured one iOS correctness fix, one desktop parity track, and one cl
 
 - Move desktop analytics off item-row heuristics and onto status-history effective dates for lifecycle reconstruction.
 - Add a desktop status history timeline so the newly written `action` and `effective_date` fields are visible to users.
-- Add desktop action coverage for `archive`, `start_trial`, and `edit_cancellation` where those transitions are part of the shared product contract.
+- Add desktop action coverage for `archive`, `start_trial`, and `edit_cancellation` where those transitions are part of the shared product contract, with `archive` limited to `cancelled -> archived`.
 - Keep this aligned with `/Users/tyler/Development/SubTrkr/docs/plans/2026-03-10-desktop-autopay-alignment-recommendations.md`.
 
 ### 3. Low-risk cleanup
@@ -74,8 +76,8 @@ This plan captured one iOS correctness fix, one desktop parity track, and one cl
 - `TASK-010` — iOS reactivation bound after auto-expired trials
 - `TASK-011` — desktop status-history parity pass
 - `TASK-012` — mobile status-history cleanup pass
-- `TASK-006` remains the separate transactional write hardening task
+- `TASK-006` is now complete via the shared backend RPC hardening pass
 
 ## Recommendation
 
-1. Keep the transactional backend write path as the remaining separate hardening task.
+1. Keep future lifecycle changes aligned with the shared backend contract instead of reintroducing client-side write paths.

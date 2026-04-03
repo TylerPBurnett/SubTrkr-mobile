@@ -13,7 +13,6 @@ Use this folder as a queue, not a dump.
 
 - `docs/plans/2026-03-08-billing-anchor-accuracy-implementation-spec.md` — recurring date correctness and due-date rollover
 - `docs/plans/2026-03-11-status-history-effective-date-migration-guide.md` — lifecycle history schema and retroactive effective dates
-- `docs/plans/2026-03-08-autopay-first-payment-tracking-design.md` — autopay-first product behavior and UI semantics
 
 ## Structure
 

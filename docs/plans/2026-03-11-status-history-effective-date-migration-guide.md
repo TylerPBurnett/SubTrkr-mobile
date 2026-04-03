@@ -16,6 +16,10 @@ Right now `item_status_history` only stores the resulting `status`, optional `re
 
 This guide recommends an additive schema migration plus small follow-up changes in both apps so mobile and desktop share one durable lifecycle-history contract.
 
+## Status Update
+
+- Completed on 2026-03-29: the shared `execute_item_status_change` RPC now owns lifecycle writes, keeps item and history updates transactional, limits archive to `cancelled -> archived`, and treats `edit_cancellation` as a correction to the authoritative cancellation event instead of a second lifecycle transition.
+
 ## Why This Is Needed
 
 ### 1. Retroactive lifecycle changes are a real product requirement
@@ -137,6 +141,8 @@ Target canonical values:
 - `convert_trial`
 - `trial_expired`
 
+`edit_cancellation` is part of the action vocabulary for incoming requests, but durable history should still preserve one authoritative cancellation row for the lifecycle period being corrected.
+
 ### Cross-platform normalization rule
 
 Desktop currently uses `convert` in its UI payload. It should normalize that value to `convert_trial` when writing history rows. The UI API does not need to be renamed immediately.
@@ -257,11 +263,11 @@ Without this migration, the apps can still function, but they will keep relying 
 
 ## Deferred Hardening
 
-One important follow-up should remain separate from this migration rollout:
+The original rollout intentionally left one backend hardening step for later:
 
 - move status changes to a transactional backend path so item-row updates and `item_status_history` inserts succeed or fail together
 
-Today both apps still perform those writes in two separate requests. That is acceptable for the current rollout, but it means a partial failure can leave current item state and historical reconstruction out of sync.
+That follow-up is now complete via the shared `execute_item_status_change` RPC. The remaining deferred work is legacy cleanup, not transactional write safety.
 
 ## Spawned Follow-Ups
 
@@ -270,7 +276,7 @@ Review of the first-pass rollout produced a small follow-up queue:
 - `TASK-010` — fix the iOS reactivation lower bound after auto-expired trials
 - `TASK-011` — close the biggest desktop parity gaps for status-history analytics and UI
 - `TASK-012` — mobile cleanup pass for history query scoping and helper reuse
-- `TASK-006` — keep transactional status-change writes as a separate hardening task
+- `TASK-006` — transactional status-change hardening, completed on 2026-03-29
 
 Detailed follow-up plan:
 
