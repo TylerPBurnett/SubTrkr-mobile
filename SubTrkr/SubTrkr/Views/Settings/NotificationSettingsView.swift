@@ -15,13 +15,22 @@ struct NotificationSettingsView: View {
                 }
                 .tint(.brand)
                 .onChange(of: notificationsEnabled) { _, enabled in
-                    if enabled {
-                        Task {
+                    Task {
+                        if enabled {
                             let granted = await notificationService.requestPermission()
                             hasPermission = granted
                             if !granted {
                                 notificationsEnabled = false
+                                return
                             }
+
+                            let items = try? await itemService.getItems()
+                            await notificationService.rescheduleAllNotifications(
+                                items: items ?? [],
+                                daysBefore: defaultReminderDays
+                            )
+                        } else {
+                            await notificationService.rescheduleAllNotifications(items: [])
                         }
                     }
                 }

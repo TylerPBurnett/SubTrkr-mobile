@@ -6,6 +6,7 @@ final class ItemService {
         case futureCancellationDateUnsupported
         case futureEffectiveDateUnsupported
         case effectiveDateBeforeItemStart
+        case invalidArchiveTransition
 
         var errorDescription: String? {
             switch self {
@@ -15,6 +16,8 @@ final class ItemService {
                 return "Effective dates must be today or earlier."
             case .effectiveDateBeforeItemStart:
                 return "Effective dates must be on or after the item's start date."
+            case .invalidArchiveTransition:
+                return "Only cancelled items can be archived."
             }
         }
     }
@@ -107,7 +110,10 @@ final class ItemService {
         if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
             let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
             if item.status == .active {
-                await notificationService.scheduleRenewalReminder(for: item, daysBefore: days > 0 ? days : 3)
+                await notificationService.scheduleRenewalReminder(
+                    for: item,
+                    daysBefore: item.notificationReminderDays(fallback: days)
+                )
             } else if item.status == .trial {
                 await notificationService.scheduleTrialExpirationReminder(for: item)
             }
@@ -127,16 +133,7 @@ final class ItemService {
             .execute()
             .value
 
-        // Reschedule notifications for updated item
-        if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
-            notificationService.cancelNotifications(for: id)
-            let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
-            if item.status == .active {
-                await notificationService.scheduleRenewalReminder(for: item, daysBefore: days > 0 ? days : 3)
-            } else if item.status == .trial {
-                await notificationService.scheduleTrialExpirationReminder(for: item)
-            }
-        }
+        await syncNotifications(for: item)
 
         return item
     }
@@ -154,115 +151,96 @@ final class ItemService {
 
     // MARK: - Status Change
 
-    func executeStatusChange(id: String, userId: String, statusData: StatusChangeData) async throws -> Item {
+    func executeStatusChange(id: String, userId _: String, statusData: StatusChangeData) async throws -> Item {
         let currentItem = try await getItemById(id)
-        var update = ItemUpdate()
-        var historyEffectiveDate: Date?
+        let today = DateHelper.startOfToday()
+        let todayString = DateHelper.formatDate(today)
+        let minimumEffectiveDate = currentItem.minimumEffectiveDate(for: statusData.action)
+        var effectiveDate: Date?
+        var pauseUntil: String?
+        var trialEndDate: String?
+        var nextBillingDate: String?
+        var clearFields: [String] = []
 
         switch statusData.action {
         case "pause":
-            update.status = .paused
-            update.pausedAt = DateHelper.formatISO8601(Date.now)
-            historyEffectiveDate = Date.now
             if let resumeDate = statusData.autoResumeDate {
-                update.pausedUntil = DateHelper.formatDate(resumeDate)
+                pauseUntil = DateHelper.formatDate(resumeDate)
             }
 
         case "cancel":
-            let effectiveDate = try resolvedHistoricalEffectiveDate(
+            effectiveDate = try resolvedHistoricalEffectiveDate(
                 statusData.effectiveDate,
                 futureDateError: .futureCancellationDateUnsupported,
-                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+                minimumDate: minimumEffectiveDate
             )
-
-            update.status = .cancelled
-            update.cancelledAt = DateHelper.formatISO8601(Date.now)
-            update.cancellationDate = DateHelper.formatDate(effectiveDate)
-            historyEffectiveDate = effectiveDate
 
         case "edit_cancellation":
-            let effectiveDate = try resolvedHistoricalEffectiveDate(
+            effectiveDate = try resolvedHistoricalEffectiveDate(
                 statusData.effectiveDate,
                 futureDateError: .futureCancellationDateUnsupported,
-                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+                minimumDate: minimumEffectiveDate
             )
 
-            update.status = .cancelled
-            update.cancellationDate = DateHelper.formatDate(effectiveDate)
-            historyEffectiveDate = effectiveDate
-
-        case "resume", "reactivate":
-            let effectiveDate = try resolvedHistoricalEffectiveDate(
+        case "resume":
+            let resolvedDate = try resolvedHistoricalEffectiveDate(
                 statusData.effectiveDate,
-                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+                minimumDate: minimumEffectiveDate
             )
 
-            update.status = .active
-            update.pausedAt = nil
-            update.pausedUntil = nil
-            update.cancelledAt = nil
-            update.cancellationDate = nil
-            update.archivedAt = nil
-            update.trialStartedAt = nil
-            update.trialEndDate = nil
-            update.nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: effectiveDate)
-            historyEffectiveDate = effectiveDate
+            effectiveDate = resolvedDate
+            clearFields = Self.activeStatusClearFields
+            nextBillingDate = DateHelper.formatDate(currentItem.nextBillingDateAfterResuming(on: resolvedDate))
+
+        case "reactivate":
+            let resolvedDate = try resolvedHistoricalEffectiveDate(
+                statusData.effectiveDate,
+                minimumDate: minimumEffectiveDate
+            )
+
+            effectiveDate = resolvedDate
+            clearFields = Self.activeStatusClearFields
+            nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: resolvedDate)
 
         case "archive":
-            update.status = .archived
-            update.archivedAt = DateHelper.formatISO8601(Date.now)
-            historyEffectiveDate = Date.now
+            guard currentItem.status == .cancelled else {
+                throw ItemServiceError.invalidArchiveTransition
+            }
 
         case "start_trial":
-            update.status = .trial
-            update.trialStartedAt = DateHelper.formatISO8601(Date.now)
-            historyEffectiveDate = Date.now
             if let endDate = statusData.effectiveDate {
-                update.trialEndDate = DateHelper.formatDate(endDate)
+                trialEndDate = DateHelper.formatDate(endDate)
             }
 
         case "convert_trial":
-            let effectiveDate = try resolvedHistoricalEffectiveDate(
+            let resolvedDate = try resolvedHistoricalEffectiveDate(
                 statusData.effectiveDate,
-                minimumDate: currentItem.minimumEffectiveDate(for: statusData.action)
+                minimumDate: minimumEffectiveDate
             )
 
-            update.status = .active
-            update.pausedAt = nil
-            update.pausedUntil = nil
-            update.cancelledAt = nil
-            update.cancellationDate = nil
-            update.archivedAt = nil
-            update.trialStartedAt = nil
-            update.trialEndDate = nil
-            update.nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: effectiveDate)
-            historyEffectiveDate = effectiveDate
+            effectiveDate = resolvedDate
+            clearFields = Self.activeStatusClearFields
+            nextBillingDate = nextBillingDateAfterActivation(for: currentItem, effectiveDate: resolvedDate)
 
         default:
             break
         }
 
-        // Guard against unknown actions — don't write a no-op update or fabricated history
-        guard let newStatus = update.status else {
-            return try await getItemById(id)
-        }
-
-        // Update the item
-        let item = try await updateItem(id: id, data: update)
-
-        // Record status history
-        let history = makeStatusHistoryInsert(
-            itemId: id,
-            userId: userId,
-            status: newStatus,
+        let item = try await executeStatusChangeRPC(
+            id: id,
             action: statusData.action,
+            effectiveDate: effectiveDate.map(DateHelper.formatDate),
+            pauseUntil: pauseUntil,
+            trialEndDate: trialEndDate,
+            nextBillingDate: nextBillingDate,
+            clearFields: clearFields,
             reason: statusData.reason,
-            userNotes: statusData.notes,
-            effectiveDate: historyEffectiveDate
+            notes: statusData.notes,
+            today: todayString,
+            minimumEffectiveDate: minimumEffectiveDate.map(DateHelper.formatDate)
         )
-        try await client.from("item_status_history")
-            .insert(history)
-            .execute()
+
+        await syncNotifications(for: item)
 
         return item
     }
@@ -293,57 +271,46 @@ final class ItemService {
                   pausedUntil <= today,
                   let resumeDate = DateHelper.parseDate(pausedUntil) else { continue }
 
-            let update = ItemUpdate(
-                nextBillingDate: nextBillingDateAfterActivation(for: item, effectiveDate: resumeDate),
-                status: .active,
-                pausedAt: nil,
-                pausedUntil: nil
-            )
-            _ = try await updateItem(id: item.id, data: update)
-
-            let history = makeStatusHistoryInsert(
-                itemId: item.id,
-                userId: item.userId,
-                status: .active,
+            let updatedItem = try await executeStatusChangeRPC(
+                id: item.id,
                 action: "resume",
+                effectiveDate: pausedUntil,
+                pauseUntil: nil,
+                trialEndDate: nil,
+                nextBillingDate: DateHelper.formatDate(item.nextBillingDateAfterResuming(on: resumeDate)),
+                clearFields: Self.activeStatusClearFields,
                 reason: "Auto-resumed",
-                userNotes: nil,
-                effectiveDate: resumeDate
+                notes: nil,
+                today: today,
+                minimumEffectiveDate: item.minimumEffectiveDate(for: "resume").map(DateHelper.formatDate)
             )
-            try await client.from("item_status_history")
-                .insert(history)
-                .execute()
+
+            await syncNotifications(for: updatedItem)
         }
     }
 
-    func handleExpiredTrials(userId: String) async throws {
+    func handleExpiredTrials(userId _: String) async throws {
         let items = try await getItems()
         let today = DateHelper.formatDate(Date.now)
 
         for item in items where item.status == .trial {
             guard let trialEndDate = item.trialEndDate, trialEndDate < today else { continue }
 
-            // Auto-cancel the expired trial
-            let update = ItemUpdate(
-                status: .cancelled,
-                cancelledAt: DateHelper.formatISO8601(Date.now),
-                cancellationDate: trialEndDate
-            )
-            _ = try await updateItem(id: item.id, data: update)
-
-            // Record the automatic transition
-            let history = makeStatusHistoryInsert(
-                itemId: item.id,
-                userId: userId,
-                status: .cancelled,
+            let updatedItem = try await executeStatusChangeRPC(
+                id: item.id,
                 action: "trial_expired",
+                effectiveDate: trialEndDate,
+                pauseUntil: nil,
+                trialEndDate: nil,
+                nextBillingDate: nil,
+                clearFields: [],
                 reason: "Trial expired",
-                userNotes: "Trial ended on \(trialEndDate)",
-                effectiveDate: DateHelper.parseDate(trialEndDate)
+                notes: "Trial ended on \(trialEndDate)",
+                today: today,
+                minimumEffectiveDate: item.minimumEffectiveDate(for: "cancel").map(DateHelper.formatDate)
             )
-            try await client.from("item_status_history")
-                .insert(history)
-                .execute()
+
+            await syncNotifications(for: updatedItem)
         }
     }
 
@@ -357,20 +324,35 @@ final class ItemService {
         }
     }
 
-    private func resolvedHistoricalEffectiveDate(_ effectiveDate: Date?,
+    static func normalizeHistoricalEffectiveDate(_ effectiveDate: Date?,
+                                                 today: Date = DateHelper.startOfToday(),
                                                  futureDateError: ItemServiceError = .futureEffectiveDateUnsupported,
                                                  minimumDate: Date? = nil) throws -> Date {
-        let resolvedDate = effectiveDate ?? Date.now
+        let normalizedToday = DateHelper.startOfDay(today)
+        let resolvedDate = DateHelper.startOfDay(effectiveDate ?? normalizedToday)
 
-        guard !DateHelper.isBeforeDay(Date.now, than: resolvedDate) else {
+        guard !DateHelper.isBeforeDay(normalizedToday, than: resolvedDate) else {
             throw futureDateError
         }
 
-        if let minimumDate, DateHelper.isBeforeDay(resolvedDate, than: minimumDate) {
-            throw ItemServiceError.effectiveDateBeforeItemStart
+        if let minimumDate {
+            let normalizedMinimumDate = DateHelper.startOfDay(minimumDate)
+            if DateHelper.isBeforeDay(resolvedDate, than: normalizedMinimumDate) {
+                throw ItemServiceError.effectiveDateBeforeItemStart
+            }
         }
 
         return resolvedDate
+    }
+
+    private func resolvedHistoricalEffectiveDate(_ effectiveDate: Date?,
+                                                 futureDateError: ItemServiceError = .futureEffectiveDateUnsupported,
+                                                 minimumDate: Date? = nil) throws -> Date {
+        try Self.normalizeHistoricalEffectiveDate(
+            effectiveDate,
+            futureDateError: futureDateError,
+            minimumDate: minimumDate
+        )
     }
 
     private func nextBillingDateAfterActivation(for item: Item, effectiveDate: Date) -> String {
@@ -378,30 +360,88 @@ final class ItemService {
         return DateHelper.formatDate(nextBillingDate)
     }
 
-    private func makeStatusHistoryInsert(itemId: String,
-                                         userId: String,
-                                         status: ItemStatus,
-                                         action: String,
-                                         reason: String?,
-                                         userNotes: String?,
-                                         effectiveDate: Date?) -> StatusHistoryInsert {
-        let formattedEffectiveDate = effectiveDate.map(DateHelper.formatDate)
-
-        return StatusHistoryInsert(
-            itemId: itemId,
-            userId: userId,
-            status: status,
-            reason: reason,
-            // Dual-write metadata into notes for one release so older clients can still reconstruct history.
-            notes: StatusHistoryMetadataCodec.encode(
-                metadata: StatusHistoryMetadata(
-                    action: action,
-                    effectiveDate: formattedEffectiveDate
-                ),
-                userNotes: userNotes
-            ),
+    private func executeStatusChangeRPC(id: String,
+                                        action: String,
+                                        effectiveDate: String?,
+                                        pauseUntil: String?,
+                                        trialEndDate: String?,
+                                        nextBillingDate: String?,
+                                        clearFields: [String],
+                                        reason: String?,
+                                        notes: String?,
+                                        today: String,
+                                        minimumEffectiveDate: String?) async throws -> Item {
+        let params = ExecuteItemStatusChangeParams(
+            itemId: id,
             action: action,
-            effectiveDate: formattedEffectiveDate
+            effectiveDate: effectiveDate,
+            pauseUntil: pauseUntil,
+            trialEndDate: trialEndDate,
+            nextBillingDate: nextBillingDate,
+            clearFields: clearFields,
+            reason: reason?.trimmingCharacters(in: .whitespacesAndNewlines),
+            notes: notes?.trimmingCharacters(in: .whitespacesAndNewlines),
+            today: today,
+            minimumEffectiveDate: minimumEffectiveDate
         )
+
+        return try await client.rpc("execute_item_status_change", params: params)
+            .single()
+            .execute()
+            .value
+    }
+
+    private func syncNotifications(for item: Item) async {
+        notificationService.cancelNotifications(for: item.id)
+        guard UserDefaults.standard.bool(forKey: "notificationsEnabled") else { return }
+
+        let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
+
+        if item.status == .active {
+            await notificationService.scheduleRenewalReminder(
+                for: item,
+                daysBefore: item.notificationReminderDays(fallback: days)
+            )
+        } else if item.status == .trial {
+            await notificationService.scheduleTrialExpirationReminder(for: item)
+        }
+    }
+
+    private static let activeStatusClearFields = [
+        "paused_at",
+        "paused_until",
+        "cancelled_at",
+        "cancellation_date",
+        "archived_at",
+        "trial_started_at",
+        "trial_end_date",
+    ]
+}
+
+private struct ExecuteItemStatusChangeParams: Encodable {
+    let itemId: String
+    let action: String
+    let effectiveDate: String?
+    let pauseUntil: String?
+    let trialEndDate: String?
+    let nextBillingDate: String?
+    let clearFields: [String]
+    let reason: String?
+    let notes: String?
+    let today: String
+    let minimumEffectiveDate: String?
+
+    enum CodingKeys: String, CodingKey {
+        case itemId = "p_item_id"
+        case action = "p_action"
+        case effectiveDate = "p_effective_date"
+        case pauseUntil = "p_pause_until"
+        case trialEndDate = "p_trial_end_date"
+        case nextBillingDate = "p_next_billing_date"
+        case clearFields = "p_clear_fields"
+        case reason = "p_reason"
+        case notes = "p_notes"
+        case today = "p_today"
+        case minimumEffectiveDate = "p_minimum_effective_date"
     }
 }

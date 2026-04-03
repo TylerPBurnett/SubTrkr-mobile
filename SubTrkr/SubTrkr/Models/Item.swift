@@ -155,6 +155,14 @@ struct Item: Codable, Identifiable, Hashable {
         categories?.name ?? "Uncategorized"
     }
 
+    func notificationReminderDays(fallback defaultDays: Int) -> Int {
+        if let reminderDays {
+            return reminderDays
+        }
+
+        return defaultDays > 0 ? defaultDays : 3
+    }
+
     func minimumEffectiveDate(for action: String) -> Date? {
         switch action {
         case "cancel", "edit_cancellation":
@@ -189,6 +197,18 @@ struct Item: Codable, Identifiable, Hashable {
 
         let anchorDate = billingAnchorDate ?? nextBillingDateFormatted
         return DateHelper.nextRecurringDate(anchorDate: anchorDate, cycle: billingCycle, onOrAfter: referenceDay)
+    }
+
+    func nextBillingDateAfterResuming(on resumeDate: Date) -> Date {
+        let resumeDay = DateHelper.startOfDay(resumeDate)
+
+        if let nextBillingDateFormatted,
+           !DateHelper.isBeforeDay(nextBillingDateFormatted, than: resumeDay) {
+            return nextBillingDateFormatted
+        }
+
+        let anchorDate = billingAnchorDate ?? nextBillingDateFormatted ?? resumeDay
+        return DateHelper.nextRecurringDate(anchorDate: anchorDate, cycle: billingCycle, onOrAfter: resumeDay)
     }
 
     func nextBillingDateAfterLoggingPayment(on paymentDate: Date) -> Date? {

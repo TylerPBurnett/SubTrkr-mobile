@@ -88,11 +88,11 @@ enum ItemStatus: String, Codable, CaseIterable, Identifiable {
 
     var availableActions: [String] {
         switch self {
-        case .active: return ["pause", "cancel", "archive", "start_trial"]
-        case .paused: return ["resume", "cancel", "archive"]
+        case .active: return ["pause", "cancel", "start_trial"]
+        case .paused: return ["resume", "cancel"]
         case .cancelled: return ["edit_cancellation", "reactivate", "archive"]
         case .archived: return ["reactivate"]
-        case .trial: return ["convert_trial", "cancel", "archive"]
+        case .trial: return ["convert_trial", "cancel"]
         }
     }
 }

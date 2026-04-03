@@ -101,26 +101,6 @@ struct StatusHistory: Codable, Identifiable {
     }
 }
 
-struct StatusHistoryInsert: Codable {
-    let itemId: String
-    let userId: String
-    let status: ItemStatus
-    let reason: String?
-    let notes: String?
-    let action: String?
-    let effectiveDate: String?
-
-    enum CodingKeys: String, CodingKey {
-        case itemId = "item_id"
-        case userId = "user_id"
-        case status
-        case reason
-        case notes
-        case action
-        case effectiveDate = "effective_date"
-    }
-}
-
 struct StatusChangeData {
     let action: String
     var effectiveDate: Date?

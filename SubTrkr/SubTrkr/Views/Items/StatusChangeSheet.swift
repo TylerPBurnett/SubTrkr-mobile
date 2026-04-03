@@ -8,8 +8,9 @@ struct StatusChangeSheet: View {
     var onStatusChanged: (() async -> Void)?
 
     @State private var selectedAction = ""
-    @State private var effectiveDate = Date.now
-    @State private var autoResumeDate = Date.now.addingTimeInterval(30 * 86400)
+    @State private var effectiveDate = DateHelper.startOfToday()
+    @State private var hasAutoResumeDate = false
+    @State private var autoResumeDate = DateHelper.startOfToday().addingTimeInterval(30 * 86400)
     @State private var reason = ""
     @State private var notes = ""
     @State private var isLoading = false
@@ -61,8 +62,17 @@ struct StatusChangeSheet: View {
 
                 if !selectedAction.isEmpty {
                     if selectedAction == "pause" {
-                        Section("Auto-Resume Date (Optional)") {
-                            DatePicker("Resume on", selection: $autoResumeDate, displayedComponents: .date)
+                        Section("Auto-Resume (Optional)") {
+                            Toggle("Resume automatically", isOn: $hasAutoResumeDate)
+
+                            if hasAutoResumeDate {
+                                DatePicker(
+                                    "Resume on",
+                                    selection: $autoResumeDate,
+                                    in: DateHelper.startOfToday().addingTimeInterval(86400)...,
+                                    displayedComponents: .date
+                                )
+                            }
                         }
                     }
 
@@ -79,14 +89,21 @@ struct StatusChangeSheet: View {
 
                     if selectedAction == "start_trial" {
                         Section("Trial End Date") {
-                            DatePicker("Ends on", selection: $effectiveDate, displayedComponents: .date)
+                            DatePicker(
+                                "Ends on",
+                                selection: $effectiveDate,
+                                in: DateHelper.startOfToday()...,
+                                displayedComponents: .date
+                            )
                         }
                     }
 
-                    Section("Details (Optional)") {
-                        TextField("Reason", text: $reason)
-                        TextField("Notes", text: $notes, axis: .vertical)
-                            .lineLimit(2...4)
+                    if selectedAction != "edit_cancellation" {
+                        Section("Details (Optional)") {
+                            TextField("Reason", text: $reason)
+                            TextField("Notes", text: $notes, axis: .vertical)
+                                .lineLimit(2...4)
+                        }
                     }
                 }
 
@@ -129,7 +146,7 @@ struct StatusChangeSheet: View {
             effectiveDate: selectedActionUsesEffectiveDate ? effectiveDate : nil,
             reason: reason.isEmpty ? nil : reason,
             notes: notes.isEmpty ? nil : notes,
-            autoResumeDate: selectedAction == "pause" ? autoResumeDate : nil
+            autoResumeDate: selectedAction == "pause" && hasAutoResumeDate ? autoResumeDate : nil
         )
 
         do {
@@ -152,12 +169,15 @@ struct StatusChangeSheet: View {
         selectedAction = action
 
         switch action {
+        case "pause":
+            hasAutoResumeDate = false
+            autoResumeDate = DateHelper.startOfToday().addingTimeInterval(30 * 86400)
         case "cancel", "edit_cancellation":
-            effectiveDate = clampedEffectiveDate(item.cancellationDateFormatted ?? Date.now, for: action)
+            effectiveDate = clampedEffectiveDate(item.cancellationDateFormatted ?? DateHelper.startOfToday(), for: action)
         case "resume", "reactivate", "convert_trial":
-            effectiveDate = clampedEffectiveDate(Date.now, for: action)
+            effectiveDate = clampedEffectiveDate(DateHelper.startOfToday(), for: action)
         case "start_trial":
-            effectiveDate = item.trialEndDateFormatted ?? Date.now
+            effectiveDate = item.trialEndDateFormatted ?? DateHelper.startOfToday().addingTimeInterval(14 * 86400)
         default:
             break
         }
@@ -188,13 +208,15 @@ struct StatusChangeSheet: View {
     }
 
     private var historicalEffectiveDateRange: ClosedRange<Date> {
-        let lowerBound = min(item.minimumEffectiveDate(for: selectedAction) ?? Date.distantPast, Date.now)
-        return lowerBound...Date.now
+        let today = DateHelper.startOfToday()
+        let lowerBound = min(item.minimumEffectiveDate(for: selectedAction) ?? Date.distantPast, today)
+        return lowerBound...today
     }
 
     private func clampedEffectiveDate(_ preferredDate: Date, for action: String) -> Date {
         let minimumDate = item.minimumEffectiveDate(for: action) ?? Date.distantPast
-        return max(minimumDate, min(preferredDate, Date.now))
+        let today = DateHelper.startOfToday()
+        return max(minimumDate, min(DateHelper.startOfDay(preferredDate), today))
     }
 
 }
