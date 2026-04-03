@@ -36,6 +36,9 @@
 		CC000000000000000000CC11 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB11 /* NotificationService.swift */; };
 		CC000000000000000000CC12 /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB12 /* PaymentService.swift */; };
 		CC000000000000000000CC13 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB13 /* SupabaseManager.swift */; };
+		EE000000000000000000EE01 /* MaintenanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE000000000000000000EE11 /* MaintenanceService.swift */; };
+		EE000000000000000000EE02 /* MaintenanceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE000000000000000000EE12 /* MaintenanceServiceTests.swift */; };
+		EE000000000000000000EE03 /* ItemListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE000000000000000000EE13 /* ItemListViewModelTests.swift */; };
 		CC000000000000000000CC14 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB14 /* ContentView.swift */; };
 		CC000000000000000000CC15 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB15 /* AnalyticsView.swift */; };
 		CC000000000000000000CC16 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BB16 /* AuthScreen.swift */; };
@@ -115,6 +118,9 @@
 		BB000000000000000000BB11 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB12 /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentService.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB13 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
+		EE000000000000000000EE11 /* MaintenanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaintenanceService.swift; sourceTree = "<group>"; };
+		EE000000000000000000EE12 /* MaintenanceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaintenanceServiceTests.swift; sourceTree = "<group>"; };
+		EE000000000000000000EE13 /* ItemListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewModelTests.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB14 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB15 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		BB000000000000000000BB16 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
@@ -246,6 +252,7 @@
 				BB000000000000000000BB29 /* BiometricService.swift */,
 				BB000000000000000000BB0F /* CategoryService.swift */,
 				BB000000000000000000BB10 /* ItemService.swift */,
+				EE000000000000000000EE11 /* MaintenanceService.swift */,
 				BB000000000000000000BB11 /* NotificationService.swift */,
 				BB000000000000000000BB12 /* PaymentService.swift */,
 				BB000000000000000000BB13 /* SupabaseManager.swift */,
@@ -353,6 +360,8 @@
 			children = (
 				DD000000000000000000DD13 /* AnalyticsServiceTests.swift */,
 				DD000000000000000000DD14 /* ItemEffectiveDateTests.swift */,
+				EE000000000000000000EE13 /* ItemListViewModelTests.swift */,
+				EE000000000000000000EE12 /* MaintenanceServiceTests.swift */,
 				DD000000000000000000DD15 /* RecurringBillingTests.swift */,
 			);
 			path = SubTrkrTests;
@@ -531,6 +540,7 @@
 				CC000000000000000000CC2A /* BiometricService.swift in Sources */,
 				CC000000000000000000CC0F /* CategoryService.swift in Sources */,
 				CC000000000000000000CC10 /* ItemService.swift in Sources */,
+				EE000000000000000000EE01 /* MaintenanceService.swift in Sources */,
 				CC000000000000000000CC11 /* NotificationService.swift in Sources */,
 				CC000000000000000000CC12 /* PaymentService.swift in Sources */,
 				CC000000000000000000CC13 /* SupabaseManager.swift in Sources */,
@@ -567,6 +577,8 @@
 			files = (
 				DD000000000000000000DD02 /* AnalyticsServiceTests.swift in Sources */,
 				DD000000000000000000DD03 /* ItemEffectiveDateTests.swift in Sources */,
+				EE000000000000000000EE03 /* ItemListViewModelTests.swift in Sources */,
+				EE000000000000000000EE02 /* MaintenanceServiceTests.swift in Sources */,
 				DD000000000000000000DD04 /* RecurringBillingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

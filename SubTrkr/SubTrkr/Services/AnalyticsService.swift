@@ -169,7 +169,7 @@ final class AnalyticsService {
     private func statusTransitions(for statusHistory: [StatusHistory]) -> [StatusTransition] {
         let calendar = Calendar.current
 
-        return statusHistory.compactMap { entry in
+        let historyEntries: [StatusTransition] = statusHistory.compactMap { entry -> StatusTransition? in
             let effectiveDate = entry.effectiveDateFormatted
                 ?? entry.changedAtFormatted.map { calendar.startOfDay(for: $0) }
 
@@ -183,6 +183,36 @@ final class AnalyticsService {
             )
         }
         .sorted { lhs, rhs in
+            (lhs.recordedAt ?? lhs.effectiveDate) < (rhs.recordedAt ?? rhs.effectiveDate)
+        }
+
+        var normalizedTransitions: [StatusTransition] = []
+
+        for entry in historyEntries {
+            if entry.action == "edit_cancellation" {
+                for index in normalizedTransitions.indices.reversed() {
+                    let previous = normalizedTransitions[index]
+                    let isCancellationAction = previous.action == "cancel"
+                        || previous.action == "trial_expired"
+                        || previous.action == nil
+
+                    if previous.status == .cancelled && isCancellationAction {
+                        normalizedTransitions[index] = StatusTransition(
+                            status: previous.status,
+                            effectiveDate: entry.effectiveDate,
+                            action: previous.action,
+                            recordedAt: previous.recordedAt
+                        )
+                        break
+                    }
+                }
+                continue
+            }
+
+            normalizedTransitions.append(entry)
+        }
+
+        return normalizedTransitions.sorted { lhs, rhs in
             if lhs.effectiveDate != rhs.effectiveDate {
                 return lhs.effectiveDate < rhs.effectiveDate
             }
@@ -192,6 +222,10 @@ final class AnalyticsService {
     }
 
     private func inferredInitialStatus(for item: Item, transitions: [StatusTransition]) -> ItemStatus {
+        if transitions.contains(where: { $0.action == "start_trial" }) {
+            return .active
+        }
+
         if let firstTransition = transitions.first, firstTransition.action == "convert_trial" {
             return .trial
         }
@@ -242,85 +276,6 @@ final class AnalyticsService {
         return result
     }
 
-    /// Category spending over time (for stacked area chart).
-    func reconstructCategorySpending(items: [Item], payments: [Payment], statusHistoryByItem: [String: [StatusHistory]] = [:], months: Int) -> [CategoryMonthlySpending] {
-        let calendar = Calendar.current
-        let now = Date.now
-
-        var paymentIndex: [String: [String: Double]] = [:]
-        for payment in payments {
-            guard let date = payment.paidDateFormatted else { continue }
-            let key = DateHelper.formatYearMonth(date)
-            paymentIndex[payment.itemId, default: [:]][key, default: 0] += payment.amount
-        }
-
-        var result: [CategoryMonthlySpending] = []
-
-        for i in (0..<months).reversed() {
-            guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
-            let (monthStart, monthEndExclusive) = monthRange(for: monthDate)
-            let monthKey = DateHelper.formatYearMonth(monthStart)
-
-            var categoryTotals: [String: (color: String, total: Double)] = [:]
-
-            for item in items {
-                var amount = 0.0
-                if let paidAmount = paymentIndex[item.id]?[monthKey] {
-                    amount = paidAmount
-                } else if wasItemActive(
-                    item: item,
-                    monthStart: monthStart,
-                    monthEndExclusive: monthEndExclusive,
-                    statusHistory: statusHistoryByItem[item.id] ?? []
-                ) {
-                    amount = item.monthlyAmount
-                }
-
-                if amount > 0 {
-                    let name = item.categoryName
-                    let color = item.categoryColor
-                    categoryTotals[name, default: (color: color, total: 0)].total += amount
-                }
-            }
-
-            for (name, data) in categoryTotals {
-                result.append(CategoryMonthlySpending(
-                    month: monthStart,
-                    category: name,
-                    color: data.color,
-                    total: data.total
-                ))
-            }
-        }
-
-        return result
-    }
-
-    /// Active item count per month.
-    func reconstructMonthlyItemCount(items: [Item], statusHistoryByItem: [String: [StatusHistory]] = [:], months: Int) -> [MonthlyItemCount] {
-        let calendar = Calendar.current
-        let now = Date.now
-
-        var result: [MonthlyItemCount] = []
-
-        for i in (0..<months).reversed() {
-            guard let monthDate = calendar.date(byAdding: .month, value: -i, to: now) else { continue }
-            let (monthStart, monthEndExclusive) = monthRange(for: monthDate)
-
-            let count = items.filter {
-                wasItemActive(
-                    item: $0,
-                    monthStart: monthStart,
-                    monthEndExclusive: monthEndExclusive,
-                    statusHistory: statusHistoryByItem[$0.id] ?? []
-                )
-            }.count
-            result.append(MonthlyItemCount(month: monthStart, count: count))
-        }
-
-        return result
-    }
-
     /// Forward-looking projected annual spend from currently active items.
     func calculateProjectedAnnualSpend(items: [Item]) -> Double {
         items
@@ -355,13 +310,4 @@ final class AnalyticsService {
             .sorted { ($0.daysUntilDue ?? Int.max) < ($1.daysUntilDue ?? Int.max) }
     }
 
-    // MARK: - Counts
-
-    func getStatusCounts(items: [Item]) -> [ItemStatus: Int] {
-        var counts: [ItemStatus: Int] = [:]
-        for item in items {
-            counts[item.status, default: 0] += 1
-        }
-        return counts
-    }
 }

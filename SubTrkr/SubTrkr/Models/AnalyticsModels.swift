@@ -18,28 +18,6 @@ struct MonthlySpending: Identifiable {
     }
 }
 
-struct CategoryMonthlySpending: Identifiable {
-    let id = UUID()
-    let month: Date
-    let category: String
-    let color: String
-    let total: Double
-
-    var shortMonth: String {
-        DateHelper.formatShortMonth(month)
-    }
-}
-
-struct MonthlyItemCount: Identifiable {
-    let id = UUID()
-    let month: Date
-    let count: Int
-
-    var shortMonth: String {
-        DateHelper.formatShortMonth(month)
-    }
-}
-
 struct TopExpense: Identifiable {
     let id: String
     let name: String

@@ -205,6 +205,114 @@ final class AnalyticsServiceTests: XCTestCase {
         assertEqual(trend.map(\.total), [12.99], accuracy: 0.001)
     }
 
+    func testEditedCancellationDateOverridesOriginalCancellationForAnalytics() {
+        let calendar = Calendar.current
+        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: Date.now))!
+        let oneMonthAgo = calendar.date(byAdding: .month, value: -1, to: monthStart)!
+        let twoMonthsAgo = calendar.date(byAdding: .month, value: -2, to: monthStart)!
+
+        let item = makeItem(
+            status: .cancelled,
+            startDate: DateHelper.formatDate(twoMonthsAgo)
+        )
+
+        let cancelRecordedAt = calendar.date(byAdding: .hour, value: 9, to: oneMonthAgo)!
+        let editRecordedAt = calendar.date(byAdding: .hour, value: 10, to: monthStart)!
+
+        let history = [
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .cancelled,
+                reason: nil,
+                notes: nil,
+                action: "cancel",
+                effectiveDate: DateHelper.formatDate(oneMonthAgo),
+                changedAt: DateHelper.formatISO8601(cancelRecordedAt)
+            ),
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .cancelled,
+                reason: nil,
+                notes: nil,
+                action: "edit_cancellation",
+                effectiveDate: DateHelper.formatDate(monthStart),
+                changedAt: DateHelper.formatISO8601(editRecordedAt)
+            )
+        ]
+
+        let trend = analyticsService.reconstructMonthlySpending(
+            items: [item],
+            payments: [],
+            statusHistoryByItem: [item.id: history],
+            months: 3
+        )
+
+        assertEqual(trend.map(\.total), [12.99, 12.99, 0], accuracy: 0.001)
+    }
+
+    func testStartTrialKeepsPreTrialMonthsActive() {
+        let calendar = Calendar.current
+        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: Date.now))!
+        let oneMonthAgo = calendar.date(byAdding: .month, value: -1, to: monthStart)!
+        let twoMonthsAgo = calendar.date(byAdding: .month, value: -2, to: monthStart)!
+
+        let item = Item(
+            id: UUID().uuidString,
+            userId: UUID().uuidString,
+            name: "Test Item",
+            amount: 12.99,
+            currency: "USD",
+            billingCycle: .monthly,
+            categoryId: nil,
+            startDate: DateHelper.formatDate(twoMonthsAgo),
+            nextBillingDate: DateHelper.formatDate(monthStart),
+            reminderDays: nil,
+            notes: nil,
+            url: nil,
+            logoUrl: nil,
+            itemType: .subscription,
+            status: .trial,
+            pausedAt: nil,
+            pausedUntil: nil,
+            cancelledAt: nil,
+            cancellationDate: nil,
+            archivedAt: nil,
+            trialStartedAt: DateHelper.formatISO8601(monthStart),
+            trialEndDate: DateHelper.formatDate(calendar.date(byAdding: .day, value: 14, to: monthStart)!),
+            isActive: nil,
+            createdAt: DateHelper.formatISO8601(Date.now),
+            updatedAt: DateHelper.formatISO8601(Date.now),
+            categories: nil
+        )
+
+        let history = [
+            StatusHistory(
+                id: UUID().uuidString,
+                itemId: item.id,
+                userId: UUID().uuidString,
+                status: .trial,
+                reason: nil,
+                notes: nil,
+                action: "start_trial",
+                effectiveDate: DateHelper.formatDate(monthStart),
+                changedAt: DateHelper.formatISO8601(monthStart)
+            )
+        ]
+
+        let trend = analyticsService.reconstructMonthlySpending(
+            items: [item],
+            payments: [],
+            statusHistoryByItem: [item.id: history],
+            months: 3
+        )
+
+        assertEqual(trend.map(\.total), [12.99, 12.99, 0], accuracy: 0.001)
+    }
+
     private func makeItem(status: ItemStatus, startDate: String) -> Item {
         Item(
             id: UUID().uuidString,

@@ -6,7 +6,7 @@ final class DashboardViewModel {
     private let itemService = ItemService()
     private let analyticsService = AnalyticsService()
     private let categoryService = CategoryService()
-    private let notificationService = NotificationService()
+    private let maintenanceService = MaintenanceService.shared
 
     var items: [Item] = []
     var categories: [Category] = []
@@ -71,24 +71,12 @@ final class DashboardViewModel {
         isLoading = false
     }
 
-    func runMaintenance(userId: String) async {
+    func runMaintenance(userId: String) async -> Bool {
         do {
-            try await itemService.advancePastDueItems()
-            try await itemService.archivePastCancellations()
-            try await itemService.resumePausedItems()
-            try await itemService.handleExpiredTrials(userId: userId)
-
-            // Reschedule all notifications after maintenance changes
-            if UserDefaults.standard.bool(forKey: "notificationsEnabled") {
-                let allItems = try await itemService.getItems()
-                let days = UserDefaults.standard.integer(forKey: "defaultReminderDays")
-                await notificationService.rescheduleAllNotifications(
-                    items: allItems,
-                    daysBefore: days > 0 ? days : 3
-                )
-            }
+            return try await maintenanceService.runIfNeeded(userId: userId)
         } catch {
             self.error = "Maintenance failed: \(error.localizedDescription)"
+            return false
         }
     }
 }

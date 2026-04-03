@@ -54,22 +54,13 @@ final class ItemListViewModel {
 
         // Sort
         result.sort { a, b in
-            let comparison: Bool
-            switch sortOption {
-            case .nextBillingDate:
-                let dateA = a.nextBillingDateFormatted ?? .distantFuture
-                let dateB = b.nextBillingDateFormatted ?? .distantFuture
-                comparison = dateA < dateB
-            case .name:
-                comparison = a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
-            case .price:
-                comparison = a.amount < b.amount
-            case .category:
-                comparison = a.categoryName.localizedCaseInsensitiveCompare(b.categoryName) == .orderedAscending
-            case .status:
-                comparison = a.status.rawValue < b.status.rawValue
+            let comparison = sortComparison(lhs: a, rhs: b)
+
+            if comparison == .orderedSame {
+                return a.id < b.id
             }
-            return sortAscending ? comparison : !comparison
+
+            return sortAscending ? comparison == .orderedAscending : comparison == .orderedDescending
         }
 
         return result
@@ -125,5 +116,32 @@ final class ItemListViewModel {
         selectedStatuses = [.active, .trial]
         sortOption = .nextBillingDate
         sortAscending = true
+    }
+
+    private func sortComparison(lhs: Item, rhs: Item) -> ComparisonResult {
+        switch sortOption {
+        case .nextBillingDate:
+            return compare(lhs.nextBillingDateFormatted ?? .distantFuture, rhs.nextBillingDateFormatted ?? .distantFuture)
+        case .name:
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name)
+        case .price:
+            return compare(lhs.amount, rhs.amount)
+        case .category:
+            return lhs.categoryName.localizedCaseInsensitiveCompare(rhs.categoryName)
+        case .status:
+            return lhs.status.rawValue.localizedCaseInsensitiveCompare(rhs.status.rawValue)
+        }
+    }
+
+    private func compare<T: Comparable>(_ lhs: T, _ rhs: T) -> ComparisonResult {
+        if lhs < rhs {
+            return .orderedAscending
+        }
+
+        if lhs > rhs {
+            return .orderedDescending
+        }
+
+        return .orderedSame
     }
 }

@@ -5,7 +5,6 @@ struct DashboardView: View {
     @Environment(AuthService.self) private var authService
     @State private var viewModel = DashboardViewModel()
     @State private var calendarViewModel = CalendarViewModel()
-    @State private var hasRunMaintenance = false
     @State private var selectedTab = 0
 
     var body: some View {
@@ -35,11 +34,12 @@ struct DashboardView: View {
             .background(Color.bgBase)
             .navigationTitle("Dashboard")
         }
-        .task {
+        .task(id: authService.currentUser?.id) {
             await viewModel.loadData()
-            if !hasRunMaintenance, let userId = authService.currentUser?.id.uuidString {
-                hasRunMaintenance = true
-                await viewModel.runMaintenance(userId: userId)
+            guard let userId = authService.currentUser?.id.uuidString else { return }
+
+            let shouldReload = await viewModel.runMaintenance(userId: userId)
+            if shouldReload {
                 await viewModel.loadData()
             }
         }
