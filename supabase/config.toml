@@ -370,6 +370,12 @@ deno_version = 2
 [functions.send-notifications]
 verify_jwt = false
 
+# The logo proxy is fetched directly by <img src="..."> in the clients, which
+# cannot attach an Authorization header, so it has to be publicly reachable.
+# It holds no user data -- it only turns a hostname into a cached brand image.
+[functions.logo-proxy]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
