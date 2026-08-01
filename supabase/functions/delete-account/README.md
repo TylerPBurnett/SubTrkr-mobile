@@ -41,10 +41,12 @@ Verified in this repo's migrations
 | `notification_log` | `item_id → items(id)` | `SET NULL` |
 | `item_status_history` | `item_id → items(id)` | `CASCADE` |
 
-⚠️ **Not verifiable from source.** `items`, `categories`, and `payments` were
+✅ **Audit passed 2026-08-01.** `items`, `categories`, and `payments` were
 created in the Supabase dashboard before this repo tracked migrations, so no
-`CREATE TABLE` for them exists here. Their `user_id → auth.users(id)` FK actions
-must be confirmed against the live database **before deploying**:
+`CREATE TABLE` for them exists here. The query below was run against the live
+database on 2026-08-01: all three `user_id → auth.users(id)` FKs are
+`ON DELETE CASCADE`, and `items.category_id → categories(id)` is
+`ON DELETE SET NULL`. Re-run it if constraints ever change:
 
 ```sql
 select

@@ -8,15 +8,17 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // function never accepts a user id from the request body, so a user can only
 // ever delete themselves.
 //
-// Cascade behaviour (verified against supabase/migrations/):
+// Cascade behaviour (verified against supabase/migrations/ and the live DB
+// via pg_constraint on 2026-08-01):
+//   - items.user_id                     -> auth.users(id) ON DELETE CASCADE
+//   - categories.user_id                -> auth.users(id) ON DELETE CASCADE
+//   - payments.user_id                  -> auth.users(id) ON DELETE CASCADE
 //   - notification_channels.user_id     -> auth.users(id) ON DELETE CASCADE
 //   - notification_preferences.user_id  -> auth.users(id) ON DELETE CASCADE
 //   - notification_log.user_id          -> auth.users(id) ON DELETE CASCADE
 //   - notification_log.item_id          -> items(id)      ON DELETE SET NULL
 //   - item_status_history.item_id       -> items(id)      ON DELETE CASCADE
-// items / categories / payments predate the migration history in this repo
-// (they were created in the Supabase dashboard), so their FK actions are not
-// verifiable from source. See README.md -- confirm them before deploying.
+//   - items.category_id                 -> categories(id) ON DELETE SET NULL
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
