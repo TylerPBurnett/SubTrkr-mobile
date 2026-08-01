@@ -7,7 +7,7 @@ import { formatRenewalMessage, formatTrialMessage, formatTestMessage } from "./u
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
 };
 
 const CONCURRENCY_LIMIT = 20; // Max concurrent API requests
@@ -101,8 +101,97 @@ async function logNotification(
   await supabase.from("notification_log").insert(entry);
 }
 
-// OPTIMIZATION 2: Bulk deduplication check
-async function getBulkSentToday(
+// Constant-time comparison so the cron secret cannot be recovered by timing
+// the 401 responses. Length is compared first and does leak, which is
+// acceptable for a fixed-length generated secret.
+function secretsMatch(provided: string, expected: string): boolean {
+  const encoder = new TextEncoder();
+  const a = encoder.encode(provided);
+  const b = encoder.encode(expected);
+  if (a.length !== b.length) return false;
+
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i];
+  }
+  return diff === 0;
+}
+
+type ClaimResult =
+  | { ok: true; id: string }
+  | { ok: false; reason: "duplicate" }
+  | { ok: false; reason: "error"; error: string };
+
+// Claim-then-send: insert a 'pending' row BEFORE dispatching. The partial
+// unique index idx_notification_log_claim (user_id, item_id, channel,
+// event_type, UTC day) WHERE status IN ('pending','sent') makes this the real
+// deduplication boundary -- two concurrent invocations race on the insert and
+// exactly one wins.
+//
+// PostgREST cannot target an expression index with on_conflict, so the loser is
+// detected from the SQLSTATE of a plain insert: 23505 = unique_violation.
+async function claimNotification(
+  supabase: ReturnType<typeof createClient>,
+  entry: {
+    user_id: string;
+    channel: string;
+    event_type: string;
+    item_id: string;
+  }
+): Promise<ClaimResult> {
+  const { data, error } = await supabase
+    .from("notification_log")
+    .insert({ ...entry, status: "pending" })
+    .select("id")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") return { ok: false, reason: "duplicate" };
+    return { ok: false, reason: "error", error: error.message };
+  }
+
+  if (!data?.id) {
+    return { ok: false, reason: "error", error: "Claim insert returned no row" };
+  }
+
+  return { ok: true, id: data.id as string };
+}
+
+// Resolve a claimed row after dispatch. 'failed' drops out of the partial
+// index so the notification can be retried on a later run; 'sent' keeps
+// holding the claim for the rest of the UTC day.
+//
+// sent_at is deliberately NOT refreshed here: it is part of the claim index
+// key, and moving it across a UTC midnight boundary between claim and
+// finalize would both release the day's claim and risk a second unique
+// violation on the update. The claim timestamp is within seconds of the send.
+async function finalizeNotification(
+  supabase: ReturnType<typeof createClient>,
+  id: string,
+  status: "sent" | "failed",
+  errorMessage?: string
+) {
+  const patch: Record<string, unknown> = { status };
+  if (errorMessage !== undefined) patch.error_message = errorMessage;
+
+  const { error } = await supabase
+    .from("notification_log")
+    .update(patch)
+    .eq("id", id);
+
+  if (error) {
+    // Dispatch already happened (or already failed), so the only cost is a row
+    // stuck at 'pending'. That is the safe direction: it keeps holding the
+    // claim, which blocks a duplicate send for the rest of the UTC day.
+    console.error(`Failed to finalize notification ${id} as '${status}': ${error.message}`);
+  }
+}
+
+// OPTIMIZATION 2: Bulk deduplication check.
+// Fast path only -- it skips work that the claim insert would reject anyway.
+// 'pending' counts as claimed: an in-flight notification from a concurrent
+// invocation must not be sent a second time.
+async function getBulkClaimedToday(
   supabase: ReturnType<typeof createClient>,
   userIds: string[],
   todayStart: Date
@@ -113,7 +202,7 @@ async function getBulkSentToday(
     .from("notification_log")
     .select("user_id, item_id, channel, event_type")
     .in("user_id", userIds)
-    .eq("status", "sent")
+    .in("status", ["pending", "sent"])
     .gte("sent_at", todayStart.toISOString());
 
   return new Set(
@@ -194,6 +283,30 @@ Deno.serve(async (req: Request) => {
     }
 
     // === Scheduled notification mode ===
+    // This function runs with verify_jwt = false (pg_cron calls it with the anon
+    // key, which ships inside every client binary), so nothing above the platform
+    // stops an arbitrary caller from triggering a full fleet-wide dispatch. A
+    // shared secret header is the gate.
+    //
+    // Fails CLOSED on purpose: an unset CRON_SECRET disables scheduled dispatch
+    // rather than leaving the endpoint open. Set it with
+    // `supabase secrets set CRON_SECRET=...` -- see README.md.
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    if (!cronSecret) {
+      return jsonResponse(
+        { error: "Scheduled dispatch is disabled: CRON_SECRET is not configured" },
+        401
+      );
+    }
+
+    const providedCronSecret = req.headers.get("x-cron-secret");
+    if (!providedCronSecret || !secretsMatch(providedCronSecret, cronSecret)) {
+      return jsonResponse(
+        { error: "Missing or invalid x-cron-secret header" },
+        401
+      );
+    }
+
     // Note: DB function now filters by timezone - only returns items where user's local time = 9 AM
     const { data: dueItems, error: queryError } = await supabase.rpc(
       "get_items_due_for_notification"
@@ -236,10 +349,12 @@ Deno.serve(async (req: Request) => {
       channelsByUser.set(ch.user_id, existing);
     }
 
-    // OPTIMIZATION 2: Bulk deduplication - single query for all sent notifications today
+    // OPTIMIZATION 2: Bulk deduplication - single query for everything already
+    // claimed (pending) or delivered (sent) today. The authoritative check is
+    // the claim insert inside each dispatch task; this only trims obvious work.
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
-    const sentSet = await getBulkSentToday(supabase, userIds, todayStart);
+    const claimedSet = await getBulkClaimedToday(supabase, userIds, todayStart);
 
     // Collect all dispatch tasks for parallel execution
     const dispatchTasks: Array<() => Promise<void>> = [];
@@ -266,13 +381,36 @@ Deno.serve(async (req: Request) => {
             channelConfig.channel,
             item.event_type
           );
-          if (sentSet.has(dedupeKey)) {
+          if (claimedSet.has(dedupeKey)) {
             totalSkipped++;
             continue;
           }
 
           // Create dispatch task (will run in parallel)
           dispatchTasks.push(async () => {
+            // Claim before sending. Losing this race means another invocation
+            // is already handling it, so nothing is dispatched here.
+            const claim = await claimNotification(supabase, {
+              user_id: userId,
+              channel: channelConfig.channel,
+              event_type: item.event_type,
+              item_id: item.item_id,
+            });
+
+            if (!claim.ok) {
+              if (claim.reason === "duplicate") {
+                totalSkipped++;
+              } else {
+                // Fail safe: without a claim row the send would be unlogged and
+                // could repeat on the next run, so it is not attempted at all.
+                console.error(
+                  `Failed to claim notification (user ${userId}, item ${item.item_id}, ${channelConfig.channel}): ${claim.error}`
+                );
+                totalFailed++;
+              }
+              return;
+            }
+
             try {
               const message =
                 item.event_type === "renewal_reminder"
@@ -286,24 +424,11 @@ Deno.serve(async (req: Request) => {
                 message
               );
 
-              await logNotification(supabase, {
-                user_id: userId,
-                channel: channelConfig.channel,
-                event_type: item.event_type,
-                item_id: item.item_id,
-                status: "sent",
-              });
+              await finalizeNotification(supabase, claim.id, "sent");
               totalSent++;
             } catch (err) {
               const errorMsg = err instanceof Error ? err.message : "Unknown error";
-              await logNotification(supabase, {
-                user_id: userId,
-                channel: channelConfig.channel,
-                event_type: item.event_type,
-                item_id: item.item_id,
-                status: "failed",
-                error_message: errorMsg,
-              });
+              await finalizeNotification(supabase, claim.id, "failed", errorMsg);
               totalFailed++;
             }
           });
